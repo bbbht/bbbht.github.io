@@ -86,18 +86,18 @@
 
 
 
-<meta name="description" content="运行hexo server命令时报错问题描述12345INFO  Start processingERROR Process failed: tags/index.mdTypeError: Cannot read property &amp;apos;utcOffset&amp;apos; of null    at Object.exports.timezone ...    ... 原因主题的timezone">
+<meta name="description" content="初次使用hexo，对各种配置还不熟悉尽量使用了默认配置，并参考别人的经验，然而还是遇到了些小问题比如运行hexo server，hexo deploy等命令时报错慢慢完善吧，后期再丰富功能">
 <meta name="keywords" content="hexo">
 <meta property="og:type" content="article">
 <meta property="og:title" content="使用hexo时遇到的问题">
 <meta property="og:url" content="http://yoursite.com/2018/02/27/problems-useing-hexo/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
-<meta property="og:description" content="运行hexo server命令时报错问题描述12345INFO  Start processingERROR Process failed: tags/index.mdTypeError: Cannot read property &amp;apos;utcOffset&amp;apos; of null    at Object.exports.timezone ...    ... 原因主题的timezone">
+<meta property="og:description" content="初次使用hexo，对各种配置还不熟悉尽量使用了默认配置，并参考别人的经验，然而还是遇到了些小问题比如运行hexo server，hexo deploy等命令时报错慢慢完善吧，后期再丰富功能">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-02-27T06:16:19.623Z">
+<meta property="og:updated_time" content="2018-02-28T06:57:22.110Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用hexo时遇到的问题">
-<meta name="twitter:description" content="运行hexo server命令时报错问题描述12345INFO  Start processingERROR Process failed: tags/index.mdTypeError: Cannot read property &amp;apos;utcOffset&amp;apos; of null    at Object.exports.timezone ...    ... 原因主题的timezone">
+<meta name="twitter:description" content="初次使用hexo，对各种配置还不熟悉尽量使用了默认配置，并参考别人的经验，然而还是遇到了些小问题比如运行hexo server，hexo deploy等命令时报错慢慢完善吧，后期再丰富功能">
 
 
 
@@ -337,7 +337,9 @@
       
 
       
-        <h2 id="运行hexo-server命令时报错"><a href="#运行hexo-server命令时报错" class="headerlink" title="运行hexo server命令时报错"></a>运行<code>hexo server</code>命令时报错</h2><h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">INFO  Start processing</span><br><span class="line">ERROR Process failed: tags/index.md</span><br><span class="line">TypeError: Cannot read property &apos;utcOffset&apos; of null</span><br><span class="line">    at Object.exports.timezone ...</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+        <p>初次使用hexo，对各种配置还不熟悉<br>尽量使用了默认配置，并参考别人的经验，然而还是遇到了些小问题<br>比如运行<code>hexo server</code>，<code>hexo deploy</code>等命令时报错<br>慢慢完善吧，后期再丰富功能</p>
+<a id="more"></a>
+<h2 id="运行hexo-server命令时报错"><a href="#运行hexo-server命令时报错" class="headerlink" title="运行hexo server命令时报错"></a>运行<code>hexo server</code>命令时报错</h2><h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">INFO  Start processing</span><br><span class="line">ERROR Process failed: tags/index.md</span><br><span class="line">TypeError: Cannot read property &apos;utcOffset&apos; of null</span><br><span class="line">    at Object.exports.timezone ...</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
 <h3 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h3><p>主题的timezone配置为空导致<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">timeZone:</span><br></pre></td></tr></table></figure></p>
 <h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p>设置主题的timezone，并与全局配置保持一致<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">timeZone: Asia/Shanghai</span><br></pre></td></tr></table></figure></p>
 <h2 id="运行hexo-deploy命令失败"><a href="#运行hexo-deploy命令失败" class="headerlink" title="运行hexo deploy命令失败"></a>运行<code>hexo deploy</code>命令失败</h2><h3 id="问题描述-1"><a href="#问题描述-1" class="headerlink" title="问题描述"></a>问题描述</h3><p>_config.yml配置如下<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line"><span class="attr">  type:</span> <span class="string">git</span></span><br><span class="line"><span class="attr">  repository:</span> <span class="string">git@github.com:bbbht/bbbht.github.io.git</span></span><br><span class="line"><span class="attr">  branch:</span> <span class="string">master</span></span><br></pre></td></tr></table></figure></p>

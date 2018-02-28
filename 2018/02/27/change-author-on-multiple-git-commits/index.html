@@ -86,18 +86,18 @@
 
 
 
-<meta name="description" content="问题描述通过hexo deploy推送到github pages上的文章，访问正常，没来得及高兴就发现了问题。仓库中的commit信息是公司项目中配置的信息！ 原因没有为项目做git上的配置，于是使用了全局的git配置。 解决方法将所有错误的name，email修改为正确的配置。发现两种方案 a. 通过git rebase -i 命令 重写历史12# 选择修改范围git rebase -i HEA">
+<meta name="description" content="问题描述通过hexo deploy推送到github pages上的文章，访问正常，没来得及高兴就发现了问题。因为仓库中的commit信息是公司项目中配置的信息！">
 <meta name="keywords" content="git">
 <meta property="og:type" content="article">
 <meta property="og:title" content="修改已提交的git仓库中commit作者信息（name,email）">
 <meta property="og:url" content="http://yoursite.com/2018/02/27/change-author-on-multiple-git-commits/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
-<meta property="og:description" content="问题描述通过hexo deploy推送到github pages上的文章，访问正常，没来得及高兴就发现了问题。仓库中的commit信息是公司项目中配置的信息！ 原因没有为项目做git上的配置，于是使用了全局的git配置。 解决方法将所有错误的name，email修改为正确的配置。发现两种方案 a. 通过git rebase -i 命令 重写历史12# 选择修改范围git rebase -i HEA">
+<meta property="og:description" content="问题描述通过hexo deploy推送到github pages上的文章，访问正常，没来得及高兴就发现了问题。因为仓库中的commit信息是公司项目中配置的信息！">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-02-28T02:27:56.543Z">
+<meta property="og:updated_time" content="2018-02-28T06:58:04.751Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="修改已提交的git仓库中commit作者信息（name,email）">
-<meta name="twitter:description" content="问题描述通过hexo deploy推送到github pages上的文章，访问正常，没来得及高兴就发现了问题。仓库中的commit信息是公司项目中配置的信息！ 原因没有为项目做git上的配置，于是使用了全局的git配置。 解决方法将所有错误的name，email修改为正确的配置。发现两种方案 a. 通过git rebase -i 命令 重写历史12# 选择修改范围git rebase -i HEA">
+<meta name="twitter:description" content="问题描述通过hexo deploy推送到github pages上的文章，访问正常，没来得及高兴就发现了问题。因为仓库中的commit信息是公司项目中配置的信息！">
 
 
 
@@ -359,7 +359,8 @@
       
 
       
-        <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>通过<code>hexo deploy</code>推送到github pages上的文章，访问正常，没来得及高兴就发现了问题。<br>仓库中的commit信息是公司项目中配置的信息！</p>
+        <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>通过<code>hexo deploy</code>推送到github pages上的文章，访问正常，没来得及高兴就发现了问题。<br>因为仓库中的commit信息是公司项目中配置的信息！</p>
+<a id="more"></a>
 <h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>没有为项目做git上的配置，于是使用了全局的git配置。</p>
 <h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>将所有错误的name，email修改为正确的配置。<br>发现两种方案</p>
 <p>a. 通过<code>git rebase -i</code> 命令 重写历史<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 选择修改范围</span></span><br><span class="line">git rebase -i HEAD~n</span><br></pre></td></tr></table></figure></p>
