@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="bash," />
 
 
 
@@ -86,16 +86,18 @@
 
 
 
-<meta name="description" content="尝试，记录，分享">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Don&#39;t Panic">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="看某项目的Dockerfile时，遇到一条命令set -- $@ 80不甚理解，于是查找资料，发现并没有那么复杂 set的用法用法很丰富，参考man set即可 set -x指令执行后先输出该指令及其参数，再输出执行结果12345678#!/bin/bashset -xecho `date`# 输出# ++ date# + echo 2018年02月27日 17:32:11# 2018年02月27">
+<meta name="keywords" content="bash">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux命令&#39;set -- $@&#39;的解释">
+<meta property="og:url" content="http://yoursite.com/2018/02/28/explain-a-linux-set-command/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
-<meta property="og:description" content="尝试，记录，分享">
+<meta property="og:description" content="看某项目的Dockerfile时，遇到一条命令set -- $@ 80不甚理解，于是查找资料，发现并没有那么复杂 set的用法用法很丰富，参考man set即可 set -x指令执行后先输出该指令及其参数，再输出执行结果12345678#!/bin/bashset -xecho `date`# 输出# ++ date# + echo 2018年02月27日 17:32:11# 2018年02月27">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-02-28T06:27:51.100Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Don&#39;t Panic">
-<meta name="twitter:description" content="尝试，记录，分享">
+<meta name="twitter:title" content="linux命令&#39;set -- $@&#39;的解释">
+<meta name="twitter:description" content="看某项目的Dockerfile时，遇到一条命令set -- $@ 80不甚理解，于是查找资料，发现并没有那么复杂 set的用法用法很丰富，参考man set即可 set -x指令执行后先输出该指令及其参数，再输出执行结果12345678#!/bin/bashset -xecho `date`# 输出# ++ date# + echo 2018年02月27日 17:32:11# 2018年02月27">
 
 
 
@@ -125,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/02/28/explain-a-linux-set-command/"/>
 
 
 
 
 
-  <title>Don't Panic</title>
+  <title>linux命令'set -- $@'的解释 | Don't Panic</title>
   
 
 
@@ -150,8 +152,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-  page-home">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -254,9 +255,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -286,9 +287,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/28/explain-a-linux-set-command/" itemprop="url">linux命令'set -- $@'的解释</a></h2>
+          <h2 class="post-title" itemprop="name headline">linux命令'set -- $@'的解释</h2>
         
 
         <div class="post-meta">
@@ -360,9 +359,7 @@
       
 
       
-        
-          
-            <p>看某项目的Dockerfile时，遇到一条命令<br><code>set -- $@ 80</code><br>不甚理解，于是查找资料，发现并没有那么复杂</p>
+        <p>看某项目的Dockerfile时，遇到一条命令<br><code>set -- $@ 80</code><br>不甚理解，于是查找资料，发现并没有那么复杂</p>
 <h2 id="set的用法"><a href="#set的用法" class="headerlink" title="set的用法"></a>set的用法</h2><p>用法很丰富，参考<code>man set</code>即可</p>
 <h3 id="set-x"><a href="#set-x" class="headerlink" title="set -x"></a><code>set -x</code></h3><p>指令执行后先输出该指令及其参数，再输出执行结果<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">set</span> -x</span><br><span class="line"><span class="built_in">echo</span> `date`</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line"><span class="comment"># ++ date</span></span><br><span class="line"><span class="comment"># + echo 2018年02月27日 17:32:11</span></span><br><span class="line"><span class="comment"># 2018年02月27日 17:32:11</span></span><br></pre></td></tr></table></figure></p>
 <h2 id="（double-bash）用法"><a href="#（double-bash）用法" class="headerlink" title="-- （double bash）用法"></a><code>--</code> （double bash）用法</h2><p><code>--</code> （double bash）其实是bash内置命令，在OPTIONS一节中</p>
@@ -393,8 +390,6 @@
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">test2.sh 1 2</span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line"><span class="comment"># $1=1</span></span><br><span class="line"><span class="comment"># $2=2</span></span><br><span class="line"><span class="comment"># $3=a</span></span><br><span class="line"><span class="comment"># $4=b</span></span><br></pre></td></tr></table></figure>
 <p>还是很实用的</p>
 
-          
-        
       
     </div>
     
@@ -409,301 +404,36 @@
 
     <footer class="post-footer">
       
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/27/change-author-on-multiple-git-commits/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="bbbht">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="https://avatars1.githubusercontent.com/u/6995166?s=400&u=7ec51c88d4058afe78bd6e5d1c32da816dd7413c&v=4">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Don't Panic">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/27/change-author-on-multiple-git-commits/" itemprop="url">修改已提交的git仓库中commit作者信息（name,email）</a></h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-27T15:10:57+08:00">
-                2018-02-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
+        <div class="post-tags">
           
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/版本控制/" itemprop="url" rel="index">
-                    <span itemprop="name">版本控制</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
+            <a href="/tags/bash/" rel="tag"># bash</a>
           
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>通过<code>hexo deploy</code>推送到github pages上的文章，访问正常，没来得及高兴就发现了问题。<br>仓库中的commit信息是公司项目中配置的信息！</p>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>没有为项目做git上的配置，于是使用了全局的git配置。</p>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>将所有错误的name，email修改为正确的配置。<br>发现两种方案</p>
-<p>a. 通过<code>git rebase -i</code> 命令 重写历史<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 选择修改范围</span></span><br><span class="line">git rebase -i HEAD~n</span><br></pre></td></tr></table></figure></p>
-<p>输出如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">pick 208d348 XXX</span><br><span class="line">pick c99c75e CCC</span><br><span class="line">pick 35c4d4c FFF</span><br><span class="line"></span><br><span class="line"># Rebase 02097a2..35c4d4c onto 02097a2 (3 commands)</span><br><span class="line">#</span><br><span class="line"># Commands:</span><br></pre></td></tr></table></figure></p>
-<p>将要修改的提交所在行 pick 改为 e 保存退出<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 通过命令一条一条修改</span></span><br><span class="line">git commit --amend --author <span class="string">"username &lt;abcdef@gmail.com&gt;"</span></span><br><span class="line">git rebase --<span class="built_in">continue</span></span><br></pre></td></tr></table></figure></p>
-<p>直至<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git rebase --<span class="built_in">continue</span></span><br><span class="line">Successfully rebased and updated refs/heads/master.</span><br></pre></td></tr></table></figure></p>
-<p>当修改条目过多时并不方便，且尝试中发现第一条提交（First commit）无法修改，因此并未使用</p>
-<p>b. 通过<code>git filter-branch</code>命令 配合脚本完成<br>从网上找到脚本如下</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"></span><br><span class="line">git filter-branch --env-filter <span class="string">'</span></span><br><span class="line"><span class="string">OLD_EMAIL="your-old-email@example.com"</span></span><br><span class="line"><span class="string">CORRECT_NAME="Your Correct Name"</span></span><br><span class="line"><span class="string">CORRECT_EMAIL="your-correct-email@example.com"</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">if [ "$GIT_COMMITTER_EMAIL" = "$OLD_EMAIL" ]</span></span><br><span class="line"><span class="string">then</span></span><br><span class="line"><span class="string">    export GIT_COMMITTER_NAME="$CORRECT_NAME"</span></span><br><span class="line"><span class="string">    export GIT_COMMITTER_EMAIL="$CORRECT_EMAIL"</span></span><br><span class="line"><span class="string">fi</span></span><br><span class="line"><span class="string">if [ "$GIT_AUTHOR_EMAIL" = "$OLD_EMAIL" ]</span></span><br><span class="line"><span class="string">then</span></span><br><span class="line"><span class="string">    export GIT_AUTHOR_NAME="$CORRECT_NAME"</span></span><br><span class="line"><span class="string">    export GIT_AUTHOR_EMAIL="$CORRECT_EMAIL"</span></span><br><span class="line"><span class="string">fi</span></span><br><span class="line"><span class="string">'</span> --tag-name-filter cat -- --branches --tags</span><br><span class="line"></span><br><span class="line"><span class="comment"># Rewrite 35c4d4c3e8b675d7b4b555dce3cff975366f5cf8 (3/4) (1 seconds passed, remaining 0 predicted)</span></span><br><span class="line"><span class="comment"># Ref 'refs/heads/master' was rewritten</span></span><br></pre></td></tr></table></figure>
-<p>简单直接，最终使用此方案完成了修改<br>然后push即可<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git push --force --tags</span><br><span class="line"># 也可指定远程仓库</span><br><span class="line"># git push --force --tags origin &apos;refs/heads/*&apos;</span><br><span class="line"></span><br><span class="line"># Everything up-to-date</span><br></pre></td></tr></table></figure></p>
-<h2 id="预防措施"><a href="#预防措施" class="headerlink" title="预防措施"></a>预防措施</h2><ol>
-<li><p>在_config.yml中显式地增加配置</p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line"><span class="attr">  type:</span> <span class="string">git</span></span><br><span class="line"><span class="attr">  repository:</span> <span class="string">git@github.com:bbbht/bbbht.github.io.git</span></span><br><span class="line"><span class="attr">  branch:</span> <span class="string">master</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">bbbht</span></span><br><span class="line"><span class="attr">  email:</span> <span class="string">plateau.loess@gmail.com</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>在git仓库中进行设置</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config user.name bbbht</span><br><span class="line">git config user.email plateau.loess@gmail.com</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History" target="_blank" rel="noopener">Git Tools - Rewriting History</a><br><a href="https://github.com/hexojs/hexo-deployer-git" target="_blank" rel="noopener">hexo-deployer-git配置</a></p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
       
 
       
       
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
       
 
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/27/problems-useing-hexo/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="bbbht">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="https://avatars1.githubusercontent.com/u/6995166?s=400&u=7ec51c88d4058afe78bd6e5d1c32da816dd7413c&v=4">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Don't Panic">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/27/problems-useing-hexo/" itemprop="url">使用hexo时遇到的问题</a></h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
             
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-27T12:37:19+08:00">
-                2018-02-27
-              </time>
+              <a href="/2018/02/27/change-author-on-multiple-git-commits/" rel="next" title="修改已提交的git仓库中commit作者信息（name,email）">
+                <i class="fa fa-chevron-left"></i> 修改已提交的git仓库中commit作者信息（name,email）
+              </a>
             
+          </div>
 
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
             
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
+          </div>
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          
-            <h2 id="运行hexo-server命令时报错"><a href="#运行hexo-server命令时报错" class="headerlink" title="运行hexo server命令时报错"></a>运行<code>hexo server</code>命令时报错</h2><h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">INFO  Start processing</span><br><span class="line">ERROR Process failed: tags/index.md</span><br><span class="line">TypeError: Cannot read property &apos;utcOffset&apos; of null</span><br><span class="line">    at Object.exports.timezone ...</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
-<h3 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h3><p>主题的timezone配置为空导致<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">timeZone:</span><br></pre></td></tr></table></figure></p>
-<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p>设置主题的timezone，并与全局配置保持一致<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">timeZone: Asia/Shanghai</span><br></pre></td></tr></table></figure></p>
-<h2 id="运行hexo-deploy命令失败"><a href="#运行hexo-deploy命令失败" class="headerlink" title="运行hexo deploy命令失败"></a>运行<code>hexo deploy</code>命令失败</h2><h3 id="问题描述-1"><a href="#问题描述-1" class="headerlink" title="问题描述"></a>问题描述</h3><p>_config.yml配置如下<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line"><span class="attr">  type:</span> <span class="string">git</span></span><br><span class="line"><span class="attr">  repository:</span> <span class="string">git@github.com:bbbht/bbbht.github.io.git</span></span><br><span class="line"><span class="attr">  branch:</span> <span class="string">master</span></span><br></pre></td></tr></table></figure></p>
-<p>报错信息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ERROR Deployer not found: git</span><br></pre></td></tr></table></figure></p>
-<h3 id="原因-1"><a href="#原因-1" class="headerlink" title="原因"></a>原因</h3><p>功能缺失</p>
-<h3 id="解决方法-1"><a href="#解决方法-1" class="headerlink" title="解决方法"></a>解决方法</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -713,10 +443,11 @@
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -724,6 +455,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -744,8 +479,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -825,6 +569,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#set的用法"><span class="nav-number">1.</span> <span class="nav-text">set的用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#set-x"><span class="nav-number">1.1.</span> <span class="nav-text">set -x</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#（double-bash）用法"><span class="nav-number">2.</span> <span class="nav-text">-- （double bash）用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用法"><span class="nav-number">3.</span> <span class="nav-text">$@用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于set-80"><span class="nav-number">4.</span> <span class="nav-text">关于set -- $@ 80</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -958,6 +718,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
