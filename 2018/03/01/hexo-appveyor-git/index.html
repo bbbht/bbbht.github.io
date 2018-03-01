@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="bash," />
+  <meta name="keywords" content="hexo," />
 
 
 
@@ -86,18 +86,18 @@
 
 
 
-<meta name="description" content="看某项目的Dockerfile时，遇到一条命令set -- $@ 80不甚理解，于是查找资料，发现并没有那么复杂">
-<meta name="keywords" content="bash">
+<meta name="description" content="之前hexo的环境是在公司电脑上部署的，考虑到源码的安全备份，以及换电脑操作的不可避免，所以需要一个方案来解决大致是三种成熟方案：  Dropbox，百度云盘等直接同步需要安装配置额外的软件，嫌麻烦了 VPS部署环境是个好方法，云端操作，然而手上并没有VPS可用 对资源文件也进行版本控制即最终所采用的方案，并配合Appveyor完成一键自动部署">
+<meta name="keywords" content="hexo">
 <meta property="og:type" content="article">
-<meta property="og:title" content="linux命令&#39;set -- $@&#39;的解释">
-<meta property="og:url" content="http://yoursite.com/2018/02/28/explain-a-linux-set-command/index.html">
+<meta property="og:title" content="使用Appveyor管理hexo源码并实现自动发布">
+<meta property="og:url" content="http://yoursite.com/2018/03/01/hexo-appveyor-git/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
-<meta property="og:description" content="看某项目的Dockerfile时，遇到一条命令set -- $@ 80不甚理解，于是查找资料，发现并没有那么复杂">
+<meta property="og:description" content="之前hexo的环境是在公司电脑上部署的，考虑到源码的安全备份，以及换电脑操作的不可避免，所以需要一个方案来解决大致是三种成熟方案：  Dropbox，百度云盘等直接同步需要安装配置额外的软件，嫌麻烦了 VPS部署环境是个好方法，云端操作，然而手上并没有VPS可用 对资源文件也进行版本控制即最终所采用的方案，并配合Appveyor完成一键自动部署">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2018-03-01T09:40:40.980Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="linux命令&#39;set -- $@&#39;的解释">
-<meta name="twitter:description" content="看某项目的Dockerfile时，遇到一条命令set -- $@ 80不甚理解，于是查找资料，发现并没有那么复杂">
+<meta name="twitter:title" content="使用Appveyor管理hexo源码并实现自动发布">
+<meta name="twitter:description" content="之前hexo的环境是在公司电脑上部署的，考虑到源码的安全备份，以及换电脑操作的不可避免，所以需要一个方案来解决大致是三种成熟方案：  Dropbox，百度云盘等直接同步需要安装配置额外的软件，嫌麻烦了 VPS部署环境是个好方法，云端操作，然而手上并没有VPS可用 对资源文件也进行版本控制即最终所采用的方案，并配合Appveyor完成一键自动部署">
 
 
 
@@ -127,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/02/28/explain-a-linux-set-command/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/03/01/hexo-appveyor-git/"/>
 
 
 
 
 
-  <title>linux命令'set -- $@'的解释 | Don't Panic</title>
+  <title>使用Appveyor管理hexo源码并实现自动发布 | Don't Panic</title>
   
 
 
@@ -279,7 +279,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/28/explain-a-linux-set-command/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/01/hexo-appveyor-git/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="bbbht">
@@ -296,7 +296,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">linux命令'set -- $@'的解释</h2>
+          <h2 class="post-title" itemprop="name headline">使用Appveyor管理hexo源码并实现自动发布</h2>
         
 
         <div class="post-meta">
@@ -308,8 +308,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-28T02:12:52+00:00">
-                2018-02-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-01T09:01:27+00:00">
+                2018-03-01
               </time>
             
 
@@ -319,28 +319,6 @@
           </span>
 
           
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux/" itemprop="url" rel="index">
-                    <span itemprop="name">Linux</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
 
           
             
@@ -349,9 +327,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/02/28/explain-a-linux-set-command/#comments" itemprop="discussionUrl">
+                <a href="/2018/03/01/hexo-appveyor-git/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/02/28/explain-a-linux-set-command/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/03/01/hexo-appveyor-git/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -384,37 +362,23 @@
       
 
       
-        <p>看某项目的Dockerfile时，遇到一条命令<br><code>set -- $@ 80</code><br>不甚理解，于是查找资料，发现并没有那么复杂</p>
-<a id="more"></a>
-<h2 id="set的用法"><a href="#set的用法" class="headerlink" title="set的用法"></a>set的用法</h2><p>用法很丰富，参考<code>man set</code>即可</p>
-<h3 id="set-x"><a href="#set-x" class="headerlink" title="set -x"></a><code>set -x</code></h3><p>指令执行后先输出该指令及其参数，再输出执行结果<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">set</span> -x</span><br><span class="line"><span class="built_in">echo</span> `date`</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line"><span class="comment"># ++ date</span></span><br><span class="line"><span class="comment"># + echo 2018年02月27日 17:32:11</span></span><br><span class="line"><span class="comment"># 2018年02月27日 17:32:11</span></span><br></pre></td></tr></table></figure></p>
-<h2 id="（double-bash）用法"><a href="#（double-bash）用法" class="headerlink" title="-- （double bash）用法"></a><code>--</code> （double bash）用法</h2><p><code>--</code> （double bash）其实是bash内置命令，在OPTIONS一节中</p>
+        <p>之前hexo的环境是在公司电脑上部署的，考虑到源码的安全备份，以及换电脑操作的不可避免，所以需要一个方案来解决<br>大致是三种成熟方案：</p>
+<ol>
+<li>Dropbox，百度云盘等直接同步<br>需要安装配置额外的软件，嫌麻烦了</li>
+<li>VPS部署环境<br>是个好方法，云端操作，然而手上并没有VPS可用</li>
+<li>对资源文件也进行版本控制<br>即最终所采用的方案，并配合<a href="https://www.appveyor.com/" target="_blank" rel="noopener">Appveyor</a>完成一键自动部署<a id="more"></a>
+</li>
+</ol>
+<h2 id="Appveyor配置"><a href="#Appveyor配置" class="headerlink" title="Appveyor配置"></a>Appveyor配置</h2><p>github账号登陆，选择对应的github page repo，简单配置即可，不再赘述<br>详见<a href="http://feg.netease.com/archives/634.html" target="_blank" rel="noopener">如何更好地对hexo博客管理</a></p>
 <blockquote>
-<p>--    A -- signals the end of options and disables further option processing.  Any arguments after the -- are treated as filenames and arguments.  An argument of - is equivalent to --.</p>
+<p>注：注意node版本</p>
 </blockquote>
-<p>即 <code>--</code>表示选项的结束，其后的任何参数都被视为文件名和参数，可以做一些特殊操作，比如新建名为”-p”的文件夹<br>但是关于<code>-</code>相当于<code>--</code>，测试并没有成功，也许是我立即错误了吧<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"># root in /tmp [11:01:36] </span><br><span class="line">$ mkdir tmpdir </span><br><span class="line"></span><br><span class="line"># root in /tmp [11:01:39] </span><br><span class="line">$ cd tmpdir   </span><br><span class="line"></span><br><span class="line"># root in /tmp/tmpdir [11:01:44] </span><br><span class="line">$ mkdir -v -p  </span><br><span class="line">mkdir: 缺少操作数</span><br><span class="line">Try &apos;mkdir --help&apos; for more information.</span><br><span class="line"></span><br><span class="line"># root in /tmp/tmpdir [11:01:57] C:1</span><br><span class="line">$ mkdir -v - -p</span><br><span class="line">mkdir: 已创建目录 &quot;-&quot;</span><br><span class="line"></span><br><span class="line"># root in /tmp/tmpdir [11:02:04] </span><br><span class="line">$ mkdir -v -- -p</span><br><span class="line">mkdir: 已创建目录 &quot;-p&quot;</span><br><span class="line"></span><br><span class="line"># root in /tmp/tmpdir [11:02:09] </span><br><span class="line">$ ll</span><br><span class="line">总用量 8.0K</span><br><span class="line">drwxr-xr-x 2 root root 4.0K 2月  28 11:02 -</span><br><span class="line">drwxr-xr-x 2 root root 4.0K 2月  28 11:02 -p</span><br></pre></td></tr></table></figure></p>
-<p>删除同理<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># root in /tmp/tmpdir [11:04:48] </span><br><span class="line">$ rm -v -r -p   </span><br><span class="line">Usage: trash-put [OPTION]... FILE...</span><br><span class="line"></span><br><span class="line">trash-put: error: no such option: -p</span><br><span class="line"></span><br><span class="line"># root in /tmp/tmpdir [11:04:55] C:2</span><br><span class="line">$ rm -v -r -- -p</span><br><span class="line">trash-put: Volume of file: /</span><br><span class="line">trash-put: Trash-dir: /root/.local/share/Trash from volume: /</span><br><span class="line">trash-put: &apos;-p&apos; trashed in ~/.local/share/Trash</span><br></pre></td></tr></table></figure></p>
-<p>trash是安装来模拟回收站的<br><!-- [trash-cli](https://github.com/andreafrancia/trash-cli) -->    </p>
-<h2 id="用法"><a href="#用法" class="headerlink" title="$@用法"></a><code>$@</code>用法</h2><p>同样参考<code>man bash</code>中Special Parameters一节内容即可</p>
-<ul>
-<li>$*<br>以一个单字符串显示所有向脚本传递的参数，与位置变量不同，参数可超过9个</li>
-<li>$@<br>传给脚本的所有参数的列表</li>
-<li>$#<br>添加到Shell的参数个数</li>
-<li>$$<br>脚本运行的当前进程ID号</li>
-<li>$?<br>显示最后命令的退出状态，0表示没有错误，其他表示有错误</li>
-<li>$!<br>Shell最后运行的后台Process的PID</li>
-<li>$0<br>脚本本身的名字</li>
-<li>$1($2,$3…)<br>传递给该shell脚本的第N个参数，不能超过9</li>
-</ul>
-<h2 id="关于set-80"><a href="#关于set-80" class="headerlink" title="关于set -- $@ 80"></a>关于<code>set -- $@ 80</code></h2><p>执行<code>man set</code>查找关于<code>--</code>和<code>-</code>的内容</p>
-<blockquote>
-<p>–  If no arguments follow this option, then the positional parameters are unset.  Otherwise, the positional parameters are set to the args, even if some of them begin with a -.<br>- Signal the end of options, cause all remaining args to be assigned to the positional parameters.  The -x and -v options are turned off.   If  there  are  no  args,  the  positional  parameters  remain unchanged.</p>
-</blockquote>
-<p>其作用就是将<code>--</code>后的参数覆盖原位置参数，即使以<code>-</code>开头也不再作为选项<br>联系上文<code>$@</code>的解释，此命令即为添加追加一个位置参数<br>test.sh<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">set</span> -- a b c</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"\$1=<span class="variable">$1</span>"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"\$2=<span class="variable">$2</span>"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"\$3=<span class="variable">$3</span>"</span></span><br></pre></td></tr></table></figure></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 无参数执行test.sh</span></span><br><span class="line">test.sh</span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line"><span class="comment"># $1=a</span></span><br><span class="line"><span class="comment"># $2=b</span></span><br><span class="line"><span class="comment"># $3=c</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 带参数执行test.sh</span></span><br><span class="line">test.sh 1 2 3</span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line"><span class="comment"># $1=a</span></span><br><span class="line"><span class="comment"># $2=b</span></span><br><span class="line"><span class="comment"># $3=c</span></span><br></pre></td></tr></table></figure>
-<p>test2.sh<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">set</span> -- <span class="variable">$@</span> a b</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"\$1=<span class="variable">$1</span>"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"\$2=<span class="variable">$2</span>"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"\$3=<span class="variable">$3</span>"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"\$4=<span class="variable">$4</span>"</span></span><br></pre></td></tr></table></figure></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">test2.sh 1 2</span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line"><span class="comment"># $1=1</span></span><br><span class="line"><span class="comment"># $2=2</span></span><br><span class="line"><span class="comment"># $3=a</span></span><br><span class="line"><span class="comment"># $4=b</span></span><br></pre></td></tr></table></figure>
-<p>还是很实用的</p>
+<h2 id="拉取仓库"><a href="#拉取仓库" class="headerlink" title="拉取仓库"></a>拉取仓库</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git@github.com:bbbht/bbbht.github.io.git hexo --branch hexo</span><br></pre></td></tr></table></figure>
+<h2 id="hexo环境初始化"><a href="#hexo环境初始化" class="headerlink" title="hexo环境初始化"></a>hexo环境初始化</h2><p>前提是系统中已存在git及nodejs环境<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入博客资源根目录</span></span><br><span class="line"><span class="built_in">cd</span> hexo</span><br><span class="line"><span class="comment"># 安装hexo</span></span><br><span class="line">npm install -g hexo-cli</span><br><span class="line"><span class="comment"># 运行hexo server</span></span><br><span class="line">hexo s -p 4000</span><br></pre></td></tr></table></figure></p>
+<p>接下来即可完成本地部署，换电脑什么的也无妨了</p>
+<h2 id="发布"><a href="#发布" class="headerlink" title="发布"></a>发布</h2><p>文章完成之后，直接在hexo分支push<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br><span class="line">git commit -am <span class="string">"commit msg"</span></span><br><span class="line">git pull --rebase</span><br><span class="line">git push origin hexo:hexo</span><br></pre></td></tr></table></figure></p>
+<p>然后等待自动发布完成，预览即可<br>本文即为测试效果而写</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="http://feg.netease.com/archives/634.html" target="_blank" rel="noopener">如何更好地对hexo博客管理</a></p>
 
       
     </div>
@@ -432,7 +396,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/bash/" rel="tag"># bash</a>
+            <a href="/tags/hexo/" rel="tag"># hexo</a>
           
         </div>
       
@@ -445,8 +409,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/02/27/change-author-on-multiple-git-commits/" rel="next" title="修改已提交的git仓库中commit作者信息（name,email）">
-                <i class="fa fa-chevron-left"></i> 修改已提交的git仓库中commit作者信息（name,email）
+              <a href="/2018/02/28/explain-a-linux-set-command/" rel="next" title="linux命令'set -- $@'的解释">
+                <i class="fa fa-chevron-left"></i> linux命令'set -- $@'的解释
               </a>
             
           </div>
@@ -454,10 +418,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/03/01/hexo-appveyor-git/" rel="prev" title="使用Appveyor管理hexo源码并实现自动发布">
-                使用Appveyor管理hexo源码并实现自动发布 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -619,7 +579,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#set的用法"><span class="nav-number">1.</span> <span class="nav-text">set的用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#set-x"><span class="nav-number">1.1.</span> <span class="nav-text">set -x</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#（double-bash）用法"><span class="nav-number">2.</span> <span class="nav-text">-- （double bash）用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用法"><span class="nav-number">3.</span> <span class="nav-text">$@用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于set-80"><span class="nav-number">4.</span> <span class="nav-text">关于set -- $@ 80</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Appveyor配置"><span class="nav-number">1.</span> <span class="nav-text">Appveyor配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拉取仓库"><span class="nav-number">2.</span> <span class="nav-text">拉取仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo环境初始化"><span class="nav-number">3.</span> <span class="nav-text">hexo环境初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#发布"><span class="nav-number">4.</span> <span class="nav-text">发布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">5.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
             
 
           </div>
@@ -802,9 +762,9 @@
     
       <script type="text/javascript">
         var disqus_config = function () {
-          this.page.url = 'http://yoursite.com/2018/02/28/explain-a-linux-set-command/';
-          this.page.identifier = '2018/02/28/explain-a-linux-set-command/';
-          this.page.title = 'linux命令\'set -- $@\'的解释';
+          this.page.url = 'http://yoursite.com/2018/03/01/hexo-appveyor-git/';
+          this.page.identifier = '2018/03/01/hexo-appveyor-git/';
+          this.page.title = '使用Appveyor管理hexo源码并实现自动发布';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://loessplateau.disqus.com/embed.js';
