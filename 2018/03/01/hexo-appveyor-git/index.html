@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="Don&#39;t Panic">
 <meta property="og:description" content="之前hexo的环境是在公司电脑上部署的，考虑到源码的安全备份，以及换电脑操作的不可避免，所以需要一个方案来解决大致是三种成熟方案：  Dropbox，百度云盘等直接同步需要安装配置额外的软件，嫌麻烦了 VPS部署环境是个好方法，云端操作，然而手上并没有VPS可用 对资源文件也进行版本控制即最终所采用的方案，并配合Appveyor完成一键自动部署">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-01T09:40:40.980Z">
+<meta property="og:updated_time" content="2018-03-02T03:14:52.599Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用Appveyor管理hexo源码并实现自动发布">
 <meta name="twitter:description" content="之前hexo的环境是在公司电脑上部署的，考虑到源码的安全备份，以及换电脑操作的不可避免，所以需要一个方案来解决大致是三种成熟方案：  Dropbox，百度云盘等直接同步需要安装配置额外的软件，嫌麻烦了 VPS部署环境是个好方法，云端操作，然而手上并没有VPS可用 对资源文件也进行版本控制即最终所采用的方案，并配合Appveyor完成一键自动部署">
@@ -207,22 +207,22 @@
         </li>
       
         
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
         <li class="menu-item menu-item-tags">
           <a href="/tags/" rel="section">
             
               <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
             
             标签
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-categories">
-          <a href="/categories/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
-            
-            分类
           </a>
         </li>
       
@@ -328,8 +328,7 @@
                   <i class="fa fa-comment-o"></i>
                 </span>
                 <a href="/2018/03/01/hexo-appveyor-git/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/01/hexo-appveyor-git/" itemprop="commentCount"></span>
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/01/hexo-appveyor-git/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -448,12 +447,9 @@
 
   
     <div class="comments" id="comments">
-      <div id="disqus_thread">
-        <noscript>
-          Please enable JavaScript to view the
-          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
-        </noscript>
-      </div>
+      
+        <div id="gitment-container"></div>
+      
     </div>
 
   
@@ -617,7 +613,7 @@
 
 
 
-  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a></div>
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
 
 
 
@@ -755,26 +751,6 @@
 
   
 
-    
-      <script id="dsq-count-scr" src="https://loessplateau.disqus.com/count.js" async></script>
-    
-
-    
-      <script type="text/javascript">
-        var disqus_config = function () {
-          this.page.url = 'http://yoursite.com/2018/03/01/hexo-appveyor-git/';
-          this.page.identifier = '2018/03/01/hexo-appveyor-git/';
-          this.page.title = '使用Appveyor管理hexo源码并实现自动发布';
-        };
-        var d = document, s = d.createElement('script');
-        s.src = 'https://loessplateau.disqus.com/embed.js';
-        s.setAttribute('data-timestamp', '' + +new Date());
-        (d.head || d.body).appendChild(s);
-      </script>
-    
-
-  
-
 
 
 
@@ -790,8 +766,49 @@
 
 
 
+  
 
 
+
+
+
+
+
+<!-- LOCAL: You can save these files to your site and update links -->
+    
+        
+        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
+        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
+    
+<!-- END LOCAL -->
+
+    
+
+    
+      <script type="text/javascript">
+      function renderGitment(){
+        var gitment = new Gitmint({
+            id: window.location.pathname, 
+            owner: 'bbbht',
+            repo: 'bbbht.github.io',
+            
+            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
+            
+            oauth: {
+            
+            
+                client_secret: '5f261e41a4e89b5975d7268370abec466bdb4877',
+            
+                client_id: '4e1040dd03efdd96ac36'
+            }});
+        gitment.render('gitment-container');
+      }
+
+      
+      renderGitment();
+      
+      </script>
+    
 
 
 
