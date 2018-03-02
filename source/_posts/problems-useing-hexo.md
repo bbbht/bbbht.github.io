@@ -55,3 +55,22 @@ ERROR Deployer not found: git
 ```sh
 npm install hexo-deployer-git --save
 ```
+
+## disqus评论无法使用
+
+### 问题描述
+同事进入博客文章页后，发现disqus评论插件并未正常加载
+
+### 原因
+你懂的
+
+### 解决方法
+使用gitment替代disqus，毕竟目前部署在github pages上
+教程很多，自行搜索即可
+[Google 搜索 hexo next gitment](https://www.google.com/search?q=hexo+next+Gitment)
+不同主题可能不同，next主题已集成，很方便
+> 注： 在主题配置文件中 github_repo 填写仓库名即可，并非仓库地址
+另外，配置完成后需登陆账号手动初始化方可使用
+
+### 参考链接
+[Gitment：使用 GitHub Issues 搭建评论系统](https://imsun.net/posts/gitment-introduction/)
