@@ -6,3 +6,5 @@ node_modules/
 public/
 .vscode/
 .deploy*/
+package-lock.json
+package.json
