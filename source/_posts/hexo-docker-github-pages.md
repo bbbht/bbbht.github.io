@@ -1,8 +1,10 @@
 ---
 title: 在docker中部署hexo
 date: 2018-03-16 08:49:53
-tags:
-categories:
+tags: 
+    - hexo
+    - docker
+categories: hexo
 ---
 开发机软件环境比较复杂，为避免无谓的干扰，所以将hexo环境放入docker中
 于是写了个Dockfile
