@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="bash," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -86,18 +86,17 @@
 
 
 
-<meta name="description" content="看某项目的Dockerfile时，遇到一条命令set -- $@ 80不甚理解，于是查找资料，发现并没有那么复杂">
-<meta name="keywords" content="bash">
+<meta name="description" content="开发机软件环境比较复杂，为避免无谓的干扰，所以将hexo环境放入docker中于是写了个Dockfile只用来本地预览，发布还是由appveyor完成顺手够用就好">
 <meta property="og:type" content="article">
-<meta property="og:title" content="linux命令&#39;set -- $@&#39;的解释">
-<meta property="og:url" content="http://yoursite.com/2018/02/28/explain-a-linux-set-command/index.html">
+<meta property="og:title" content="在docker中部署hexo">
+<meta property="og:url" content="http://yoursite.com/2018/03/16/hexo-docker-github-pages/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
-<meta property="og:description" content="看某项目的Dockerfile时，遇到一条命令set -- $@ 80不甚理解，于是查找资料，发现并没有那么复杂">
+<meta property="og:description" content="开发机软件环境比较复杂，为避免无谓的干扰，所以将hexo环境放入docker中于是写了个Dockfile只用来本地预览，发布还是由appveyor完成顺手够用就好">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2018-03-16T09:29:24.871Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="linux命令&#39;set -- $@&#39;的解释">
-<meta name="twitter:description" content="看某项目的Dockerfile时，遇到一条命令set -- $@ 80不甚理解，于是查找资料，发现并没有那么复杂">
+<meta name="twitter:title" content="在docker中部署hexo">
+<meta name="twitter:description" content="开发机软件环境比较复杂，为避免无谓的干扰，所以将hexo环境放入docker中于是写了个Dockfile只用来本地预览，发布还是由appveyor完成顺手够用就好">
 
 
 
@@ -127,13 +126,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/02/28/explain-a-linux-set-command/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/03/16/hexo-docker-github-pages/"/>
 
 
 
 
 
-  <title>linux命令'set -- $@'的解释 | Don't Panic</title>
+  <title>在docker中部署hexo | Don't Panic</title>
   
 
 
@@ -279,7 +278,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/28/explain-a-linux-set-command/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/16/hexo-docker-github-pages/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="bbbht">
@@ -296,7 +295,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">linux命令'set -- $@'的解释</h2>
+          <h2 class="post-title" itemprop="name headline">在docker中部署hexo</h2>
         
 
         <div class="post-meta">
@@ -308,8 +307,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-28T02:12:52+00:00">
-                2018-02-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T00:49:53+00:00">
+                2018-03-16
               </time>
             
 
@@ -319,28 +318,6 @@
           </span>
 
           
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux/" itemprop="url" rel="index">
-                    <span itemprop="name">Linux</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
 
           
             
@@ -349,8 +326,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/02/28/explain-a-linux-set-command/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/02/28/explain-a-linux-set-command/" itemprop="commentsCount"></span>
+                <a href="/2018/03/16/hexo-docker-github-pages/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/16/hexo-docker-github-pages/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -383,37 +360,10 @@
       
 
       
-        <p>看某项目的Dockerfile时，遇到一条命令<br><code>set -- $@ 80</code><br>不甚理解，于是查找资料，发现并没有那么复杂</p>
-<a id="more"></a>
-<h2 id="set的用法"><a href="#set的用法" class="headerlink" title="set的用法"></a>set的用法</h2><p>用法很丰富，参考<code>man set</code>即可</p>
-<h3 id="set-x"><a href="#set-x" class="headerlink" title="set -x"></a><code>set -x</code></h3><p>指令执行后先输出该指令及其参数，再输出执行结果<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">set</span> -x</span><br><span class="line"><span class="built_in">echo</span> `date`</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line"><span class="comment"># ++ date</span></span><br><span class="line"><span class="comment"># + echo 2018年02月27日 17:32:11</span></span><br><span class="line"><span class="comment"># 2018年02月27日 17:32:11</span></span><br></pre></td></tr></table></figure></p>
-<h2 id="（double-bash）用法"><a href="#（double-bash）用法" class="headerlink" title="-- （double bash）用法"></a><code>--</code> （double bash）用法</h2><p><code>--</code> （double bash）其实是bash内置命令，在OPTIONS一节中</p>
-<blockquote>
-<p>--    A -- signals the end of options and disables further option processing.  Any arguments after the -- are treated as filenames and arguments.  An argument of - is equivalent to --.</p>
-</blockquote>
-<p>即 <code>--</code>表示选项的结束，其后的任何参数都被视为文件名和参数，可以做一些特殊操作，比如新建名为”-p”的文件夹<br>但是关于<code>-</code>相当于<code>--</code>，测试并没有成功，也许是我立即错误了吧<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"># root in /tmp [11:01:36] </span><br><span class="line">$ mkdir tmpdir </span><br><span class="line"></span><br><span class="line"># root in /tmp [11:01:39] </span><br><span class="line">$ cd tmpdir   </span><br><span class="line"></span><br><span class="line"># root in /tmp/tmpdir [11:01:44] </span><br><span class="line">$ mkdir -v -p  </span><br><span class="line">mkdir: 缺少操作数</span><br><span class="line">Try &apos;mkdir --help&apos; for more information.</span><br><span class="line"></span><br><span class="line"># root in /tmp/tmpdir [11:01:57] C:1</span><br><span class="line">$ mkdir -v - -p</span><br><span class="line">mkdir: 已创建目录 &quot;-&quot;</span><br><span class="line"></span><br><span class="line"># root in /tmp/tmpdir [11:02:04] </span><br><span class="line">$ mkdir -v -- -p</span><br><span class="line">mkdir: 已创建目录 &quot;-p&quot;</span><br><span class="line"></span><br><span class="line"># root in /tmp/tmpdir [11:02:09] </span><br><span class="line">$ ll</span><br><span class="line">总用量 8.0K</span><br><span class="line">drwxr-xr-x 2 root root 4.0K 2月  28 11:02 -</span><br><span class="line">drwxr-xr-x 2 root root 4.0K 2月  28 11:02 -p</span><br></pre></td></tr></table></figure></p>
-<p>删除同理<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># root in /tmp/tmpdir [11:04:48] </span><br><span class="line">$ rm -v -r -p   </span><br><span class="line">Usage: trash-put [OPTION]... FILE...</span><br><span class="line"></span><br><span class="line">trash-put: error: no such option: -p</span><br><span class="line"></span><br><span class="line"># root in /tmp/tmpdir [11:04:55] C:2</span><br><span class="line">$ rm -v -r -- -p</span><br><span class="line">trash-put: Volume of file: /</span><br><span class="line">trash-put: Trash-dir: /root/.local/share/Trash from volume: /</span><br><span class="line">trash-put: &apos;-p&apos; trashed in ~/.local/share/Trash</span><br></pre></td></tr></table></figure></p>
-<p>trash是安装来模拟回收站的<br><!-- [trash-cli](https://github.com/andreafrancia/trash-cli) -->    </p>
-<h2 id="用法"><a href="#用法" class="headerlink" title="$@用法"></a><code>$@</code>用法</h2><p>同样参考<code>man bash</code>中Special Parameters一节内容即可</p>
-<ul>
-<li>$*<br>以一个单字符串显示所有向脚本传递的参数，与位置变量不同，参数可超过9个</li>
-<li>$@<br>传给脚本的所有参数的列表</li>
-<li>$#<br>添加到Shell的参数个数</li>
-<li>$$<br>脚本运行的当前进程ID号</li>
-<li>$?<br>显示最后命令的退出状态，0表示没有错误，其他表示有错误</li>
-<li>$!<br>Shell最后运行的后台Process的PID</li>
-<li>$0<br>脚本本身的名字</li>
-<li>$1($2,$3…)<br>传递给该shell脚本的第N个参数，不能超过9</li>
-</ul>
-<h2 id="关于set-80"><a href="#关于set-80" class="headerlink" title="关于set -- $@ 80"></a>关于<code>set -- $@ 80</code></h2><p>执行<code>man set</code>查找关于<code>--</code>和<code>-</code>的内容</p>
-<blockquote>
-<p>–  If no arguments follow this option, then the positional parameters are unset.  Otherwise, the positional parameters are set to the args, even if some of them begin with a -.<br>- Signal the end of options, cause all remaining args to be assigned to the positional parameters.  The -x and -v options are turned off.   If  there  are  no  args,  the  positional  parameters  remain unchanged.</p>
-</blockquote>
-<p>其作用就是将<code>--</code>后的参数覆盖原位置参数，即使以<code>-</code>开头也不再作为选项<br>联系上文<code>$@</code>的解释，此命令即为添加追加一个位置参数<br>test.sh<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">set</span> -- a b c</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"\$1=<span class="variable">$1</span>"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"\$2=<span class="variable">$2</span>"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"\$3=<span class="variable">$3</span>"</span></span><br></pre></td></tr></table></figure></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 无参数执行test.sh</span></span><br><span class="line">test.sh</span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line"><span class="comment"># $1=a</span></span><br><span class="line"><span class="comment"># $2=b</span></span><br><span class="line"><span class="comment"># $3=c</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 带参数执行test.sh</span></span><br><span class="line">test.sh 1 2 3</span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line"><span class="comment"># $1=a</span></span><br><span class="line"><span class="comment"># $2=b</span></span><br><span class="line"><span class="comment"># $3=c</span></span><br></pre></td></tr></table></figure>
-<p>test2.sh<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">set</span> -- <span class="variable">$@</span> a b</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"\$1=<span class="variable">$1</span>"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"\$2=<span class="variable">$2</span>"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"\$3=<span class="variable">$3</span>"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"\$4=<span class="variable">$4</span>"</span></span><br></pre></td></tr></table></figure></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">test2.sh 1 2</span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line"><span class="comment"># $1=1</span></span><br><span class="line"><span class="comment"># $2=2</span></span><br><span class="line"><span class="comment"># $3=a</span></span><br><span class="line"><span class="comment"># $4=b</span></span><br></pre></td></tr></table></figure>
-<p>还是很实用的</p>
+        <p>开发机软件环境比较复杂，为避免无谓的干扰，所以将hexo环境放入docker中<br>于是写了个Dockfile<br>只用来本地预览，发布还是由appveyor完成<br>顺手够用就好<br><a id="more"></a></p>
+<h2 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h2><h3 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h3><p>Dockerfile<br><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> node:<span class="number">6</span>-alpine</span><br><span class="line"><span class="keyword">MAINTAINER</span> bbbht &lt;plateau.loess@gmail.com&gt;</span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /hexo</span></span><br><span class="line"><span class="bash">VOLUME [<span class="string">'/hexo'</span>]</span></span><br><span class="line"><span class="bash">EXPOSE 4000</span></span><br><span class="line"><span class="bash">ENV LANG C.UTF-8</span></span><br><span class="line"><span class="bash"></span></span><br><span class="line"><span class="bash">RUN apk add --update git &amp;&amp; \</span></span><br><span class="line"><span class="bash">    npm install hexo-cli -g --no-optional</span></span><br><span class="line"><span class="bash"></span></span><br><span class="line"><span class="bash">COPY entrypoint.sh /</span></span><br><span class="line"><span class="bash">ENTRYPOINT [<span class="string">"sh"</span>, <span class="string">"/entrypoint.sh"</span>]</span></span><br><span class="line"><span class="bash">CMD [<span class="string">'hexo'</span>, <span class="string">'s'</span>]</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="容器运行初始化脚本"><a href="#容器运行初始化脚本" class="headerlink" title="容器运行初始化脚本"></a>容器运行初始化脚本</h3><p>entrypoint.sh<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">set</span> -x</span><br><span class="line">HEXO_DIR=/hexo</span><br><span class="line"><span class="keyword">if</span> [ ! -d <span class="variable">$HEXO_DIR</span>/.git ]; <span class="keyword">then</span></span><br><span class="line">    git <span class="built_in">clone</span> https://github.com/bbbht/bbbht.github.io.git --branch hexo <span class="variable">$HEXO_DIR</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="variable">$HEXO_DIR</span><span class="string">" is not empty"</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="built_in">cd</span> <span class="variable">$HEXO_DIR</span></span><br><span class="line">git config user.name bbbht</span><br><span class="line">git config user.email plateau.loess@gmail.com</span><br><span class="line">git config core.fileMode <span class="literal">false</span></span><br><span class="line">npm install --no-optional --no-bin-links </span><br><span class="line"></span><br><span class="line"><span class="built_in">exec</span> <span class="string">"<span class="variable">$@</span>"</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>将Dockerfile，entrypoint.sh存为文件，放在在同一目录下<br>执行命令<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker build -t hexo:alpine .</span><br><span class="line">docker run -d --name hexo-server -p 4000:4000 -v /hexo:/hexo hexo:alpine hexo s -w</span><br><span class="line"><span class="comment">#  配置别名，方便本地化使用hexo命令</span></span><br><span class="line"><span class="built_in">alias</span> hexo=<span class="string">"docker exec hexo-server hexo"</span></span><br></pre></td></tr></table></figure></p>
 
       
     </div>
@@ -429,12 +379,6 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/bash/" rel="tag"># bash</a>
-          
-        </div>
-      
 
       
       
@@ -444,8 +388,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/02/27/change-author-on-multiple-git-commits/" rel="next" title="修改已提交的git仓库中commit作者信息（name,email）">
-                <i class="fa fa-chevron-left"></i> 修改已提交的git仓库中commit作者信息（name,email）
+              <a href="/2018/03/15/docker-chinese-error/" rel="next" title="docker中不能显示或输入中文">
+                <i class="fa fa-chevron-left"></i> docker中不能显示或输入中文
               </a>
             
           </div>
@@ -453,10 +397,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/03/01/hexo-appveyor-git/" rel="prev" title="使用Appveyor管理hexo源码并实现自动发布">
-                使用Appveyor管理hexo源码并实现自动发布 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -615,7 +555,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#set的用法"><span class="nav-number">1.</span> <span class="nav-text">set的用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#set-x"><span class="nav-number">1.1.</span> <span class="nav-text">set -x</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#（double-bash）用法"><span class="nav-number">2.</span> <span class="nav-text">-- （double bash）用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用法"><span class="nav-number">3.</span> <span class="nav-text">$@用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于set-80"><span class="nav-number">4.</span> <span class="nav-text">关于set -- $@ 80</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#源码"><span class="nav-number">1.</span> <span class="nav-text">源码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Dockerfile"><span class="nav-number">1.1.</span> <span class="nav-text">Dockerfile</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#容器运行初始化脚本"><span class="nav-number">1.2.</span> <span class="nav-text">容器运行初始化脚本</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用"><span class="nav-number">2.</span> <span class="nav-text">使用</span></a></li></ol></div>
             
 
           </div>
