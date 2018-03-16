@@ -7,4 +7,3 @@ public/
 .vscode/
 .deploy*/
 package-lock.json
-package.json
