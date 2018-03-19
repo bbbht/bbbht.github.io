@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="hexo," />
+  <meta name="keywords" content="bbbht, blog, don't panic" />
 
 
 
@@ -86,18 +86,17 @@
 
 
 
-<meta name="description" content="初次使用hexo，对各种配置还不熟悉尽量使用了默认配置，并参考别人的经验，然而还是遇到了些小问题比如运行hexo server，hexo deploy等命令时报错慢慢完善吧，后期再丰富功能">
-<meta name="keywords" content="hexo">
-<meta property="og:type" content="article">
-<meta property="og:title" content="使用hexo时遇到的问题">
-<meta property="og:url" content="http://yoursite.com/2018/02/27/problems-useing-hexo/index.html">
+<meta name="description" content="尚未解决的问题docker中的hexo无法监测文件改动hexo部署在docker中，通过数据卷使用虚拟机中的数据，而虚拟机中的数据又是来自virtualbox，共享win10中的文件夹问题在于，在docker中运行hexo s，并win中修改hexo源文件后刷新页面，内容未改变而在虚拟机中对修改过的文件使用touch命令后，再刷新页面，就显示修改后的内容了">
+<meta property="og:type" content="website">
+<meta property="og:title" content="issues">
+<meta property="og:url" content="http://yoursite.com/issues/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
-<meta property="og:description" content="初次使用hexo，对各种配置还不熟悉尽量使用了默认配置，并参考别人的经验，然而还是遇到了些小问题比如运行hexo server，hexo deploy等命令时报错慢慢完善吧，后期再丰富功能">
+<meta property="og:description" content="尚未解决的问题docker中的hexo无法监测文件改动hexo部署在docker中，通过数据卷使用虚拟机中的数据，而虚拟机中的数据又是来自virtualbox，共享win10中的文件夹问题在于，在docker中运行hexo s，并win中修改hexo源文件后刷新页面，内容未改变而在虚拟机中对修改过的文件使用touch命令后，再刷新页面，就显示修改后的内容了">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-19T09:55:28.640Z">
+<meta property="og:updated_time" content="2018-03-19T09:55:28.655Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="使用hexo时遇到的问题">
-<meta name="twitter:description" content="初次使用hexo，对各种配置还不熟悉尽量使用了默认配置，并参考别人的经验，然而还是遇到了些小问题比如运行hexo server，hexo deploy等命令时报错慢慢完善吧，后期再丰富功能">
+<meta name="twitter:title" content="issues">
+<meta name="twitter:description" content="尚未解决的问题docker中的hexo无法监测文件改动hexo部署在docker中，通过数据卷使用虚拟机中的数据，而虚拟机中的数据又是来自virtualbox，共享win10中的文件夹问题在于，在docker中运行hexo s，并win中修改hexo源文件后刷新页面，内容未改变而在虚拟机中对修改过的文件使用touch命令后，再刷新页面，就显示修改后的内容了">
 
 
 
@@ -127,13 +126,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/02/27/problems-useing-hexo/"/>
+  <link rel="canonical" href="http://yoursite.com/issues/"/>
 
 
 
 
 
-  <title>使用hexo时遇到的问题 | Don't Panic</title>
+  <title>issues | Don't Panic</title>
   
 
 
@@ -287,175 +286,34 @@
 
   <div id="posts" class="posts-expand">
     
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/27/problems-useing-hexo/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="bbbht">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="https://avatars1.githubusercontent.com/u/6995166?s=400&u=7ec51c88d4058afe78bd6e5d1c32da816dd7413c&v=4">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Don't Panic">
-    </span>
-
     
+    
+    <div class="post-block page">
       <header class="post-header">
 
-        
-        
-          <h2 class="post-title" itemprop="name headline">使用hexo时遇到的问题</h2>
-        
+	<h2 class="post-title" itemprop="name headline">issues</h2>
 
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-27T04:37:19+00:00">
-                2018-02-27
-              </time>
-            
 
-            
 
-            
-          </span>
-
-          
-
-          
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/02/27/problems-useing-hexo/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/02/27/problems-useing-hexo/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-            <span class="post-meta-divider">|</span>
-            <span class="page-pv">总阅读量
-            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
-            </span>
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+</header>
 
       
       
-
       
-        <p>初次使用hexo，对各种配置还不熟悉<br>尽量使用了默认配置，并参考别人的经验，然而还是遇到了些小问题<br>比如运行<code>hexo server</code>，<code>hexo deploy</code>等命令时报错<br>慢慢完善吧，后期再丰富功能</p>
-<a id="more"></a>
-<h2 id="运行hexo-server命令时报错"><a href="#运行hexo-server命令时报错" class="headerlink" title="运行hexo server命令时报错"></a>运行<code>hexo server</code>命令时报错</h2><h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">INFO  Start processing</span><br><span class="line">ERROR Process failed: tags/index.md</span><br><span class="line">TypeError: Cannot read property &apos;utcOffset&apos; of null</span><br><span class="line">    at Object.exports.timezone ...</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
-<h3 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h3><p>主题的timezone配置为空导致<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">timeZone:</span><br></pre></td></tr></table></figure></p>
-<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p>设置主题的timezone，并与全局配置保持一致<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">timeZone: Asia/Shanghai</span><br></pre></td></tr></table></figure></p>
-<h2 id="运行hexo-deploy命令失败"><a href="#运行hexo-deploy命令失败" class="headerlink" title="运行hexo deploy命令失败"></a>运行<code>hexo deploy</code>命令失败</h2><h3 id="问题描述-1"><a href="#问题描述-1" class="headerlink" title="问题描述"></a>问题描述</h3><p>_config.yml配置如下<br><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line"><span class="attr">  type:</span> <span class="string">git</span></span><br><span class="line"><span class="attr">  repository:</span> <span class="string">git@github.com:bbbht/bbbht.github.io.git</span></span><br><span class="line"><span class="attr">  branch:</span> <span class="string">master</span></span><br></pre></td></tr></table></figure></p>
-<p>报错信息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ERROR Deployer not found: git</span><br></pre></td></tr></table></figure></p>
-<h3 id="原因-1"><a href="#原因-1" class="headerlink" title="原因"></a>原因</h3><p>功能缺失</p>
-<h3 id="解决方法-1"><a href="#解决方法-1" class="headerlink" title="解决方法"></a>解决方法</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
-<h2 id="disqus评论无法使用"><a href="#disqus评论无法使用" class="headerlink" title="disqus评论无法使用"></a>disqus评论无法使用</h2><h3 id="问题描述-2"><a href="#问题描述-2" class="headerlink" title="问题描述"></a>问题描述</h3><p>同事进入博客文章页后，发现disqus评论插件并未正常加载</p>
-<h3 id="原因-2"><a href="#原因-2" class="headerlink" title="原因"></a>原因</h3><p>你懂的</p>
-<h3 id="解决方法-2"><a href="#解决方法-2" class="headerlink" title="解决方法"></a>解决方法</h3><p>使用gitment替代disqus，毕竟目前部署在github pages上<br>教程很多，自行搜索即可<br><a href="https://www.google.com/search?q=hexo+next+Gitment" target="_blank" rel="noopener">Google 搜索 hexo next gitment</a><br>不同主题可能不同，next主题已集成，很方便</p>
-<blockquote>
-<p>注： 在主题配置文件中 github_repo 填写仓库名即可，并非仓库地址<br>另外，配置完成后需登陆账号手动初始化方可使用</p>
-</blockquote>
-<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><p><a href="https://imsun.net/posts/gitment-introduction/" target="_blank" rel="noopener">Gitment：使用 GitHub Issues 搭建评论系统</a></p>
+      <div class="post-body">
+        
+        
+          <h2 id="尚未解决的问题"><a href="#尚未解决的问题" class="headerlink" title="尚未解决的问题"></a>尚未解决的问题</h2><h4 id="docker中的hexo无法监测文件改动"><a href="#docker中的hexo无法监测文件改动" class="headerlink" title="docker中的hexo无法监测文件改动"></a>docker中的hexo无法监测文件改动</h4><p>hexo部署在docker中，通过数据卷使用虚拟机中的数据，而虚拟机中的数据又是来自virtualbox，共享win10中的文件夹<br>问题在于，在docker中运行<code>hexo s</code>，并win中修改hexo源文件后刷新页面，内容未改变<br>而在虚拟机中对修改过的文件使用<code>touch</code>命令后，再刷新页面，就显示修改后的内容了</p>
 
+        
+      </div>
+      
+      
       
     </div>
     
     
     
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/hexo/" rel="tag"># hexo</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/02/27/change-author-on-multiple-git-commits/" rel="prev" title="修改已提交的git仓库中commit作者信息（name,email）">
-                修改已提交的git仓库中commit作者信息（name,email） <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-
-    <div class="post-spread">
-      
-    </div>
   </div>
 
 
@@ -598,7 +456,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#运行hexo-server命令时报错"><span class="nav-number">1.</span> <span class="nav-text">运行hexo server命令时报错</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题描述"><span class="nav-number">1.1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#原因"><span class="nav-number">1.2.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决方法"><span class="nav-number">1.3.</span> <span class="nav-text">解决方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行hexo-deploy命令失败"><span class="nav-number">2.</span> <span class="nav-text">运行hexo deploy命令失败</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题描述-1"><span class="nav-number">2.1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#原因-1"><span class="nav-number">2.2.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决方法-1"><span class="nav-number">2.3.</span> <span class="nav-text">解决方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#disqus评论无法使用"><span class="nav-number">3.</span> <span class="nav-text">disqus评论无法使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题描述-2"><span class="nav-number">3.1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#原因-2"><span class="nav-number">3.2.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决方法-2"><span class="nav-number">3.3.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考链接"><span class="nav-number">3.4.</span> <span class="nav-text">参考链接</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#尚未解决的问题"><span class="nav-number">1.</span> <span class="nav-text">尚未解决的问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#docker中的hexo无法监测文件改动"><span class="nav-number">1.0.1.</span> <span class="nav-text">docker中的hexo无法监测文件改动</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
@@ -781,9 +639,9 @@
     
       <script type="text/javascript">
         var disqus_config = function () {
-          this.page.url = 'http://yoursite.com/2018/02/27/problems-useing-hexo/';
-          this.page.identifier = '2018/02/27/problems-useing-hexo/';
-          this.page.title = '使用hexo时遇到的问题';
+          this.page.url = 'http://yoursite.com/issues/index.html';
+          this.page.identifier = 'issues/index.html';
+          this.page.title = 'issues';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://loessplateau.disqus.com/embed.js';

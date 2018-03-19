@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="virtualbox," />
 
 
 
@@ -87,13 +87,14 @@
 
 
 <meta name="description" content="因为想要在主机和虚拟机之间共享目录，所以要安装增强功能但是直接点击 设备-&amp;gt;安装增强功能 的操作是失败的失败提示未能加载虚拟光盘 … vboxguestadditions.iso …使用的环境如下：  virtubox：版本 5.2.8 虚拟机：Ubuntu server 14.04 主机系统：win10 版本1079  最终是通过虚拟机内直接安装来解决">
+<meta name="keywords" content="virtualbox">
 <meta property="og:type" content="article">
 <meta property="og:title" content="VirtualBox使用共享目录及安装增强功能失败的解决方案">
 <meta property="og:url" content="http://yoursite.com/2018/03/18/VirtualBox-install-Guest-Additions-error/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
 <meta property="og:description" content="因为想要在主机和虚拟机之间共享目录，所以要安装增强功能但是直接点击 设备-&amp;gt;安装增强功能 的操作是失败的失败提示未能加载虚拟光盘 … vboxguestadditions.iso …使用的环境如下：  virtubox：版本 5.2.8 虚拟机：Ubuntu server 14.04 主机系统：win10 版本1079  最终是通过虚拟机内直接安装来解决">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-19T08:04:59.968Z">
+<meta property="og:updated_time" content="2018-03-19T09:55:28.640Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="VirtualBox使用共享目录及安装增强功能失败的解决方案">
 <meta name="twitter:description" content="因为想要在主机和虚拟机之间共享目录，所以要安装增强功能但是直接点击 设备-&amp;gt;安装增强功能 的操作是失败的失败提示未能加载虚拟光盘 … vboxguestadditions.iso …使用的环境如下：  virtubox：版本 5.2.8 虚拟机：Ubuntu server 14.04 主机系统：win10 版本1079  最终是通过虚拟机内直接安装来解决">
@@ -147,6 +148,16 @@
   ga('send', 'pageview');
 </script>
 
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?eb57bcadcc119e3cc4ce3b3da405e9ee";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
 
 
 
@@ -206,16 +217,6 @@
         </li>
       
         
-        <li class="menu-item menu-item-about">
-          <a href="/about/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
-            
-            关于
-          </a>
-        </li>
-      
-        
         <li class="menu-item menu-item-tags">
           <a href="/tags/" rel="section">
             
@@ -232,6 +233,26 @@
               <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
             归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-issues">
+          <a href="/issues/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            issues
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
           </a>
         </li>
       
@@ -318,6 +339,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/虚拟机/" itemprop="url" rel="index">
+                    <span itemprop="name">虚拟机</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -327,7 +370,8 @@
                   <i class="fa fa-comment-o"></i>
                 </span>
                 <a href="/2018/03/18/VirtualBox-install-Guest-Additions-error/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/18/VirtualBox-install-Guest-Additions-error/" itemprop="commentsCount"></span>
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/03/18/VirtualBox-install-Guest-Additions-error/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -394,6 +438,12 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/virtualbox/" rel="tag"># virtualbox</a>
+          
+        </div>
+      
 
       
       
@@ -442,9 +492,12 @@
 
   
     <div class="comments" id="comments">
-      
-        <div id="gitment-container"></div>
-      
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
     </div>
 
   
@@ -510,7 +563,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -521,7 +574,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">7</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -746,6 +799,26 @@
 
   
 
+    
+      <script id="dsq-count-scr" src="https://loessplateau.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2018/03/18/VirtualBox-install-Guest-Additions-error/';
+          this.page.identifier = '2018/03/18/VirtualBox-install-Guest-Additions-error/';
+          this.page.title = 'VirtualBox使用共享目录及安装增强功能失败的解决方案';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://loessplateau.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
 
 
 
@@ -761,49 +834,8 @@
 
 
 
-  
 
 
-
-
-
-
-
-<!-- LOCAL: You can save these files to your site and update links -->
-    
-        
-        <link rel="stylesheet" href="https://aimingoo.github.io/gitmint/style/default.css">
-        <script src="https://aimingoo.github.io/gitmint/dist/gitmint.browser.js"></script>
-    
-<!-- END LOCAL -->
-
-    
-
-    
-      <script type="text/javascript">
-      function renderGitment(){
-        var gitment = new Gitmint({
-            id: window.location.pathname, 
-            owner: 'bbbht',
-            repo: 'bbbht.github.io',
-            
-            lang: "" || navigator.language || navigator.systemLanguage || navigator.userLanguage,
-            
-            oauth: {
-            
-            
-                client_secret: '5f261e41a4e89b5975d7268370abec466bdb4877',
-            
-                client_id: '4e1040dd03efdd96ac36'
-            }});
-        gitment.render('gitment-container');
-      }
-
-      
-      renderGitment();
-      
-      </script>
-    
 
 
 
