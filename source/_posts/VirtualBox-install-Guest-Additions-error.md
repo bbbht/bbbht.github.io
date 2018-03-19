@@ -1,8 +1,8 @@
 ---
 title: VirtualBox使用共享目录及安装增强功能失败的解决方案
 date: 2018-03-19 07:31:53
-tags:
-categories:
+tags: virtualbox
+categories: 虚拟机
 ---
 因为想要在主机和虚拟机之间共享目录，所以要安装增强功能
 但是直接点击 设备->安装增强功能 的操作是失败的
