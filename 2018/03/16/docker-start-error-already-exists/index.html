@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="hexo," />
+  <meta name="keywords" content="docker," />
 
 
 
@@ -86,18 +86,18 @@
 
 
 
-<meta name="description" content="之前hexo的环境是在公司电脑上部署的，考虑到源码的安全备份，以及换电脑操作的不可避免，所以需要一个方案来解决大致是三种成熟方案：  Dropbox，百度云盘等直接同步需要安装配置额外的软件，嫌麻烦了 VPS部署环境是个好方法，云端操作，然而手上并没有VPS可用 对资源文件也进行版本控制即最终所采用的方案，并配合Appveyor完成一键自动部署">
-<meta name="keywords" content="hexo">
+<meta name="description" content="新装的虚拟机，新安装的docker，启动正常容器运行也正常，问题出在重启虚拟机后运行docker start XXX 报错 XXX already exists，而该容器并未运行最终理解为新版本（18.02）bug，降级docker解决">
+<meta name="keywords" content="docker">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用Appveyor管理hexo源码并实现自动发布">
-<meta property="og:url" content="http://yoursite.com/2018/03/01/hexo-appveyor-git/index.html">
+<meta property="og:title" content="已停止容器无法通过docker start启动并报错already exists">
+<meta property="og:url" content="http://yoursite.com/2018/03/16/docker-start-error-already-exists/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
-<meta property="og:description" content="之前hexo的环境是在公司电脑上部署的，考虑到源码的安全备份，以及换电脑操作的不可避免，所以需要一个方案来解决大致是三种成熟方案：  Dropbox，百度云盘等直接同步需要安装配置额外的软件，嫌麻烦了 VPS部署环境是个好方法，云端操作，然而手上并没有VPS可用 对资源文件也进行版本控制即最终所采用的方案，并配合Appveyor完成一键自动部署">
+<meta property="og:description" content="新装的虚拟机，新安装的docker，启动正常容器运行也正常，问题出在重启虚拟机后运行docker start XXX 报错 XXX already exists，而该容器并未运行最终理解为新版本（18.02）bug，降级docker解决">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2018-03-19T08:04:59.968Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="使用Appveyor管理hexo源码并实现自动发布">
-<meta name="twitter:description" content="之前hexo的环境是在公司电脑上部署的，考虑到源码的安全备份，以及换电脑操作的不可避免，所以需要一个方案来解决大致是三种成熟方案：  Dropbox，百度云盘等直接同步需要安装配置额外的软件，嫌麻烦了 VPS部署环境是个好方法，云端操作，然而手上并没有VPS可用 对资源文件也进行版本控制即最终所采用的方案，并配合Appveyor完成一键自动部署">
+<meta name="twitter:title" content="已停止容器无法通过docker start启动并报错already exists">
+<meta name="twitter:description" content="新装的虚拟机，新安装的docker，启动正常容器运行也正常，问题出在重启虚拟机后运行docker start XXX 报错 XXX already exists，而该容器并未运行最终理解为新版本（18.02）bug，降级docker解决">
 
 
 
@@ -127,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/03/01/hexo-appveyor-git/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/03/16/docker-start-error-already-exists/"/>
 
 
 
 
 
-  <title>使用Appveyor管理hexo源码并实现自动发布 | Don't Panic</title>
+  <title>已停止容器无法通过docker start启动并报错already exists | Don't Panic</title>
   
 
 
@@ -279,7 +279,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/01/hexo-appveyor-git/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/16/docker-start-error-already-exists/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="bbbht">
@@ -296,7 +296,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">使用Appveyor管理hexo源码并实现自动发布</h2>
+          <h2 class="post-title" itemprop="name headline">已停止容器无法通过docker start启动并报错already exists</h2>
         
 
         <div class="post-meta">
@@ -308,8 +308,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-01T09:01:27+00:00">
-                2018-03-01
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-16T01:37:58+00:00">
+                2018-03-16
               </time>
             
 
@@ -319,6 +319,28 @@
           </span>
 
           
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index">
+                    <span itemprop="name">docker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -327,8 +349,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/03/01/hexo-appveyor-git/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/01/hexo-appveyor-git/" itemprop="commentsCount"></span>
+                <a href="/2018/03/16/docker-start-error-already-exists/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count gitment-comments-count" data-xid="/2018/03/16/docker-start-error-already-exists/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -361,23 +383,14 @@
       
 
       
-        <p>之前hexo的环境是在公司电脑上部署的，考虑到源码的安全备份，以及换电脑操作的不可避免，所以需要一个方案来解决<br>大致是三种成熟方案：</p>
-<ol>
-<li>Dropbox，百度云盘等直接同步<br>需要安装配置额外的软件，嫌麻烦了</li>
-<li>VPS部署环境<br>是个好方法，云端操作，然而手上并没有VPS可用</li>
-<li>对资源文件也进行版本控制<br>即最终所采用的方案，并配合<a href="https://www.appveyor.com/" target="_blank" rel="noopener">Appveyor</a>完成一键自动部署<a id="more"></a>
-</li>
-</ol>
-<h2 id="Appveyor配置"><a href="#Appveyor配置" class="headerlink" title="Appveyor配置"></a>Appveyor配置</h2><p>github账号登陆，选择对应的github page repo，简单配置即可，不再赘述<br>详见<a href="http://feg.netease.com/archives/634.html" target="_blank" rel="noopener">如何更好地对hexo博客管理</a></p>
-<blockquote>
-<p>注：注意node版本</p>
-</blockquote>
-<h2 id="拉取仓库"><a href="#拉取仓库" class="headerlink" title="拉取仓库"></a>拉取仓库</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git@github.com:bbbht/bbbht.github.io.git hexo --branch hexo</span><br></pre></td></tr></table></figure>
-<h2 id="hexo环境初始化"><a href="#hexo环境初始化" class="headerlink" title="hexo环境初始化"></a>hexo环境初始化</h2><p>前提是系统中已存在git及nodejs环境<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入博客资源根目录</span></span><br><span class="line"><span class="built_in">cd</span> hexo</span><br><span class="line"><span class="comment"># 安装hexo</span></span><br><span class="line">npm install -g hexo-cli</span><br><span class="line"><span class="comment"># 运行hexo server</span></span><br><span class="line">hexo s -p 4000</span><br></pre></td></tr></table></figure></p>
-<p>接下来即可完成本地部署，换电脑什么的也无妨了</p>
-<h2 id="发布"><a href="#发布" class="headerlink" title="发布"></a>发布</h2><p>文章完成之后，直接在hexo分支push<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git add .</span><br><span class="line">git commit -am <span class="string">"commit msg"</span></span><br><span class="line">git pull --rebase</span><br><span class="line">git push origin hexo:hexo</span><br></pre></td></tr></table></figure></p>
-<p>然后等待自动发布完成，预览即可<br>本文即为测试效果而写</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="http://feg.netease.com/archives/634.html" target="_blank" rel="noopener">如何更好地对hexo博客管理</a></p>
+        <p>新装的虚拟机，新安装的docker，启动正常<br>容器运行也正常，问题出在重启虚拟机后<br>运行docker start XXX 报错 XXX already exists，而该容器并未运行<br>最终理解为新版本（18.02）bug，降级docker解决<br><a id="more"></a></p>
+<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>无法通过start，restart命令启动已停止的容器<br>均报错already exists<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">$ docker start webserver </span><br><span class="line">Error response from daemon: container <span class="string">"ca9f2b815c64980dd3625870a995b50b7b9a3dca2130b275122a21beef380b9c"</span>: already exists</span><br><span class="line">Error: failed to start containers: webserver</span><br><span class="line">$ </span><br><span class="line">$ docker restart webserver </span><br><span class="line">Error response from daemon: Cannot restart container webserver: container <span class="string">"ca9f2b815c64980dd3625870a995b50b7b9a3dca2130b275122a21beef380b9c"</span>: already exists</span><br><span class="line">$ </span><br><span class="line">$ docker ps -a</span><br><span class="line">CONTAINER ID        IMAGE                                                   COMMAND             CREATED             STATUS                        PORTS                                                           NAMES</span><br><span class="line">ca9f2b815c64        registry.cn-hangzhou.aliyuncs.com/mudu/mudutv-web-dev   <span class="string">"/start.sh"</span>         5 hours ago         Exited (255) 11 minutes ago   0.0.0.0:80-&gt;80/tcp, 0.0.0.0:443-&gt;443/tcp, 0.0.0.0:222-&gt;22/tcp   webserver</span><br><span class="line">$ docker stop webserver </span><br><span class="line">webserver</span><br><span class="line">$ docker start webserver </span><br><span class="line">Error response from daemon: container <span class="string">"ca9f2b815c64980dd3625870a995b50b7b9a3dca2130b275122a21beef380b9c"</span>: already exists</span><br><span class="line">Error: failed to start containers: webserver</span><br><span class="line">$ </span><br><span class="line">$ docker --version</span><br><span class="line">Docker version 18.02.0-ce, build fc4de44</span><br></pre></td></tr></table></figure></p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>网上遇到此问题的，基本都是最新版本，即<strong>18.02</strong><br>应该是版本bug</p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>选择降级来尝试解决</p>
+<h4 id="查看下可用版本列表"><a href="#查看下可用版本列表" class="headerlink" title="查看下可用版本列表"></a>查看下可用版本列表</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">$ apt-cache policy docker-ce </span><br><span class="line">docker-ce:</span><br><span class="line">  已安装：  (无)</span><br><span class="line">  候选软件包：18.02.0~ce-0~ubuntu</span><br><span class="line">  版本列表：</span><br><span class="line">     18.02.0~ce-0~ubuntu 0</span><br><span class="line">        500 https://download.docker.com/linux/ubuntu/ trusty/edge amd64 Packages</span><br><span class="line">     18.01.0~ce-0~ubuntu 0</span><br><span class="line">        500 https://download.docker.com/linux/ubuntu/ trusty/edge amd64 Packages</span><br><span class="line">     17.12.1~ce-0~ubuntu 0</span><br><span class="line">        500 https://download.docker.com/linux/ubuntu/ trusty/edge amd64 Packages</span><br><span class="line">     17.12.0~ce-0~ubuntu 0</span><br><span class="line">        500 https://download.docker.com/linux/ubuntu/ trusty/edge amd64 Packages</span><br><span class="line">     17.11.0~ce-0~ubuntu 0</span><br><span class="line">        500 https://download.docker.com/linux/ubuntu/ trusty/edge amd64 Packages</span><br><span class="line">     17.10.0~ce-0~ubuntu 0</span><br><span class="line">        500 https://download.docker.com/linux/ubuntu/ trusty/edge amd64 Packages</span><br><span class="line">     17.09.1~ce-0~ubuntu 0</span><br><span class="line">        500 https://download.docker.com/linux/ubuntu/ trusty/edge amd64 Packages</span><br><span class="line">     .............</span><br></pre></td></tr></table></figure>
+<h4 id="卸载docker-ce"><a href="#卸载docker-ce" class="headerlink" title="卸载docker-ce"></a>卸载docker-ce</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get purge docker-ce</span><br></pre></td></tr></table></figure>
+<h4 id="安装指定版本"><a href="#安装指定版本" class="headerlink" title="安装指定版本"></a>安装指定版本</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo apt-get install -y docker-ce=17.12.0~ce-0~ubuntu</span><br></pre></td></tr></table></figure>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://github.com/docker/for-linux/issues/211" target="_blank" rel="noopener">github docker issues</a></p>
 
       
     </div>
@@ -395,7 +408,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/hexo/" rel="tag"># hexo</a>
+            <a href="/tags/docker/" rel="tag"># docker</a>
           
         </div>
       
@@ -408,8 +421,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/02/28/explain-a-linux-set-command/" rel="next" title="linux命令'set -- $@'的解释">
-                <i class="fa fa-chevron-left"></i> linux命令'set -- $@'的解释
+              <a href="/2018/03/16/hexo-docker-github-pages/" rel="next" title="在docker中部署hexo">
+                <i class="fa fa-chevron-left"></i> 在docker中部署hexo
               </a>
             
           </div>
@@ -418,8 +431,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/03/08/provisional-headers-are-shown/" rel="prev" title="Chrome请求provisional headers are shown的解决">
-                Chrome请求provisional headers are shown的解决 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/03/18/VirtualBox-install-Guest-Additions-error/" rel="prev" title="VirtualBox使用共享目录及安装增强功能失败的解决方案">
+                VirtualBox使用共享目录及安装增强功能失败的解决方案 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -579,7 +592,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Appveyor配置"><span class="nav-number">1.</span> <span class="nav-text">Appveyor配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拉取仓库"><span class="nav-number">2.</span> <span class="nav-text">拉取仓库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo环境初始化"><span class="nav-number">3.</span> <span class="nav-text">hexo环境初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#发布"><span class="nav-number">4.</span> <span class="nav-text">发布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">5.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题描述"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原因"><span class="nav-number">2.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方法"><span class="nav-number">3.</span> <span class="nav-text">解决方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#查看下可用版本列表"><span class="nav-number">3.0.1.</span> <span class="nav-text">查看下可用版本列表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#卸载docker-ce"><span class="nav-number">3.0.2.</span> <span class="nav-text">卸载docker-ce</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装指定版本"><span class="nav-number">3.0.3.</span> <span class="nav-text">安装指定版本</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">4.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
             
 
           </div>
