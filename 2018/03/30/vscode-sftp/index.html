@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="git," />
+  <meta name="keywords" content="vscode," />
 
 
 
@@ -86,18 +86,18 @@
 
 
 
-<meta name="description" content="问题描述通过hexo deploy推送到github pages上的文章，访问正常，没来得及高兴就发现了问题。因为仓库中的commit信息是公司项目中配置的信息！">
-<meta name="keywords" content="git">
+<meta name="description" content="之前有碰到使用虚拟机共享文件夹的文件同步问题发现一种新方案，直接将文件置于docker镜像中，然后配置ssh，通过sftp协议访问即可当然，sftp默认使用有一定的安全性问题，暂不考虑本地使用vscode，配合sftp插件来使用demo为hexo开发环境，与上次的版本比较，在使用上有了很大的精简">
+<meta name="keywords" content="vscode">
 <meta property="og:type" content="article">
-<meta property="og:title" content="修改已提交的git仓库中commit作者信息（name,email）">
-<meta property="og:url" content="http://yoursite.com/2018/02/27/change-author-on-multiple-git-commits/index.html">
+<meta property="og:title" content="VSCode 配合sftp同步编辑远程代码">
+<meta property="og:url" content="http://yoursite.com/2018/03/30/vscode-sftp/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
-<meta property="og:description" content="问题描述通过hexo deploy推送到github pages上的文章，访问正常，没来得及高兴就发现了问题。因为仓库中的commit信息是公司项目中配置的信息！">
+<meta property="og:description" content="之前有碰到使用虚拟机共享文件夹的文件同步问题发现一种新方案，直接将文件置于docker镜像中，然后配置ssh，通过sftp协议访问即可当然，sftp默认使用有一定的安全性问题，暂不考虑本地使用vscode，配合sftp插件来使用demo为hexo开发环境，与上次的版本比较，在使用上有了很大的精简">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-03-30T07:18:10.682Z">
+<meta property="og:updated_time" content="2018-03-30T07:18:10.698Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="修改已提交的git仓库中commit作者信息（name,email）">
-<meta name="twitter:description" content="问题描述通过hexo deploy推送到github pages上的文章，访问正常，没来得及高兴就发现了问题。因为仓库中的commit信息是公司项目中配置的信息！">
+<meta name="twitter:title" content="VSCode 配合sftp同步编辑远程代码">
+<meta name="twitter:description" content="之前有碰到使用虚拟机共享文件夹的文件同步问题发现一种新方案，直接将文件置于docker镜像中，然后配置ssh，通过sftp协议访问即可当然，sftp默认使用有一定的安全性问题，暂不考虑本地使用vscode，配合sftp插件来使用demo为hexo开发环境，与上次的版本比较，在使用上有了很大的精简">
 
 
 
@@ -127,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/02/27/change-author-on-multiple-git-commits/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/03/30/vscode-sftp/"/>
 
 
 
 
 
-  <title>修改已提交的git仓库中commit作者信息（name,email） | Don't Panic</title>
+  <title>VSCode 配合sftp同步编辑远程代码 | Don't Panic</title>
   
 
 
@@ -299,7 +299,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/27/change-author-on-multiple-git-commits/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/30/vscode-sftp/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="bbbht">
@@ -316,7 +316,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">修改已提交的git仓库中commit作者信息（name,email）</h2>
+          <h2 class="post-title" itemprop="name headline">VSCode 配合sftp同步编辑远程代码</h2>
         
 
         <div class="post-meta">
@@ -328,8 +328,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-27T07:10:57+00:00">
-                2018-02-27
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-30T05:49:10+00:00">
+                2018-03-30
               </time>
             
 
@@ -351,8 +351,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/版本控制/" itemprop="url" rel="index">
-                    <span itemprop="name">版本控制</span>
+                  <a href="/categories/开发工具/" itemprop="url" rel="index">
+                    <span itemprop="name">开发工具</span>
                   </a>
                 </span>
 
@@ -369,9 +369,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/02/27/change-author-on-multiple-git-commits/#comments" itemprop="discussionUrl">
+                <a href="/2018/03/30/vscode-sftp/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/02/27/change-author-on-multiple-git-commits/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/03/30/vscode-sftp/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -404,27 +404,13 @@
       
 
       
-        <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>通过<code>hexo deploy</code>推送到github pages上的文章，访问正常，没来得及高兴就发现了问题。<br>因为仓库中的commit信息是公司项目中配置的信息！</p>
-<a id="more"></a>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>没有为项目做git上的配置，于是使用了全局的git配置。</p>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>将所有错误的name，email修改为正确的配置。<br>发现两种方案</p>
-<p>a. 通过<code>git rebase -i</code> 命令 重写历史<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 选择修改范围</span></span><br><span class="line">git rebase -i HEAD~n</span><br></pre></td></tr></table></figure></p>
-<p>输出如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">pick 208d348 XXX</span><br><span class="line">pick c99c75e CCC</span><br><span class="line">pick 35c4d4c FFF</span><br><span class="line"></span><br><span class="line"># Rebase 02097a2..35c4d4c onto 02097a2 (3 commands)</span><br><span class="line">#</span><br><span class="line"># Commands:</span><br></pre></td></tr></table></figure></p>
-<p>将要修改的提交所在行 pick 改为 e 保存退出<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 通过命令一条一条修改</span></span><br><span class="line">git commit --amend --author <span class="string">"username &lt;abcdef@gmail.com&gt;"</span></span><br><span class="line">git rebase --<span class="built_in">continue</span></span><br></pre></td></tr></table></figure></p>
-<p>直至<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git rebase --<span class="built_in">continue</span></span><br><span class="line">Successfully rebased and updated refs/heads/master.</span><br></pre></td></tr></table></figure></p>
-<p>当修改条目过多时并不方便，且尝试中发现第一条提交（First commit）无法修改，因此并未使用</p>
-<p>b. 通过<code>git filter-branch</code>命令 配合脚本完成<br>从网上找到脚本如下</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"></span><br><span class="line">git filter-branch --env-filter <span class="string">'</span></span><br><span class="line"><span class="string">OLD_EMAIL="your-old-email@example.com"</span></span><br><span class="line"><span class="string">CORRECT_NAME="Your Correct Name"</span></span><br><span class="line"><span class="string">CORRECT_EMAIL="your-correct-email@example.com"</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">if [ "$GIT_COMMITTER_EMAIL" = "$OLD_EMAIL" ]</span></span><br><span class="line"><span class="string">then</span></span><br><span class="line"><span class="string">    export GIT_COMMITTER_NAME="$CORRECT_NAME"</span></span><br><span class="line"><span class="string">    export GIT_COMMITTER_EMAIL="$CORRECT_EMAIL"</span></span><br><span class="line"><span class="string">fi</span></span><br><span class="line"><span class="string">if [ "$GIT_AUTHOR_EMAIL" = "$OLD_EMAIL" ]</span></span><br><span class="line"><span class="string">then</span></span><br><span class="line"><span class="string">    export GIT_AUTHOR_NAME="$CORRECT_NAME"</span></span><br><span class="line"><span class="string">    export GIT_AUTHOR_EMAIL="$CORRECT_EMAIL"</span></span><br><span class="line"><span class="string">fi</span></span><br><span class="line"><span class="string">'</span> --tag-name-filter cat -- --branches --tags</span><br><span class="line"></span><br><span class="line"><span class="comment"># Rewrite 35c4d4c3e8b675d7b4b555dce3cff975366f5cf8 (3/4) (1 seconds passed, remaining 0 predicted)</span></span><br><span class="line"><span class="comment"># Ref 'refs/heads/master' was rewritten</span></span><br></pre></td></tr></table></figure>
-<p>简单直接，最终使用此方案完成了修改<br>然后push即可<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git push --force --tags</span><br><span class="line"># 也可指定远程仓库</span><br><span class="line"># git push --force --tags origin &apos;refs/heads/*&apos;</span><br><span class="line"></span><br><span class="line"># Everything up-to-date</span><br></pre></td></tr></table></figure></p>
-<h2 id="预防措施"><a href="#预防措施" class="headerlink" title="预防措施"></a>预防措施</h2><ol>
-<li><p>在_config.yml中显式地增加配置</p>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line"><span class="attr">  type:</span> <span class="string">git</span></span><br><span class="line"><span class="attr">  repository:</span> <span class="string">git@github.com:bbbht/bbbht.github.io.git</span></span><br><span class="line"><span class="attr">  branch:</span> <span class="string">master</span></span><br><span class="line"><span class="attr">  name:</span> <span class="string">bbbht</span></span><br><span class="line"><span class="attr">  email:</span> <span class="string">plateau.loess@gmail.com</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>在git仓库中进行设置</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config user.name bbbht</span><br><span class="line">git config user.email plateau.loess@gmail.com</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History" target="_blank" rel="noopener">Git Tools - Rewriting History</a><br><a href="https://github.com/hexojs/hexo-deployer-git" target="_blank" rel="noopener">hexo-deployer-git配置</a></p>
+        <p>之前有碰到使用虚拟机共享文件夹的文件同步问题<br>发现一种新方案，直接将文件置于docker镜像中，然后配置ssh，通过sftp协议访问即可<br>当然，sftp默认使用有一定的安全性问题，暂不考虑<br>本地使用vscode，配合sftp插件来使用<br>demo为hexo开发环境，与上次的版本比较，在使用上有了很大的精简<br><a id="more"></a></p>
+<h3 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h3><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> node:<span class="number">6</span>-alpine</span><br><span class="line"><span class="keyword">MAINTAINER</span> bbbht &lt;plateau.loess@gmail.com&gt;</span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /hexo</span></span><br><span class="line"><span class="bash">ENV LANG C.UTF-8</span></span><br><span class="line"><span class="bash"></span></span><br><span class="line"><span class="bash">RUN apk update &amp;&amp; \</span></span><br><span class="line"><span class="bash">    apk add --no-cache openrc openssh git tzdata &amp;&amp; \</span></span><br><span class="line"><span class="bash">    rc-update add sshd &amp;&amp; \</span></span><br><span class="line"><span class="bash">    rc-status &amp;&amp; \</span></span><br><span class="line"><span class="bash">    touch /run/openrc/softlevel &amp;&amp; \</span></span><br><span class="line"><span class="bash">    <span class="built_in">echo</span> -e root:root | chpasswd &amp;&amp; \</span></span><br><span class="line"><span class="bash">    ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime &amp;&amp; \</span></span><br><span class="line"><span class="bash">    <span class="built_in">echo</span> <span class="string">"Asia/Shanghai"</span> &gt; /etc/timezone &amp;&amp; \</span></span><br><span class="line"><span class="bash">    npm install hexo-cli -g --no-optional &amp;&amp; \</span></span><br><span class="line"><span class="bash">    <span class="built_in">echo</span> <span class="string">"PermitRootLogin yes"</span> &gt;&gt; /etc/ssh/sshd_config &amp;&amp; \</span></span><br><span class="line"><span class="bash">    git <span class="built_in">clone</span> https://github.com/bbbht/bbbht.github.io.git --branch hexo /hexo &amp;&amp; \</span></span><br><span class="line"><span class="bash">    <span class="built_in">cd</span> /hexo &amp;&amp; \</span></span><br><span class="line"><span class="bash">    git config user.name bbbht &amp;&amp; \</span></span><br><span class="line"><span class="bash">    git config user.email plateau.loess@gmail.com &amp;&amp; \</span></span><br><span class="line"><span class="bash">    git config core.fileMode <span class="literal">false</span> &amp;&amp; \</span></span><br><span class="line"><span class="bash">    npm install --no-optional --no-bin-links &amp;&amp; \</span></span><br><span class="line"><span class="bash">    rm -rf /var/cache/apk/* /tmp/*</span></span><br><span class="line"><span class="bash"></span></span><br><span class="line"><span class="bash"></span></span><br><span class="line"><span class="bash">CMD [<span class="string">'hexo'</span>, <span class="string">'s'</span>]</span></span><br></pre></td></tr></table></figure>
+<p>通过<code>echo -e root:root | chpasswd</code>方式设置root密码<br>通过安装tzdata，修改了时区为 UTC+0800<br>安装openrc，设置ssh开机启动<br>其中<code>rc-status</code>为必要步骤<br>然后编辑更新等工作在主机系统中完成即可</p>
+<h3 id="运行docker"><a href="#运行docker" class="headerlink" title="运行docker"></a>运行docker</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 构建镜像</span><br><span class="line">docker build -t hexo:alpine .</span><br><span class="line"># 运行容器</span><br><span class="line">docker run -d --name hexo-server -p 4000:4000 -p 4022:22 hexo:alpine hexo s</span><br></pre></td></tr></table></figure>
+<h3 id="配置sftp插件"><a href="#配置sftp插件" class="headerlink" title="配置sftp插件"></a>配置sftp插件</h3><p>安装插件<br>打开指定的空目录<br><code>Ctrl + Shift + P</code>输入 <code>sftp:config</code><br>编辑生成的sftp.json文件<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"protocol"</span>: <span class="string">"sftp"</span>,</span><br><span class="line">    <span class="attr">"host"</span>: <span class="string">"192.168.3.144"</span>,</span><br><span class="line">    <span class="attr">"username"</span>: <span class="string">"root"</span>,</span><br><span class="line">    <span class="attr">"password"</span>: <span class="string">"root"</span>,</span><br><span class="line">    <span class="attr">"port"</span>: <span class="number">4022</span>,</span><br><span class="line">    <span class="attr">"uploadOnSave"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">"downloadOnOpen"</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">"watcher"</span>: &#123;</span><br><span class="line">        <span class="attr">"files"</span>: <span class="string">"**/*"</span>,</span><br><span class="line">        <span class="attr">"autoUpload"</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="attr">"autoDelete"</span>: <span class="literal">true</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">"ignore"</span>: [</span><br><span class="line">        <span class="string">"node_modules"</span>,</span><br><span class="line">        <span class="string">".vscode"</span>,</span><br><span class="line">        <span class="string">".idea"</span>,</span><br><span class="line">        <span class="string">".DS_Store"</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="attr">"remotePath"</span>: <span class="string">"/hexo"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后<code>Ctrl + Shift + P</code>输入 <code>sftp:Download</code>即可获取远程代码，并保持同步<br>不再有文件修改状态的问题<br>具体使用及配置说明，请移步参考链接</p>
+<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><p><a href="https://marketplace.visualstudio.com/items?itemName=liximomo.sftp" target="_blank" rel="noopener">sftp sync extension for VS Code</a></p>
 
       
     </div>
@@ -442,7 +428,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/git/" rel="tag"># git</a>
+            <a href="/tags/vscode/" rel="tag"># vscode</a>
           
         </div>
       
@@ -455,8 +441,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/02/27/problems-useing-hexo/" rel="next" title="使用hexo时遇到的问题">
-                <i class="fa fa-chevron-left"></i> 使用hexo时遇到的问题
+              <a href="/2018/03/27/git-log-custom-powerful/" rel="next" title="自定义git log的图形化显示">
+                <i class="fa fa-chevron-left"></i> 自定义git log的图形化显示
               </a>
             
           </div>
@@ -464,10 +450,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/02/28/explain-a-linux-set-command/" rel="prev" title="linux命令'set -- $@'的解释">
-                linux命令'set -- $@'的解释 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -629,7 +611,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题描述"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原因"><span class="nav-number">2.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方法"><span class="nav-number">3.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#预防措施"><span class="nav-number">4.</span> <span class="nav-text">预防措施</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">5.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Dockerfile"><span class="nav-number">1.</span> <span class="nav-text">Dockerfile</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运行docker"><span class="nav-number">2.</span> <span class="nav-text">运行docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置sftp插件"><span class="nav-number">3.</span> <span class="nav-text">配置sftp插件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考链接"><span class="nav-number">4.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
             
 
           </div>
@@ -812,9 +794,9 @@
     
       <script type="text/javascript">
         var disqus_config = function () {
-          this.page.url = 'http://yoursite.com/2018/02/27/change-author-on-multiple-git-commits/';
-          this.page.identifier = '2018/02/27/change-author-on-multiple-git-commits/';
-          this.page.title = '修改已提交的git仓库中commit作者信息（name,email）';
+          this.page.url = 'http://yoursite.com/2018/03/30/vscode-sftp/';
+          this.page.identifier = '2018/03/30/vscode-sftp/';
+          this.page.title = 'VSCode 配合sftp同步编辑远程代码';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://loessplateau.disqus.com/embed.js';
