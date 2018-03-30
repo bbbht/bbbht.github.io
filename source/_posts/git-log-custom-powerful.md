@@ -14,7 +14,7 @@ categories: 版本控制
 
 ## 方案
 ```
-git config alias.lg="log --pretty=format:'%C(red)%h%Creset %C(white)%s %C(yellow)%d %C(green)%an %C(cyan)%cr%Creset' --graph"
+git config alias.lg "log --pretty=format:'%C(red)%h%Creset %C(white)%s %C(yellow)%d %C(green)%an %C(cyan)%cr%Creset' --graph"
 ```
 
 git log 常用参数
@@ -88,7 +88,9 @@ git log 常用参数
 - reverse
 
 加入自定义颜色配置，突出显示提交
-``--pretty=format:'%C(red)%h%Creset %C(white)%s %C(yellow)%d %C(green)%an %C(cyan)%cr%Creset'``
+```
+--pretty=format:'%C(red)%h%Creset %C(white)%s %C(yellow)%d %C(green)%an %C(cyan)%cr%Creset'
+```
 
 ### 展示分支关系``--graph``
 显示branch的ascii图例
