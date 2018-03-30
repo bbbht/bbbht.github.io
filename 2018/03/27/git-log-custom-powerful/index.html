@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="chrome,ajax," />
+  <meta name="keywords" content="git," />
 
 
 
@@ -86,18 +86,18 @@
 
 
 
-<meta name="description" content="前端反馈说部分接口调用失败，接口返回异常通过chrome开发者工具查看请求，request headers下有警告提示：provisional headers are shown感觉并不是后端的问题，但问题既然发生了，还是要解决的">
-<meta name="keywords" content="chrome,ajax">
+<meta name="description" content="习惯用命令行来使用git使用IDE或者sourcetree等工具，不够轻量化最常使用的git log命令显示的方式过于冗余，翻看起来费时费力使用--oneline虽然是一行一个commit，但是少了太多细节当然可以选择使用tig，但win下暂不能傻瓜式使用，后面再提于是可以定制一个命令来满足需求">
+<meta name="keywords" content="git">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Chrome请求provisional headers are shown的解决">
-<meta property="og:url" content="http://yoursite.com/2018/03/08/provisional-headers-are-shown/index.html">
+<meta property="og:title" content="自定义git log的图形化显示">
+<meta property="og:url" content="http://yoursite.com/2018/03/27/git-log-custom-powerful/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
-<meta property="og:description" content="前端反馈说部分接口调用失败，接口返回异常通过chrome开发者工具查看请求，request headers下有警告提示：provisional headers are shown感觉并不是后端的问题，但问题既然发生了，还是要解决的">
+<meta property="og:description" content="习惯用命令行来使用git使用IDE或者sourcetree等工具，不够轻量化最常使用的git log命令显示的方式过于冗余，翻看起来费时费力使用--oneline虽然是一行一个commit，但是少了太多细节当然可以选择使用tig，但win下暂不能傻瓜式使用，后面再提于是可以定制一个命令来满足需求">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2018-03-30T03:12:57.050Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Chrome请求provisional headers are shown的解决">
-<meta name="twitter:description" content="前端反馈说部分接口调用失败，接口返回异常通过chrome开发者工具查看请求，request headers下有警告提示：provisional headers are shown感觉并不是后端的问题，但问题既然发生了，还是要解决的">
+<meta name="twitter:title" content="自定义git log的图形化显示">
+<meta name="twitter:description" content="习惯用命令行来使用git使用IDE或者sourcetree等工具，不够轻量化最常使用的git log命令显示的方式过于冗余，翻看起来费时费力使用--oneline虽然是一行一个commit，但是少了太多细节当然可以选择使用tig，但win下暂不能傻瓜式使用，后面再提于是可以定制一个命令来满足需求">
 
 
 
@@ -127,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/03/08/provisional-headers-are-shown/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/03/27/git-log-custom-powerful/"/>
 
 
 
 
 
-  <title>Chrome请求provisional headers are shown的解决 | Don't Panic</title>
+  <title>自定义git log的图形化显示 | Don't Panic</title>
   
 
 
@@ -299,7 +299,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/08/provisional-headers-are-shown/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/27/git-log-custom-powerful/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="bbbht">
@@ -316,7 +316,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">Chrome请求provisional headers are shown的解决</h2>
+          <h2 class="post-title" itemprop="name headline">自定义git log的图形化显示</h2>
         
 
         <div class="post-meta">
@@ -328,8 +328,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-08T07:39:37+00:00">
-                2018-03-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-27T09:19:29+00:00">
+                2018-03-27
               </time>
             
 
@@ -351,8 +351,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/前端/" itemprop="url" rel="index">
-                    <span itemprop="name">前端</span>
+                  <a href="/categories/版本控制/" itemprop="url" rel="index">
+                    <span itemprop="name">版本控制</span>
                   </a>
                 </span>
 
@@ -369,9 +369,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/03/08/provisional-headers-are-shown/#comments" itemprop="discussionUrl">
+                <a href="/2018/03/27/git-log-custom-powerful/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/03/08/provisional-headers-are-shown/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/03/27/git-log-custom-powerful/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -404,13 +404,38 @@
       
 
       
-        <p>前端反馈说部分接口调用失败，接口返回异常<br>通过chrome开发者工具查看请求，request headers下有警告提示：<br>provisional headers are shown<br>感觉并不是后端的问题，但问题既然发生了，还是要解决的<br><a id="more"></a></p>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>通过搜索、测试，找到几个可能的原因</p>
-<h3 id="缓存导致"><a href="#缓存导致" class="headerlink" title="缓存导致"></a>缓存导致</h3><p>由缓存导致的问题特征很明显，即出现（from cache）<br>无此特征，排除</p>
-<h3 id="请求时间过长导致"><a href="#请求时间过长导致" class="headerlink" title="请求时间过长导致"></a>请求时间过长导致</h3><p>由此导致的问题有长时间请求的特征<br>通过开发者工具的timeline发现请求时间并无异常<br>也可排除</p>
-<h3 id="插件导致"><a href="#插件导致" class="headerlink" title="插件导致"></a>插件导致</h3><p>比如ADblock，会对疑似广告链接进行屏蔽，造成此问题<br>然而在隐身模式，不加载任何插件的情况下问题依旧<br>也排除</p>
-<h3 id="请求被异常中断"><a href="#请求被异常中断" class="headerlink" title="请求被异常中断"></a>请求被异常中断</h3><p>即请求发出后，尚未接收到响应时就被别的操作打断<br>经确认是此原因导致<br>出现异常的请求为最终结果的提交请求<br>在未收到服务器响应的时便，页面跳转到了别的页面，造成了请求的异常中断</p>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>确认接收服务器响应后再跳转页面即可</p>
+        <p>习惯用命令行来使用git<br>使用IDE或者sourcetree等工具，不够轻量化<br>最常使用的<code>git log</code>命令显示的方式过于冗余，翻看起来费时费力<br>使用<code>--oneline</code>虽然是一行一个commit，但是少了太多细节<br>当然可以选择使用tig，但win下暂不能傻瓜式使用，后面再提<br>于是可以定制一个命令来满足需求<br><a id="more"></a></p>
+<h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config alias.lg=&quot;log --pretty=format:&apos;%C(red)%h%Creset %C(white)%s %C(yellow)%d %C(green)%an %C(cyan)%cr%Creset&apos; --graph&quot;</span><br></pre></td></tr></table></figure>
+<p>git log 常用参数<br>| 选项              | 说明                                                                                                |<br>| —————– | ————————————————————————————————— |<br>| -p                | 按补丁格式显示每个更新之间的差异                                                                    |<br>| –stat            | 显示每次更新的文件修改统计信息                                                                      |<br>| –shortstat       | 只显示 –stat 中最后的行数修改添加移除统计                                                          |<br>| –name-only       | 仅在提交信息后显示已修改的文件清单                                                                  |<br>| –name-status     | 显示新增、修改、删除的文件清单                                                                      |<br>| –abbrev-commit   | 仅显示 SHA-1 的前几个字符，而非所有的 40 个字符                                                     |<br>| –relative-date   | 使用较短的相对时间显示（比如，“2 weeks ago”）                                                     |<br>| –graph           | 显示 ASCII 图形表示的分支合并历史                                                                   |<br>| –pretty          | 使用其他格式显示历史提交信息。可用的选项包括 oneline，short，full，fuller 和 format（后跟指定格式） |<br>| -(n)              | 仅显示最近的 n 条提交                                                                               |<br>| –since, –after  | 仅显示指定时间之后的提交                                                                            |<br>| –until, –before | 仅显示指定时间之前的提交                                                                            |<br>| –author          | 仅显示指定作者相关的提交                                                                            |<br>| –committer       | 仅显示指定提交者相关的提交                                                                          |<br>| –grep            | 仅显示含指定关键字的提交                                                                            |<br>| -S                | 仅显示添加或移除了某个关键字的提交                                                                  |<br>有些是适用于特殊筛选需求的，而非常规列表展示<br>可用于列表的，固定命令配置的如下</p>
+<h3 id="定制显示内容-pretty-format"><a href="#定制显示内容-pretty-format" class="headerlink" title="定制显示内容--pretty=format"></a>定制显示内容<code>--pretty=format</code></h3><blockquote>
+<p><code>git log --pretty=format:&quot;%h - %an, %ar : %s&quot;</code><br>ca82a6d - Scott Chacon, 6 years ago : changed the version number<br>085bb3b - Scott Chacon, 6 years ago : removed unnecessary test<br>a11bef0 - Scott Chacon, 6 years ago : first commit</p>
+</blockquote>
+<p>常规选项<br>| 选项 | 说明                                        |<br>| —- | ——————————————- |<br>| %H   | 提交对象（commit）的完整哈希字串            |<br>| %h   | 提交对象的简短哈希字串                      |<br>| %T   | 树对象（tree）的完整哈希字串                |<br>| %t   | 树对象的简短哈希字串                        |<br>| %P   | 父对象（parent）的完整哈希字串              |<br>| %p   | 父对象的简短哈希字串                        |<br>| %d   | ref名称                                     |<br>| %an  | 作者（author）的名字                        |<br>| %ae  | 作者的电子邮件地址                          |<br>| %ad  | 作者修订日期（可以用 –date= 选项定制格式） |<br>| %ar  | 作者修订日期，按多久以前的方式显示          |<br>| %cn  | 提交者(committer)的名字                     |<br>| %ce  | 提交者的电子邮件地址                        |<br>| %cd  | 提交日期                                    |<br>| %cr  | 提交日期，按多久以前的方式显示              |<br>| %s   | 提交说明                                    |</p>
+<blockquote>
+<p>注意提交者与作者的区别<br>以及<code>%Cxxx</code>的颜色控制<br>可选颜色</p>
+<ul>
+<li>normal</li>
+<li>black</li>
+<li>red</li>
+<li>green</li>
+<li>yellow</li>
+<li>blue</li>
+<li>magenta</li>
+<li>cyan</li>
+<li>white</li>
+</ul>
+</blockquote>
+<p>可选属性</p>
+<ul>
+<li>bold</li>
+<li>dim</li>
+<li>ul</li>
+<li>blink</li>
+<li>reverse</li>
+</ul>
+<p>加入自定义颜色配置，突出显示提交<br><code>--pretty=format:&#39;%C(red)%h%Creset %C(white)%s %C(yellow)%d %C(green)%an %C(cyan)%cr%Creset&#39;</code></p>
+<h3 id="展示分支关系-graph"><a href="#展示分支关系-graph" class="headerlink" title="展示分支关系--graph"></a>展示分支关系<code>--graph</code></h3><p>显示branch的ascii图例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">*   0a393e6fa6 </span><br><span class="line">|\</span><br><span class="line">| * 9c1e6222ba </span><br><span class="line">|/</span><br><span class="line">*   7ddcda31f8 </span><br><span class="line">|\</span><br><span class="line">| * 8410487369 </span><br><span class="line">| * 09cdcd9c0c </span><br><span class="line">| * b7b35ab996</span><br></pre></td></tr></table></figure></p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="file:///D:/Applications/Git/mingw64/share/doc/git-doc/git-log.html" target="_blank" rel="noopener">git log 文档</a><br><a href="https://github.com/jonas/tig" target="_blank" rel="noopener">tig</a></p>
 
       
     </div>
@@ -428,9 +453,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/chrome/" rel="tag"># chrome</a>
-          
-            <a href="/tags/ajax/" rel="tag"># ajax</a>
+            <a href="/tags/git/" rel="tag"># git</a>
           
         </div>
       
@@ -443,8 +466,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/03/01/hexo-appveyor-git/" rel="next" title="使用Appveyor管理hexo源码并实现自动发布">
-                <i class="fa fa-chevron-left"></i> 使用Appveyor管理hexo源码并实现自动发布
+              <a href="/2018/03/22/alpine-linux-docker-summary/" rel="next" title="使用精简alpine linux系统构建docker镜像">
+                <i class="fa fa-chevron-left"></i> 使用精简alpine linux系统构建docker镜像
               </a>
             
           </div>
@@ -452,10 +475,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/03/15/docker-chinese-error/" rel="prev" title="docker中不能显示或输入中文">
-                docker中不能显示或输入中文 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -617,7 +636,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原因"><span class="nav-number">1.</span> <span class="nav-text">原因</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存导致"><span class="nav-number">1.1.</span> <span class="nav-text">缓存导致</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#请求时间过长导致"><span class="nav-number">1.2.</span> <span class="nav-text">请求时间过长导致</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#插件导致"><span class="nav-number">1.3.</span> <span class="nav-text">插件导致</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#请求被异常中断"><span class="nav-number">1.4.</span> <span class="nav-text">请求被异常中断</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方法"><span class="nav-number">2.</span> <span class="nav-text">解决方法</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#方案"><span class="nav-number">1.</span> <span class="nav-text">方案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定制显示内容-pretty-format"><span class="nav-number">1.1.</span> <span class="nav-text">定制显示内容--pretty=format</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#展示分支关系-graph"><span class="nav-number">1.2.</span> <span class="nav-text">展示分支关系--graph</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">2.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
             
 
           </div>
@@ -800,9 +819,9 @@
     
       <script type="text/javascript">
         var disqus_config = function () {
-          this.page.url = 'http://yoursite.com/2018/03/08/provisional-headers-are-shown/';
-          this.page.identifier = '2018/03/08/provisional-headers-are-shown/';
-          this.page.title = 'Chrome请求provisional headers are shown的解决';
+          this.page.url = 'http://yoursite.com/2018/03/27/git-log-custom-powerful/';
+          this.page.identifier = '2018/03/27/git-log-custom-powerful/';
+          this.page.title = '自定义git log的图形化显示';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://loessplateau.disqus.com/embed.js';
