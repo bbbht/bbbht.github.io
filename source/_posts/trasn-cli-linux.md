@@ -1,5 +1,5 @@
 ---
-title: trasn cli linux
+title: Linux中安装trash-cli代替rm命令
 date: 2018-04-11 14:23:33
 tags: 
     - trash-cli
@@ -8,6 +8,7 @@ categories: linux
 ---
 ``rm -rf /``的故事屡见不鲜
 已习惯使用``trash``代替了``rm``命令
+对一般文件的删除就相当于有了回收站功能
 防患于未然吧
 
 <!-- more -->
