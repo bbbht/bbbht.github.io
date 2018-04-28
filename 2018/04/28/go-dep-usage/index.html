@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="bash,trash-cli," />
+  <meta name="keywords" content="go,dep," />
 
 
 
@@ -86,18 +86,18 @@
 
 
 
-<meta name="description" content="rm -rf /的故事屡见不鲜已习惯使用trash代替了rm命令对一般文件的删除就相当于有了回收站功能防患于未然吧">
-<meta name="keywords" content="bash,trash-cli">
+<meta name="description" content="PHP有依赖管理工具Composer，写Go项目的时候也会依赖很多的包目前使用dep来进行依赖管理简单的使用只需要几个命令就可以  生成依赖配置文件（init） 安装更新依赖（ensure）">
+<meta name="keywords" content="go,dep">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Linux中安装trash-cli代替rm命令">
-<meta property="og:url" content="http://yoursite.com/2018/04/11/trasn-cli-linux/index.html">
+<meta property="og:title" content="go包依赖管理工具dep">
+<meta property="og:url" content="http://yoursite.com/2018/04/28/go-dep-usage/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
-<meta property="og:description" content="rm -rf /的故事屡见不鲜已习惯使用trash代替了rm命令对一般文件的删除就相当于有了回收站功能防患于未然吧">
+<meta property="og:description" content="PHP有依赖管理工具Composer，写Go项目的时候也会依赖很多的包目前使用dep来进行依赖管理简单的使用只需要几个命令就可以  生成依赖配置文件（init） 安装更新依赖（ensure）">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2018-04-28T03:17:51.922Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Linux中安装trash-cli代替rm命令">
-<meta name="twitter:description" content="rm -rf /的故事屡见不鲜已习惯使用trash代替了rm命令对一般文件的删除就相当于有了回收站功能防患于未然吧">
+<meta name="twitter:title" content="go包依赖管理工具dep">
+<meta name="twitter:description" content="PHP有依赖管理工具Composer，写Go项目的时候也会依赖很多的包目前使用dep来进行依赖管理简单的使用只需要几个命令就可以  生成依赖配置文件（init） 安装更新依赖（ensure）">
 
 
 
@@ -127,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/04/11/trasn-cli-linux/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/04/28/go-dep-usage/"/>
 
 
 
 
 
-  <title>Linux中安装trash-cli代替rm命令 | Don't Panic</title>
+  <title>go包依赖管理工具dep | Don't Panic</title>
   
 
 
@@ -299,7 +299,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/11/trasn-cli-linux/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/28/go-dep-usage/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="bbbht">
@@ -316,7 +316,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">Linux中安装trash-cli代替rm命令</h2>
+          <h2 class="post-title" itemprop="name headline">go包依赖管理工具dep</h2>
         
 
         <div class="post-meta">
@@ -328,8 +328,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-11T06:23:33+00:00">
-                2018-04-11
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-28T02:29:53+00:00">
+                2018-04-28
               </time>
             
 
@@ -351,8 +351,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
+                  <a href="/categories/go/" itemprop="url" rel="index">
+                    <span itemprop="name">go</span>
                   </a>
                 </span>
 
@@ -369,9 +369,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/04/11/trasn-cli-linux/#comments" itemprop="discussionUrl">
+                <a href="/2018/04/28/go-dep-usage/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/11/trasn-cli-linux/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/04/28/go-dep-usage/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -404,42 +404,23 @@
       
 
       
-        <p><code>rm -rf /</code>的故事屡见不鲜<br>已习惯使用<code>trash</code>代替了<code>rm</code>命令<br>对一般文件的删除就相当于有了回收站功能<br>防患于未然吧</p>
+        <p>PHP有依赖管理工具Composer，写Go项目的时候也会依赖很多的包<br>目前使用<code>dep</code>来进行依赖管理<br>简单的使用只需要几个命令就可以</p>
+<ul>
+<li>生成依赖配置文件（init）</li>
+<li>安装更新依赖（ensure）</li>
+</ul>
 <a id="more"></a>
-<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install -y python-pip</span><br><span class="line">sudo pip install trash-cli</span><br></pre></td></tr></table></figure>
-<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><table>
-<thead>
-<tr>
-<th>command</th>
-<th>description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>trash-put</td>
-<td>trash files and directories.</td>
-</tr>
-<tr>
-<td>trash-empty</td>
-<td>empty the trashcan(s).</td>
-</tr>
-<tr>
-<td>trash-list</td>
-<td>list trashed files.</td>
-</tr>
-<tr>
-<td>trash-restore</td>
-<td>restore a trashed file.</td>
-</tr>
-<tr>
-<td>trash-rm</td>
-<td>remove individual files from the trashcan.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="rm别名"><a href="#rm别名" class="headerlink" title="rm别名"></a>rm别名</h3><p>设置rm别名，加入~/.bashrc 或 ~/.zshrc<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">alias</span> rm=<span class="string">'echo "This is not the command you are looking for."; false'</span></span><br></pre></td></tr></table></figure></p>
-<p>一定要使用<code>rm</code>的时候<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\rm file-without-hope</span><br></pre></td></tr></table></figure></p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://github.com/andreafrancia/trash-cli" target="_blank" rel="noopener">trash-cli - Command Line Interface to FreeDesktop.org Trash</a></p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>如果安装了Go语言环境<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go get -u github.com/golang/dep/cmd/dep</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">dep version</span><br><span class="line">dep:</span><br><span class="line"> version     : devel</span><br><span class="line"> build date  :</span><br><span class="line"> git hash    :</span><br><span class="line"> go version  : go1.10.1</span><br><span class="line"> go compiler : gc</span><br><span class="line"> platform    : windows/amd64</span><br><span class="line"> features    : ImportDuringSolve=false</span><br></pre></td></tr></table></figure>
+<p>其他安装方法查阅<a href="https://golang.github.io/dep/docs/installation.html" target="_blank" rel="noopener">参考文档</a></p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><p>在项目根目录运行，需要<strong>互联网</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dep init</span><br></pre></td></tr></table></figure></p>
+<p>将生成两个文件，及一个目录<br>Gopkg.toml Gopkg.lock vendor/<br>Gopkg.toml Gopkg.lock要加入版本控制<br>vender/就看实际需要了，比如没有<strong>互联网</strong></p>
+<h3 id="安装依赖"><a href="#安装依赖" class="headerlink" title="安装依赖"></a>安装依赖</h3><p>在项目根目录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dep ensure</span><br></pre></td></tr></table></figure></p>
+<h4 id="添加依赖"><a href="#添加依赖" class="headerlink" title="添加依赖"></a>添加依赖</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dep ensure -add github.com/foo/bar github.com/baz/quux</span><br></pre></td></tr></table></figure>
+<h4 id="移除依赖"><a href="#移除依赖" class="headerlink" title="移除依赖"></a>移除依赖</h4><p>通过执行命令<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dep ensure</span><br></pre></td></tr></table></figure></p>
+<p>在输出中会提示代码中未使用的依赖（此时Gopkg.lock文件中已移除相应项）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Warning: the following project(s) have [[constraint]] stanzas in Gopkg.toml:</span><br><span class="line"></span><br><span class="line">  ✗  github.com/sirupsen/logrus</span><br><span class="line"></span><br><span class="line">However, these projects are not direct dependencies of the current project:</span><br><span class="line">they are not imported in any .go files, nor are they in the &apos;required&apos; list in</span><br><span class="line">Gopkg.toml. Dep only applies [[constraint]] rules to direct dependencies, so</span><br><span class="line">these rules will have no effect.</span><br><span class="line"></span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>然后手动从Gopkg.toml文件中移除列出的包即可<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[[constraint]]</span><br><span class="line">  name = &quot;github.com/go-sql-driver/mysql&quot;</span><br><span class="line">  version = &quot;1.3.0&quot;</span><br><span class="line"></span><br><span class="line">[[constraint]]</span><br><span class="line">  name = &quot;github.com/sirupsen/logrus&quot;</span><br><span class="line">  version = &quot;1.0.5&quot;</span><br><span class="line"></span><br><span class="line">[[constraint]]</span><br><span class="line">  name = &quot;github.com/nsqio/go-nsq&quot;</span><br><span class="line">  version = &quot;1.0.7&quot;</span><br></pre></td></tr></table></figure></p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://golang.github.io/dep/docs/introduction.html" target="_blank" rel="noopener">dep documentation.</a></p>
 
       
     </div>
@@ -457,9 +438,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/bash/" rel="tag"># bash</a>
+            <a href="/tags/go/" rel="tag"># go</a>
           
-            <a href="/tags/trash-cli/" rel="tag"># trash-cli</a>
+            <a href="/tags/dep/" rel="tag"># dep</a>
           
         </div>
       
@@ -472,8 +453,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/04/08/mysql-type-conversion/" rel="next" title="MySQL的类型转换（比较）">
-                <i class="fa fa-chevron-left"></i> MySQL的类型转换（比较）
+              <a href="/2018/04/20/go-no-such-file-or-directory-but-exists/" rel="next" title="Go本地编译后，服务器运行报错“no such file or directory”">
+                <i class="fa fa-chevron-left"></i> Go本地编译后，服务器运行报错“no such file or directory”
               </a>
             
           </div>
@@ -481,10 +462,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/04/20/linux-nohup-and_&/" rel="prev" title="linux进程后台运行 nohup和&">
-                linux进程后台运行 nohup和& <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -646,7 +623,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用"><span class="nav-number">2.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rm别名"><span class="nav-number">2.1.</span> <span class="nav-text">rm别名</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">3.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用"><span class="nav-number">2.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化"><span class="nav-number">2.1.</span> <span class="nav-text">初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装依赖"><span class="nav-number">2.2.</span> <span class="nav-text">安装依赖</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#添加依赖"><span class="nav-number">2.2.1.</span> <span class="nav-text">添加依赖</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#移除依赖"><span class="nav-number">2.2.2.</span> <span class="nav-text">移除依赖</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">3.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
             
 
           </div>
@@ -829,9 +806,9 @@
     
       <script type="text/javascript">
         var disqus_config = function () {
-          this.page.url = 'http://yoursite.com/2018/04/11/trasn-cli-linux/';
-          this.page.identifier = '2018/04/11/trasn-cli-linux/';
-          this.page.title = 'Linux中安装trash-cli代替rm命令';
+          this.page.url = 'http://yoursite.com/2018/04/28/go-dep-usage/';
+          this.page.identifier = '2018/04/28/go-dep-usage/';
+          this.page.title = 'go包依赖管理工具dep';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://loessplateau.disqus.com/embed.js';
