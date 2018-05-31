@@ -35,8 +35,9 @@ RUN apk update && \
     git config core.fileMode false && \
     npm install --no-optional --no-bin-links && \
     rm -rf /var/cache/apk/* /tmp/*
-
-CMD hexo s && rc-service sshd restart
+    
+# 注意命令执行顺序
+CMD rc-service sshd restart && hexo s
 ```
 通过``echo -e root:root | chpasswd``方式设置root密码
 通过安装tzdata，修改了时区为 UTC+0800
