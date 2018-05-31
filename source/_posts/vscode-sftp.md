@@ -36,8 +36,7 @@ RUN apk update && \
     npm install --no-optional --no-bin-links && \
     rm -rf /var/cache/apk/* /tmp/*
 
-
-CMD ['hexo', 's']
+CMD hexo s && rc-service sshd restart
 ```
 通过``echo -e root:root | chpasswd``方式设置root密码
 通过安装tzdata，修改了时区为 UTC+0800
@@ -48,8 +47,8 @@ CMD ['hexo', 's']
 ```
 # 构建镜像
 docker build -t hexo:alpine .
-# 运行容器
-docker run -d --name hexo-server -p 4000:4000 -p 4022:22 hexo:alpine hexo s
+# 运行容器，不指定CMD命令，使用Dockerfile中的默认命令，启动sshd及hexo
+docker run -d --name hexo-server -p 4000:4000 -p 4022:22 hexo:alpine
 ```
 
 ### 配置sftp插件

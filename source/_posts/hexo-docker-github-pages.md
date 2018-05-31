@@ -11,7 +11,9 @@ categories: hexo
 只用来本地预览，发布还是由appveyor完成
 顺手够用就好
 <!-- more -->
-
+# 废弃
+以下Dockerfile等不再使用，参考
+[VSCode 配合sftp同步编辑远程代码](/2018/03/30/vscode-sftp/)
 ## 源码
 ### Dockerfile
 Dockerfile
