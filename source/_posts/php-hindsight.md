@@ -63,3 +63,19 @@ echo strlen("赵钱孙李a"), PHP_EOL;
 
 #### 参考链接
 [mb_strwidth Manual](http://php.net/manual/zh/function.mb-strwidth.php)
+
+## glob
+寻找与模式匹配的文件路径，返回一个包含有匹配文件／目录的数组。如果出错返回 FALSE。  
+简化了文件夹遍历方式，可使用正则匹配  
+部分系统不支持，参照文档  
+
+文档示例
+```
+<?php
+foreach (glob("*.txt") as $filename) {
+    echo "$filename size " . filesize($filename) . "\n";
+}
+```
+
+#### 
+[glob Manual](http://php.net/manual/zh/function.glob.php)
