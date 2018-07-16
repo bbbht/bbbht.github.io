@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="bash,trash-cli," />
+  <meta name="keywords" content="cookie," />
 
 
 
@@ -86,18 +86,18 @@
 
 
 
-<meta name="description" content="rm -rf /的故事屡见不鲜已习惯使用trash代替了rm命令对一般文件的删除就相当于有了回收站功能防患于未然吧">
-<meta name="keywords" content="bash,trash-cli">
+<meta name="description" content="虽然cookie用了很多年，从第一次面试就有cookie和session的区别相关的问题但是，今天却又在cookie上栽了个跟头——cookie注销失败而原因则是domain导致的，所以把domain的相关内容再记录下">
+<meta name="keywords" content="cookie">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Linux中安装trash-cli代替rm命令">
-<meta property="og:url" content="http://yoursite.com/2018/04/11/trasn-cli-linux/index.html">
+<meta property="og:title" content="设置cookie时的domain配置">
+<meta property="og:url" content="http://yoursite.com/2018/07/16/cookie-set-domain/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
-<meta property="og:description" content="rm -rf /的故事屡见不鲜已习惯使用trash代替了rm命令对一般文件的删除就相当于有了回收站功能防患于未然吧">
+<meta property="og:description" content="虽然cookie用了很多年，从第一次面试就有cookie和session的区别相关的问题但是，今天却又在cookie上栽了个跟头——cookie注销失败而原因则是domain导致的，所以把domain的相关内容再记录下">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-07-16T08:19:48.661Z">
+<meta property="og:updated_time" content="2018-07-16T08:19:48.645Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Linux中安装trash-cli代替rm命令">
-<meta name="twitter:description" content="rm -rf /的故事屡见不鲜已习惯使用trash代替了rm命令对一般文件的删除就相当于有了回收站功能防患于未然吧">
+<meta name="twitter:title" content="设置cookie时的domain配置">
+<meta name="twitter:description" content="虽然cookie用了很多年，从第一次面试就有cookie和session的区别相关的问题但是，今天却又在cookie上栽了个跟头——cookie注销失败而原因则是domain导致的，所以把domain的相关内容再记录下">
 
 
 
@@ -127,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/04/11/trasn-cli-linux/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/07/16/cookie-set-domain/"/>
 
 
 
 
 
-  <title>Linux中安装trash-cli代替rm命令 | Don't Panic</title>
+  <title>设置cookie时的domain配置 | Don't Panic</title>
   
 
 
@@ -299,7 +299,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/11/trasn-cli-linux/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/16/cookie-set-domain/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="bbbht">
@@ -316,7 +316,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">Linux中安装trash-cli代替rm命令</h2>
+          <h2 class="post-title" itemprop="name headline">设置cookie时的domain配置</h2>
         
 
         <div class="post-meta">
@@ -328,8 +328,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-11T06:23:33+00:00">
-                2018-04-11
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-16T06:39:50+00:00">
+                2018-07-16
               </time>
             
 
@@ -351,8 +351,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/linux/" itemprop="url" rel="index">
-                    <span itemprop="name">linux</span>
+                  <a href="/categories/web/" itemprop="url" rel="index">
+                    <span itemprop="name">web</span>
                   </a>
                 </span>
 
@@ -369,9 +369,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/04/11/trasn-cli-linux/#comments" itemprop="discussionUrl">
+                <a href="/2018/07/16/cookie-set-domain/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/11/trasn-cli-linux/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/07/16/cookie-set-domain/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -404,42 +404,45 @@
       
 
       
-        <p><code>rm -rf /</code>的故事屡见不鲜<br>已习惯使用<code>trash</code>代替了<code>rm</code>命令<br>对一般文件的删除就相当于有了回收站功能<br>防患于未然吧</p>
-<a id="more"></a>
-<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install -y python-pip</span><br><span class="line">sudo pip install trash-cli</span><br></pre></td></tr></table></figure>
-<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><table>
-<thead>
-<tr>
-<th>command</th>
-<th>description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>trash-put</td>
-<td>trash files and directories.</td>
-</tr>
-<tr>
-<td>trash-empty</td>
-<td>empty the trashcan(s).</td>
-</tr>
-<tr>
-<td>trash-list</td>
-<td>list trashed files.</td>
-</tr>
-<tr>
-<td>trash-restore</td>
-<td>restore a trashed file.</td>
-</tr>
-<tr>
-<td>trash-rm</td>
-<td>remove individual files from the trashcan.</td>
-</tr>
-</tbody>
-</table>
-<h3 id="rm别名"><a href="#rm别名" class="headerlink" title="rm别名"></a>rm别名</h3><p>设置rm别名，加入~/.bashrc 或 ~/.zshrc<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">alias</span> rm=<span class="string">'echo "This is not the command you are looking for."; false'</span></span><br></pre></td></tr></table></figure></p>
-<p>一定要使用<code>rm</code>的时候<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\rm file-without-hope</span><br></pre></td></tr></table></figure></p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://github.com/andreafrancia/trash-cli" target="_blank" rel="noopener">trash-cli - Command Line Interface to FreeDesktop.org Trash</a></p>
+        <p>虽然cookie用了很多年，从第一次面试就有cookie和session的区别相关的问题<br>但是，今天却又在cookie上栽了个跟头——cookie注销失败<br>而原因则是domain导致的，所以把domain的相关内容再记录下<br><a id="more"></a></p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>浏览器对cookie的保护造成cookie无法跨域设置，也就是只能操作当前域名以及其父级域名下的cookie</p>
+<p>使用php的setcookie举例<br>为便于观察与记录，修改本地host，模拟三级域名</p>
+<ul>
+<li>z.com</li>
+<li>y.z.com</li>
+<li>x.y.z.com</li>
+</ul>
+<p>在<code>y.z.com</code>执行，设置cookie<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">setcookie(<span class="string">'x'</span>, <span class="string">'x'</span>, <span class="number">0</span>, <span class="string">'/'</span>, <span class="string">'x.y.z.com'</span>);</span><br><span class="line">setcookie(<span class="string">'y'</span>, <span class="string">'y'</span>, <span class="number">0</span>, <span class="string">'/'</span>, <span class="string">'y.z.com'</span>);</span><br><span class="line">setcookie(<span class="string">'z'</span>, <span class="string">'z'</span>, <span class="number">0</span>, <span class="string">'/'</span>, <span class="string">'z.com'</span>);</span><br><span class="line">setcookie(<span class="string">'xyz'</span>, <span class="string">'xyz'</span>, <span class="number">0</span>, <span class="string">'/'</span>);</span><br></pre></td></tr></table></figure></p>
+<p>控制台输出cookie<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="built_in">document</span>.location.host</span><br><span class="line">&lt; <span class="string">"y.z.com"</span></span><br><span class="line">&gt; <span class="built_in">document</span>.cookie</span><br><span class="line">&lt; <span class="string">"y=y; z=z; xyz=xyz"</span></span><br></pre></td></tr></table></figure></p>
+<ol>
+<li>显式设置domain时，当前域名，以及其父级域名下设置的cookie为可见状态<br>如<code>y.z.com</code>可访问域为<code>z.com</code>的cookie，但不能访问<code>x.y.z.com</code>下的cookie<br>意味着顶级域名下显式设置domain为顶级域名的cookie对所有子域名有效  </li>
+</ol>
+<blockquote>
+<p>旧版浏览器仍然在使用废弃的 » RFC 2109， 需要一个前置的点 . 来匹配所有子域名。</p>
+</blockquote>
+<ol start="2">
+<li><p>domain置空，则为代码执行当前域名，且设置的cookie为 <strong>私有</strong><br><code>y.z.com</code>可正常访问，但其父级域<code>z.com</code>以及子域<code>x.y.z.com</code>下，均不可见</p>
+</li>
+<li><p>只能为当前域名或者其父级域名设置cookie，否则无效<br>如<code>y.z.com</code>下无法设置域为<code>x.y.z.com</code>的cookie</p>
+</li>
+<li><p>删除或修改cookie时，指定的key, domain, path 必须与想要删掉的cookie保持一致才能操作  </p>
+</li>
+</ol>
+<ul>
+<li><p>不一致时的修改将创建另一个cookie<br>  在<code>y.z.com</code>执行不对应的删除cookie代码，key为y的cookie将不会被删除</p>
+  <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">setcookie(<span class="string">'y'</span>, <span class="string">'y'</span>, time() - <span class="number">1</span>, <span class="string">'/'</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>删除时将expires的值设为一个过期值即可<br>  在<code>y.z.com</code>执行不对应的cookie修改代码，将出现两个key为y的cookie</p>
+  <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">setcookie(<span class="string">'y'</span>, <span class="string">'y-update'</span>, <span class="number">0</span>, <span class="string">'/'</span>);</span><br></pre></td></tr></table></figure>
+<p>  控制台输出</p>
+  <figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="built_in">document</span>.location.host</span><br><span class="line">&lt; <span class="string">"y.z.com"</span></span><br><span class="line">&gt; <span class="built_in">document</span>.cookie</span><br><span class="line">&lt; <span class="string">"y=y; z=z; xyz=xyz; y=y-update"</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><blockquote>
+<p>无谓的设置cookie只会产生安全隐患以及带宽压力</p>
+</blockquote>
+<p>无法注销的原因就在于删除cookie时未指定domain，而设置时指定了domain<br>虽然字面上是用一个域名，但并不能操作成功<br>设置与修改、删除时的参数保持一致即可解决问题</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="http://php.net/manual/zh/function.setcookie.php" target="_blank" rel="noopener">setcookie manual</a></p>
 
       
     </div>
@@ -457,9 +460,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/bash/" rel="tag"># bash</a>
-          
-            <a href="/tags/trash-cli/" rel="tag"># trash-cli</a>
+            <a href="/tags/cookie/" rel="tag"># cookie</a>
           
         </div>
       
@@ -472,8 +473,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/04/08/mysql-type-conversion/" rel="next" title="MySQL的类型转换（比较）">
-                <i class="fa fa-chevron-left"></i> MySQL的类型转换（比较）
+              <a href="/2018/07/12/nginx-301-redirect-without-trailing-slash/" rel="next" title="nginx对url添加斜杠并301跳转">
+                <i class="fa fa-chevron-left"></i> nginx对url添加斜杠并301跳转
               </a>
             
           </div>
@@ -481,10 +482,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/04/20/linux-nohup-and_&/" rel="prev" title="linux进程后台运行 nohup和&">
-                linux进程后台运行 nohup和& <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -646,7 +643,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用"><span class="nav-number">2.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#rm别名"><span class="nav-number">2.1.</span> <span class="nav-text">rm别名</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">3.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原因"><span class="nav-number">1.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方法"><span class="nav-number">2.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">3.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
             
 
           </div>
@@ -829,9 +826,9 @@
     
       <script type="text/javascript">
         var disqus_config = function () {
-          this.page.url = 'http://yoursite.com/2018/04/11/trasn-cli-linux/';
-          this.page.identifier = '2018/04/11/trasn-cli-linux/';
-          this.page.title = 'Linux中安装trash-cli代替rm命令';
+          this.page.url = 'http://yoursite.com/2018/07/16/cookie-set-domain/';
+          this.page.identifier = '2018/07/16/cookie-set-domain/';
+          this.page.title = '设置cookie时的domain配置';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://loessplateau.disqus.com/embed.js';
