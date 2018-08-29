@@ -5,8 +5,9 @@ tags: git
 categories: git
 ---
 最近``go  get``总是失败，报错
+
 ```
-$ git clone https://github.com/mattn/go-sqlite3.git
+git clone https://github.com/mattn/go-sqlite3.git
 Cloning into 'go-sqlite3'...
 remote: Counting objects: 2804, done.
 remote: Compressing objects: 100% (7/7), done.
@@ -14,7 +15,8 @@ error: RPC failed; curl 18 transfer closed with outstanding read data remaining
 fatal: The remote end hung up unexpectedly
 fatal: early EOF
 fatal: index-pack failed
-``` 
+```
+
 直接``git clone``也是同样的问题  
 当然，访问``github.com``是没问题  
 
