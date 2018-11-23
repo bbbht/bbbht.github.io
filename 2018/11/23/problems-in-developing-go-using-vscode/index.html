@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="Don&#39;t Panic">
 <meta property="og:description" content="最近做Go开发还是使用vscode作为主力开发工具感觉碰到的一些问题需要整理记录下有些问题每次都鼓捣半天，虽能解决，却也无确切解释">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-11-23T09:25:36.723Z">
+<meta property="og:updated_time" content="2018-11-23T10:00:50.401Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用vscode开发Go过程中遇到的问题">
 <meta name="twitter:description" content="最近做Go开发还是使用vscode作为主力开发工具感觉碰到的一些问题需要整理记录下有些问题每次都鼓捣半天，虽能解决，却也无确切解释">
@@ -423,7 +423,7 @@
 </blockquote>
 <p>运行<code>gotype-live -a ./</code>后，报出了准确的错误所在，所以应该并非不能找到包，而是其他错误导致的<br>但运行后并无报错  </p>
 <ol>
-<li>开启<code>&quot;go.vetOnSave&quot;: &quot;package&quot;</code>后，问题解决，会出现import错误，但vet运行后自动消失    </li>
+<li>开启<code>&quot;go.vetOnSave&quot;: &quot;package&quot;</code><br>问题解决，会出现import错误，但vet运行后自动消失，是被覆盖掉的，所以并不能解决    </li>
 <li>开启保存自动编译，<code>&quot;go.buildOnSave&quot;: &quot;on&quot;</code>，代替liveErrors</li>
 </ol>
 <h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><p><a href="https://github.com/Microsoft/vscode-go/issues/1239" target="_blank" rel="noopener">Live error reporting says can’t find import:</a></p>
