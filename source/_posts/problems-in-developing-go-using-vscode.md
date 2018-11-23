@@ -101,7 +101,8 @@ issues讨论列表中，有提到
 
 运行`gotype-live -a ./`后，报出了准确的错误所在，所以应该并非不能找到包，而是其他错误导致的  
 但运行后并无报错  
-1. 开启`"go.vetOnSave": "package"`后，问题解决，会出现import错误，但vet运行后自动消失    
+1. 开启`"go.vetOnSave": "package"`  
+   问题解决，会出现import错误，但vet运行后自动消失，是被覆盖掉的，所以并不能解决    
 2. 开启保存自动编译，`"go.buildOnSave": "on"`，代替liveErrors
 
 ### 参考链接
