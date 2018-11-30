@@ -15,9 +15,16 @@ categories: vscode
 ## Vscode Go相关的配置
 ```json
 {
+  "[go]": {
+    "editor.formatOnSave": false,
+    "editor.tabSize": 4,
+    "editor.insertSpaces": false
+  },
   "go.formatTool": "goreturns",
-  "go.buildOnSave": "off",
-  "go.vetOnSave": "package",
+  "editor.formatOnType": true,
+  "go.gocodeAutoBuild": true,
+  "go.buildOnSave": "package",
+  "go.vetOnSave": "off",
   "go.inferGopath": true,
   "go.useCodeSnippetsOnFunctionSuggest": true,
   "go.useCodeSnippetsOnFunctionSuggestWithoutType": false,
@@ -28,6 +35,8 @@ categories: vscode
     //"--debug",
     "-Dgotype",
     "-Dgas",
+    "-Dgosec",
+    // "-Dvet",
     "--exclude=should be",
     "--exclude=declaration of \"err",
     "--exclude=should have comment"
@@ -47,14 +56,14 @@ categories: vscode
     "toggleTestFile": true,
     "addTags": true,
     "removeTags": false,
-    "testAtCursor": true,
-    "testFile": true,
+    "testAtCursor": false,
+    "testFile": false,
     "testPackage": false,
-    "generateTestForFunction": false,
-    "generateTestForFile": false,
+    "generateTestForFunction": true,
+    "generateTestForFile": true,
     "generateTestForPackage": false,
     "addImport": false,
-    "testCoverage": true,
+    "testCoverage": false,
     "playground": false
   }
 }
@@ -95,15 +104,19 @@ could not import git.xxx.tv/xxx/web/model (can't find import: "git.xxx.tv/xxx/we
 > ramya-rao-a commented on 5 Dec 2017  
 > Closing this as this is an upstream issue with gotype and we there is nothing much we can do from the extension's perspective.
 
-### 解决方案
-issues讨论列表中，有提到
-> I ran gotype-live -a ./, it showed the exact errors
+#### update
+vscode编写go程序时，代码提示是依据`pkg`中后的`.a`文件内容的  
+> `-i`会使`go build`命令安装那些编译目标依赖的且还未被安装的代码包。
+> 这里的安装意味着产生与代码包对应的归档文件，并将其放置到当前工作区目录的pkg子目录的相应子目录中。
+> 在默认情况下，这些代码包是不会被安装的
 
-运行`gotype-live -a ./`后，报出了准确的错误所在，所以应该并非不能找到包，而是其他错误导致的  
-但运行后并无报错  
-1. 开启`"go.vetOnSave": "package"`  
-   问题解决，会出现import错误，但vet运行后自动消失，是被覆盖掉的，所以并不能解决    
-2. 开启保存自动编译，`"go.buildOnSave": "on"`，代替liveErrors
+检查发现`pkg`下对应的`.a`文件上次更新时间确实落后了很多  
+原因是设置中`"go.buildOnSave": "off"`  
+
+### 解决方案
+
+开启`"go.buildOnSave": "package"`  
 
 ### 参考链接
 [Live error reporting says can't find import:](https://github.com/Microsoft/vscode-go/issues/1239)
+[Package build](https://golang.org/pkg/go/build/)
