@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="Don&#39;t Panic">
 <meta property="og:description" content="当前编辑器是在windows环境使用，但go开发过程中，一些项目的依赖如libkafka等，很难在win下安装所以需要在linux下配置临时开发环境来解决当前win10版本的wsl，配合X-Server已经可以胜任">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-01-28T02:38:04.286Z">
+<meta property="og:updated_time" content="2019-01-28T05:37:07.854Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="在WSL中使用VSCode">
 <meta name="twitter:description" content="当前编辑器是在windows环境使用，但go开发过程中，一些项目的依赖如libkafka等，很难在win下安装所以需要在linux下配置临时开发环境来解决当前win10版本的wsl，配合X-Server已经可以胜任">
@@ -432,7 +432,17 @@
 <li>需要的话，注销一下</li>
 </ul>
 </li>
+<li><p>如果不能使用中文输入法</p>
+<ul>
+<li><code>sudo apt-get --assume-yes install fcitx fcitx-googlepinyin dbus-x11</code></li>
+<li><code>.profile或.zshrc</code> 导入环境变量<code>export LC_ALL=&quot;zh_CN.UTF-8&quot; export XMODIFIERS=@im=fcitx export GTK_IM_MODULE=fcitx export QT_IM_MODULE=fcitx</code></li>
+<li><code>fcitx</code></li>
+<li><code>fcitx-configtool</code>配置中文输入法，再修改下切换快捷键，防止与win冲突</li>
+</ul>
+</li>
 </ol>
+<p>重启机器打开wsl后自动启动，在<code>.zshrc</code>添加<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if [ $(ps -ax | grep dbus-daemon | wc -l) -eq 1 ]; then</span><br><span class="line">  eval `dbus-launch fcitx &gt; /dev/null 2&gt;&amp;1`</span><br><span class="line">fi</span><br></pre></td></tr></table></figure></p>
+<p>出现不能输入的情况，尝试<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dbus-run-session -- zsh</span><br><span class="line">fcitx</span><br></pre></td></tr></table></figure></p>
 <h2 id="4-Go环境配置"><a href="#4-Go环境配置" class="headerlink" title="4. Go环境配置"></a>4. Go环境配置</h2><ol>
 <li>安装go</li>
 <li><p>修改环境变量</p>
