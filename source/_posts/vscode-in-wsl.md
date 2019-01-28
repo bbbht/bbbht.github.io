@@ -33,6 +33,24 @@ categories: vscode
     - `sudo fc-cache -f -v`
     - 需要的话，注销一下
 
+4. 如果不能使用中文输入法
+    - `sudo apt-get --assume-yes install fcitx fcitx-googlepinyin dbus-x11`
+    - `.profile或.zshrc` 导入环境变量`export LC_ALL="zh_CN.UTF-8" export XMODIFIERS=@im=fcitx export GTK_IM_MODULE=fcitx export QT_IM_MODULE=fcitx`
+    - `fcitx `
+    - `fcitx-configtool`配置中文输入法，再修改下切换快捷键，防止与win冲突
+
+重启机器打开wsl后自动启动，在`.zshrc`添加
+```
+if [ $(ps -ax | grep dbus-daemon | wc -l) -eq 1 ]; then
+  eval `dbus-launch fcitx > /dev/null 2>&1`
+fi
+```
+出现不能输入的情况，尝试
+```
+dbus-run-session -- zsh
+fcitx
+```
+
 ## 4. Go环境配置
 1. 安装go
 2. 修改环境变量
