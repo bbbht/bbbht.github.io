@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="curl,">
+  <meta name="keywords" content="go,">
 
 
 
@@ -86,18 +86,18 @@
 
 
 
-<meta name="description" content="用PHP的curl进行文件中转上传，发生了错误  curl: (26) couldn’t open file">
-<meta name="keywords" content="curl">
+<meta name="description" content="年底重构抢公司红包业务代码，解决了不少历史遗产bug其中一些是很常见的问题，如并发读写map，for-range中取地址，闭包defer等业务结果居然是正确的。。。">
+<meta name="keywords" content="go">
 <meta property="og:type" content="article">
-<meta property="og:title" content="php curl 上传文件报错 26 couldn&#39;t open file">
-<meta property="og:url" content="http://yoursite.com/2018/11/09/php-curl-26-couldn-t-open-file/index.html">
+<meta property="og:title" content="golang的for-range的注意点">
+<meta property="og:url" content="http://yoursite.com/2019/01/30/go-for-range/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
-<meta property="og:description" content="用PHP的curl进行文件中转上传，发生了错误  curl: (26) couldn’t open file">
+<meta property="og:description" content="年底重构抢公司红包业务代码，解决了不少历史遗产bug其中一些是很常见的问题，如并发读写map，for-range中取地址，闭包defer等业务结果居然是正确的。。。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2019-01-31T02:48:23.357Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="php curl 上传文件报错 26 couldn&#39;t open file">
-<meta name="twitter:description" content="用PHP的curl进行文件中转上传，发生了错误  curl: (26) couldn’t open file">
+<meta name="twitter:title" content="golang的for-range的注意点">
+<meta name="twitter:description" content="年底重构抢公司红包业务代码，解决了不少历史遗产bug其中一些是很常见的问题，如并发读写map，for-range中取地址，闭包defer等业务结果居然是正确的。。。">
 
 
 
@@ -127,14 +127,14 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/11/09/php-curl-26-couldn-t-open-file/">
+  <link rel="canonical" href="http://yoursite.com/2019/01/30/go-for-range/">
 
 
 
 
 
   <meta name="google-site-verification" content="aVUEVKghcpKmqD1MgxttjI8n8mrd1iSrStqvpDlEAdg">
-  <title>php curl 上传文件报错 26 couldn't open file | Don't Panic</title>
+  <title>golang的for-range的注意点 | Don't Panic</title>
   
 
 
@@ -300,7 +300,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/09/php-curl-26-couldn-t-open-file/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/30/go-for-range/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="bbbht">
@@ -317,7 +317,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">php curl 上传文件报错 26 couldn't open file</h2>
+          <h2 class="post-title" itemprop="name headline">golang的for-range的注意点</h2>
         
 
         <div class="post-meta">
@@ -329,8 +329,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-09T03:55:26+00:00">
-                2018-11-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-30T12:31:42+00:00">
+                2019-01-30
               </time>
             
 
@@ -352,8 +352,8 @@
               
               
                 <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
-                  <a href="/categories/php/" itemprop="url" rel="index">
-                    <span itemprop="name">php</span>
+                  <a href="/categories/go/" itemprop="url" rel="index">
+                    <span itemprop="name">go</span>
                   </a>
                 </span>
 
@@ -370,8 +370,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/11/09/php-curl-26-couldn-t-open-file/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/11/09/php-curl-26-couldn-t-open-file/" itemprop="commentCount"></span>
+                <a href="/2019/01/30/go-for-range/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/01/30/go-for-range/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -404,15 +404,25 @@
       
 
       
-        <p>用PHP的curl进行文件中转上传，发生了错误</p>
-<blockquote>
-<p>curl: (26) couldn’t open file</p>
-</blockquote>
+        <p>年底重构抢公司红包业务代码，解决了不少历史遗产bug<br>其中一些是很常见的问题，如并发读写map，for-range中取地址，闭包defer等<br>业务结果居然是正确的。。。</p>
 <a id="more"></a>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>POST 方法上传文件，文件上传方式<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$file = <span class="keyword">new</span> \CurlFile($filpath);</span><br></pre></td></tr></table></figure></p>
-<p>其中<code>$filepath</code>使用了相对路径</p>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>调用<code>CurlFile</code>时，使用文件的绝对路径</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://stackoverflow.com/questions/23730283/curl-26-couldnt-open-file" target="_blank" rel="noopener">stackoverflow.com</a></p>
+<p>有并发大触发的并发读写map的致命错误（ fatal error: concurrent map read and map write）<br>此bug并未引起关注，因为会自动重启。。。</p>
+<p>defer执行闭包的赋值问题也是频频出现，好在鲜有需要执行闭包的错误发生,单独记录  </p>
+<p>还有个错误是for循环中取地址的问题，倒是在转换数据结构的时候，也踩进了坑</p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>实际上就是对赋值的误解，误以为每次生成新的变量，相应的还有go函数的参数值传递相关的误解  </p>
+<p>超级简化版的例子，形如<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	bar := []<span class="keyword">int</span>&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;</span><br><span class="line">	<span class="keyword">for</span> index, value := <span class="keyword">range</span> bar &#123;</span><br><span class="line">		fmt.Printf(<span class="string">"%d %p %d\n"</span>, index, &amp;value, value)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>输出<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">0 0xc00004e080 1</span><br><span class="line">1 0xc00004e080 2</span><br><span class="line">2 0xc00004e080 3</span><br></pre></td></tr></table></figure></p>
+<p>所以原因就是value变量并非每次循环生成一个新的变量，而只是重新赋值<br>所以如果将<code>&amp;value</code>的地址始终不变，如果将地址赋值给别的变量，则最终指向同一个地址<br>如果是使用循环外部变量，也存在这个问题，因为都是同一个变量  </p>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><ol>
+<li>在循环内赋值给一个新变量<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> index, value := <span class="keyword">range</span> bar &#123;</span><br><span class="line">    foo := value</span><br><span class="line">    fmt.Printf(<span class="string">"%d %p %d\n"</span>, index, &amp;foo, value)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">0 0xc00004e080 1</span><br><span class="line">1 0xc00004e098 2</span><br><span class="line">2 0xc00004e0d0 3</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>直接使用索引取值<br>只是举个栗子，不能这么取址玩<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> index, value := <span class="keyword">range</span> bar &#123;</span><br><span class="line">    fmt.Printf(<span class="string">"%d %p %d\n"</span>, index, &amp;bar[index], value)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">0 0xc00004c0c0 1</span><br><span class="line">1 0xc00004c0c8 2</span><br><span class="line">2 0xc00004c0d0 3</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -430,7 +440,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/curl/" rel="tag"># curl</a>
+            <a href="/tags/go/" rel="tag"># go</a>
           
         </div>
       
@@ -443,8 +453,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/10/19/IE-response-JSON-alert-download/" rel="next" title="IE9 接口返回json数据，提示下载">
-                <i class="fa fa-chevron-left"></i> IE9 接口返回json数据，提示下载
+              <a href="/2019/01/28/vscode-in-wsl/" rel="next" title="在WSL中使用VSCode">
+                <i class="fa fa-chevron-left"></i> 在WSL中使用VSCode
               </a>
             
           </div>
@@ -452,10 +462,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/11/16/php-xdebug-profile/" rel="prev" title="使用Xdebug分析PHP性能问题">
-                使用Xdebug分析PHP性能问题 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -615,7 +621,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原因"><span class="nav-number">1.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方法"><span class="nav-number">2.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">3.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原因"><span class="nav-number">1.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方法"><span class="nav-number">2.</span> <span class="nav-text">解决方法</span></a></li></ol></div>
             
 
           </div>
@@ -798,9 +804,9 @@
     
       <script type="text/javascript">
         var disqus_config = function () {
-          this.page.url = 'http://yoursite.com/2018/11/09/php-curl-26-couldn-t-open-file/';
-          this.page.identifier = '2018/11/09/php-curl-26-couldn-t-open-file/';
-          this.page.title = 'php curl 上传文件报错 26 couldn\'t open file';
+          this.page.url = 'http://yoursite.com/2019/01/30/go-for-range/';
+          this.page.identifier = '2019/01/30/go-for-range/';
+          this.page.title = 'golang的for-range的注意点';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://loessplateau.disqus.com/embed.js';
