@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="Don&#39;t Panic">
 <meta property="og:description" content="Go操作MySQL数据库，插入datetime列的数据都是UTC时间Go中对应的类型为time.Time，即便设置了时区也是一样的结果所以要改变mysql包的默认行为，设置时区">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-12T09:27:42.677Z">
+<meta property="og:updated_time" content="2019-02-17T07:16:12.154Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Go查询MySQLdatetime列，设置时区">
 <meta name="twitter:description" content="Go操作MySQL数据库，插入datetime列的数据都是UTC时间Go中对应的类型为time.Time，即便设置了时区也是一样的结果所以要改变mysql包的默认行为，设置时区">
@@ -165,7 +165,7 @@
 
 </head>
 
-<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-Hans">
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
 
   
   
@@ -175,7 +175,7 @@
   <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
-    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-wrapper">
   <div class="site-meta ">
     
@@ -295,20 +295,20 @@
   
   
 
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
   
   
   
   <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/27/go-mysql-datetime-timezone/">
 
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="bbbht">
-      <meta itemprop="description" content="">
+      <meta itemprop="description" content>
       <meta itemprop="image" content="https://avatars1.githubusercontent.com/u/6995166?s=400&u=7ec51c88d4058afe78bd6e5d1c32da816dd7413c&v=4">
     </span>
 
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="Don't Panic">
     </span>
 
@@ -351,7 +351,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/categories/go/" itemprop="url" rel="index">
                     <span itemprop="name">go</span>
                   </a>
@@ -417,7 +417,7 @@
 <p>Type:           bool<br>Valid Values:   true, false<br>Default:        false<br>parseTime=true changes the output type of DATE and DATETIME values to time.Time instead of []byte / string The date or datetime like 0000-00-00 00:00:00 is converted into zero value of time.Time.</p>
 </blockquote>
 <h3 id="loc"><a href="#loc" class="headerlink" title="loc"></a>loc</h3><blockquote>
-<p>Type:           string<br>Valid Values:   <escaped name=""><br>Default:        UTC<br>Sets the location for time.Time values (when using parseTime=true). “Local” sets the system’s location. See time.LoadLocation for details.</escaped></p>
+<p>Type:           string<br>Valid Values:   <escaped name><br>Default:        UTC<br>Sets the location for time.Time values (when using parseTime=true). “Local” sets the system’s location. See time.LoadLocation for details.</escaped></p>
 </blockquote>
 <blockquote>
 <p>Note that this sets the location for time.Time values but does not change MySQL’s time_zone setting. For that see the time_zone system variable, which can also be set as a DSN parameter.</p>
@@ -544,7 +544,7 @@
 
       <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
-          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
               <img class="site-author-image" itemprop="image" src="https://avatars1.githubusercontent.com/u/6995166?s=400&u=7ec51c88d4058afe78bd6e5d1c32da816dd7413c&v=4" alt="bbbht">
             
@@ -559,7 +559,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">40</span>
+                  <span class="site-state-item-count">41</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -581,7 +581,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">26</span>
+                  <span class="site-state-item-count">27</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
