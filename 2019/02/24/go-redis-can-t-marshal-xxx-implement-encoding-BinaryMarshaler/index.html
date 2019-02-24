@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="bbbht, blog, don't panic">
+  <meta name="keywords" content="go,redis,">
 
 
 
@@ -86,16 +86,18 @@
 
 
 
-<meta name="description" content="尝试，记录，分享">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Don&#39;t Panic">
-<meta property="og:url" content="http://yoursite.com/page/5/index.html">
+<meta name="description" content="在go项目中使用redis时，难免要使用Get/Set存取一些复杂的数据结构直接缓存会报错1redis: can&amp;apos;t marshal xxx (implement encoding.BinaryMarshaler) xxx为对应的数据结构此时就要自定义一些方法来解决了">
+<meta name="keywords" content="go,redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go redis can&#39;t marshal xxx (implement encoding.BinaryMarshaler)">
+<meta property="og:url" content="http://yoursite.com/2019/02/24/go-redis-can-t-marshal-xxx-implement-encoding-BinaryMarshaler/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
-<meta property="og:description" content="尝试，记录，分享">
+<meta property="og:description" content="在go项目中使用redis时，难免要使用Get/Set存取一些复杂的数据结构直接缓存会报错1redis: can&amp;apos;t marshal xxx (implement encoding.BinaryMarshaler) xxx为对应的数据结构此时就要自定义一些方法来解决了">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-02-24T08:35:27.120Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Don&#39;t Panic">
-<meta name="twitter:description" content="尝试，记录，分享">
+<meta name="twitter:title" content="go redis can&#39;t marshal xxx (implement encoding.BinaryMarshaler)">
+<meta name="twitter:description" content="在go项目中使用redis时，难免要使用Get/Set存取一些复杂的数据结构直接缓存会报错1redis: can&amp;apos;t marshal xxx (implement encoding.BinaryMarshaler) xxx为对应的数据结构此时就要自定义一些方法来解决了">
 
 
 
@@ -125,14 +127,14 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/page/5/">
+  <link rel="canonical" href="http://yoursite.com/2019/02/24/go-redis-can-t-marshal-xxx-implement-encoding-BinaryMarshaler/">
 
 
 
 
 
   <meta name="google-site-verification" content="aVUEVKghcpKmqD1MgxttjI8n8mrd1iSrStqvpDlEAdg">
-  <title>Don't Panic</title>
+  <title>go redis can't marshal xxx (implement encoding.BinaryMarshaler) | Don't Panic</title>
   
 
 
@@ -170,8 +172,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-  page-home">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -284,9 +285,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -299,7 +300,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/27/change-author-on-multiple-git-commits/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/24/go-redis-can-t-marshal-xxx-implement-encoding-BinaryMarshaler/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="bbbht">
@@ -316,9 +317,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/27/change-author-on-multiple-git-commits/" itemprop="url">修改已提交的git仓库中commit作者信息（name,email）</a></h2>
+          <h2 class="post-title" itemprop="name headline">go redis can't marshal xxx (implement encoding.BinaryMarshaler)</h2>
         
 
         <div class="post-meta">
@@ -330,8 +329,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-27T15:10:57+08:00">
-                2018-02-27
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-24T07:16:37+00:00">
+                2019-02-24
               </time>
             
 
@@ -353,8 +352,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/版本控制/" itemprop="url" rel="index">
-                    <span itemprop="name">版本控制</span>
+                  <a href="/categories/go/" itemprop="url" rel="index">
+                    <span itemprop="name">go</span>
                   </a>
                 </span>
 
@@ -371,8 +370,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/02/27/change-author-on-multiple-git-commits/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/02/27/change-author-on-multiple-git-commits/" itemprop="commentCount"></span>
+                <a href="/2019/02/24/go-redis-can-t-marshal-xxx-implement-encoding-BinaryMarshaler/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/02/24/go-redis-can-t-marshal-xxx-implement-encoding-BinaryMarshaler/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -381,6 +380,11 @@
           
           
 
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
           
 
           
@@ -400,16 +404,15 @@
       
 
       
-        
-          <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>通过<code>hexo deploy</code>推送到github pages上的文章，访问正常，没来得及高兴就发现了问题。<br>因为仓库中的commit信息是公司项目中配置的信息！</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/02/27/change-author-on-multiple-git-commits/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
+        <p>在go项目中使用redis时，难免要使用<code>Get/Set</code>存取一些复杂的数据结构<br>直接缓存会报错<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis: can&apos;t marshal xxx (implement encoding.BinaryMarshaler)</span><br></pre></td></tr></table></figure></p>
+<p>xxx为对应的数据结构<br>此时就要自定义一些方法来解决了</p>
+<a id="more"></a>
+<p>当前使用的redis客户端为 <a href="https://github.com/go-redis/redis" target="_blank" rel="noopener">go-redis</a> v6<br>需要为缓存的对象添加两个方法，<code>go-redis</code>会自动应用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">MarshalBinary() ([]byte, error)</span><br><span class="line">UnmarshalBinary(data []byte) error</span><br></pre></td></tr></table></figure></p>
+<p>在其中实现序列化与反序列化的方法即可，一般使用json库<br>当然为了性能考虑，也可以使用其它更高效的库，如msgpack，benchmark有5-10倍提升<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">BenchmarkStructVmihailencoMsgpack-4   	  200000	     12814 ns/op	    2128 B/op	      26 allocs/op </span><br><span class="line">BenchmarkStructUgorjiGoMsgpack-4      	  100000	     17678 ns/op	    3616 B/op	      70 allocs/op </span><br><span class="line">BenchmarkStructUgorjiGoCodec-4        	  100000	     19053 ns/op	    7346 B/op	      23 allocs/op </span><br><span class="line">BenchmarkStructJSON-4                 	   20000	     69438 ns/op	    7864 B/op	      26 allocs/op </span><br><span class="line">BenchmarkStructGOB-4                  	   10000	    104331 ns/op	   14664 B/op	     278 allocs/op</span><br></pre></td></tr></table></figure></p>
+<h2 id="Example"><a href="#Example" class="headerlink" title="Example"></a>Example</h2><figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">    <span class="string">"fmt"</span></span><br><span class="line">    <span class="string">"time"</span></span><br><span class="line">    <span class="string">"github.com/go-redis/redis"</span></span><br><span class="line">    <span class="string">"github.com/vmihailenco/msgpack"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    client := redis.NewClient(&amp;redis.Options&#123;</span><br><span class="line">        Addr:     <span class="string">"192.168.0.1:6379"</span>,</span><br><span class="line">        Password: <span class="string">"kljsdfslkdfj"</span>,    <span class="comment">// password </span></span><br><span class="line">        DB:       <span class="number">0</span>,                <span class="comment">// use default DB</span></span><br><span class="line">    &#125;)</span><br><span class="line"></span><br><span class="line">    pong, err := client.Ping().Result()</span><br><span class="line">    fmt.Println(pong, err)</span><br><span class="line">    </span><br><span class="line">    fmt.Println(client.Set(<span class="string">"cache1"</span>, &amp;something&#123;<span class="number">100</span>, <span class="string">"101"</span>&#125;, time.Second*<span class="number">1</span>).Result())</span><br><span class="line">    fmt.Println(client.Get(<span class="string">"cache1"</span>).Result())</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> something <span class="keyword">struct</span> &#123;</span><br><span class="line">    ID      <span class="keyword">int</span></span><br><span class="line">    Name    <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *something)</span> <span class="title">MarshalBinary</span><span class="params">()</span> <span class="params">([]<span class="keyword">byte</span>, error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> msgpack.Marshal(s)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *something)</span> <span class="title">UnmarshalBinary</span><span class="params">(data []<span class="keyword">byte</span>)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> msgpack.Unmarshal(data, s)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>还有复杂对象取地址传参，不然还是会报错<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis: can&apos;t marshal xxx (implement encoding.BinaryMarshaler)</span><br></pre></td></tr></table></figure></p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://github.com/go-redis/redis" target="_blank" rel="noopener">go-redis</a><br><a href="https://github.com/go-redis/redis/issues/16" target="_blank" rel="noopener">go-redis issues</a><br><a href="https://github.com/vmihailenco/msgpack" target="_blank" rel="noopener">msgpack</a>  </p>
+
       
     </div>
     
@@ -424,148 +427,38 @@
 
     <footer class="post-footer">
       
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/27/problems-useing-hexo/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="bbbht">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="https://avatars1.githubusercontent.com/u/6995166?s=400&u=7ec51c88d4058afe78bd6e5d1c32da816dd7413c&v=4">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Don't Panic">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/02/27/problems-useing-hexo/" itemprop="url">使用hexo时遇到的问题</a></h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-27T12:37:19+08:00">
-                2018-02-27
-              </time>
-            
-
-            
-
-            
-          </span>
-
+        <div class="post-tags">
           
-
+            <a href="/tags/go/" rel="tag"># go</a>
           
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/02/27/problems-useing-hexo/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/02/27/problems-useing-hexo/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
+            <a href="/tags/redis/" rel="tag"># redis</a>
           
-
-          
-          
-
-          
-
-          
-
-          
-
         </div>
-      </header>
-    
+      
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
+      
       
       
 
       
-        
-          <p>初次使用hexo，对各种配置还不熟悉<br>尽量使用了默认配置，并参考别人的经验，然而还是遇到了些小问题<br>比如运行<code>hexo server</code>，<code>hexo deploy</code>等命令时报错<br>慢慢完善吧，后期再丰富功能</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/02/27/problems-useing-hexo/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/02/15/go-fmt-Sprintf-string-qutoes-verbs/" rel="next" title="go fmt.Sprintf字符串占位符输出引号">
+                <i class="fa fa-chevron-left"></i> go fmt.Sprintf字符串占位符输出引号
+              </a>
+            
           </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
 
-    
+          <span class="post-nav-divider"></span>
 
-    
-
-    
-
-    <footer class="post-footer">
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
       
 
       
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -575,14 +468,11 @@
   </article>
 
 
-    
-  </section>
 
-  
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
-  </nav>
-
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -590,6 +480,20 @@
 
 
           
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
 
         </div>
         
@@ -610,8 +514,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -689,6 +602,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Example"><span class="nav-number">1.</span> <span class="nav-text">Example</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">2.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -842,6 +771,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
@@ -859,6 +792,18 @@
       <script id="dsq-count-scr" src="https://loessplateau.disqus.com/count.js" async></script>
     
 
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2019/02/24/go-redis-can-t-marshal-xxx-implement-encoding-BinaryMarshaler/';
+          this.page.identifier = '2019/02/24/go-redis-can-t-marshal-xxx-implement-encoding-BinaryMarshaler/';
+          this.page.title = 'go redis can\'t marshal xxx (implement encoding.BinaryMarshaler)';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://loessplateau.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
     
 
   
