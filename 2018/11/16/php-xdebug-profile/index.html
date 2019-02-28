@@ -95,7 +95,7 @@
 <meta property="og:description" content="最近应用首页终于到了不得不优化的地步由于只是响应慢，所以决定使用日常的xdebug的profiler功能来分析记录一下使用的工具及配置，毕竟不是经常使用优化虽好，可不能痴迷啊">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://kcachegrind.sourceforge.net/html/pics/KcgShot3.gif">
-<meta property="og:updated_time" content="2019-02-24T08:35:27.136Z">
+<meta property="og:updated_time" content="2019-02-28T12:52:17.204Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用Xdebug分析PHP性能问题">
 <meta name="twitter:description" content="最近应用首页终于到了不得不优化的地步由于只是响应慢，所以决定使用日常的xdebug的profiler功能来分析记录一下使用的工具及配置，毕竟不是经常使用优化虽好，可不能痴迷啊">
@@ -407,7 +407,7 @@
 
       
         <p>最近应用首页终于到了不得不优化的地步<br>由于只是响应慢，所以决定使用日常的xdebug的profiler功能来分析<br>记录一下使用的工具及配置，毕竟不是经常使用<br>优化虽好，可不能痴迷啊<br><a id="more"></a></p>
-<p>Xdebug的安装配置无需多言，这次这是在配置中增加了profiler的内容<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">xdebug.profiler_enable = 0</span><br><span class="line">xdebug.profiler_enable_trigger = 1</span><br><span class="line">xdebug.profiler_output_dir = "/debug/php/profile"</span><br><span class="line">xdebug.profiler_output_name = "cachegrind.out.%t"</span><br></pre></td></tr></table></figure></p>
+<p>Xdebug的安装配置无需多言，这次这是在配置中增加了profiler的内容<br><figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">xdebug.profiler_enable</span> = <span class="number">0</span></span><br><span class="line"><span class="attr">xdebug.profiler_enable_trigger</span> = <span class="number">1</span></span><br><span class="line"><span class="attr">xdebug.profiler_output_dir</span> = <span class="string">"/debug/php/profile"</span></span><br><span class="line"><span class="attr">xdebug.profiler_output_name</span> = <span class="string">"cachegrind.out.%t"</span></span><br></pre></td></tr></table></figure></p>
 <p>具体的配置可参考xdebug文档<br>使用了默认的<code>XDEBUG_PROFILE</code>参数来触发profile记录<br>只是输出目录要确保有权限写文件<br>输出文件格式为<code>cachegrind.out.时间戳</code>，若分析的页面或接口多的话，应该使用脚本路径或query_uri来标志，以便于区分<br>重启<code>php-fpm</code>后，正常访问，加上XDEBUG_PROFILE参数即可<br>问题在于生成的文件是不可读的，要要工具，在windos下使用了<code>QCacheGrind(Kcachegrind)</code><br>盗一张管网图<br><img src="http://kcachegrind.sourceforge.net/html/pics/KcgShot3.gif" alt="效果图"></p>
 <p>有很清晰的每个函数的调用时间及所占比例，以及直观的调用栈，哪个地方需要优化一目了然  </p>
 <h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="http://kcachegrind.sourceforge.net/html/Home.html" target="_blank" rel="noopener">KCachegrind</a><br><a href="http://kcachegrind.sourceforge.net/html/Tips.html" target="_blank" rel="noopener">Tips</a></p>
@@ -542,7 +542,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">42</span>
+                  <span class="site-state-item-count">43</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -553,7 +553,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-count">20</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -564,7 +564,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">28</span>
+                  <span class="site-state-item-count">30</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
