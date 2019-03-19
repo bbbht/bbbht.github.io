@@ -39,6 +39,13 @@ categories: vscode
     - `fcitx `
     - `fcitx-configtool`配置中文输入法，再修改下切换快捷键，防止与win冲突
 
+## 4. 更新VScode
+```sh
+wget https://vscode-update.azurewebsites.net/latest/linux-deb-x64/stable -O /tmp/code_latest_amd64.deb
+
+sudo dpkg -i /tmp/code_latest_amd64.deb
+```
+
 重启机器打开wsl后自动启动，在`.zshrc`添加
 ```
 if [ $(ps -ax | grep dbus-daemon | wc -l) -eq 1 ]; then
