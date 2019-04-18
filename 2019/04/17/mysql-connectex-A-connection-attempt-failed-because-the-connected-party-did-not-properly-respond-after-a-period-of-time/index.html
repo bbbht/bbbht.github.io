@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="Don&#39;t Panic">
 <meta property="og:description" content="有一项MySQL数据迁移的工作，将原表（2000W+数据量）的数据处理后，分表（256张）存储是用Go来完成，计划使用相当于表数量的goroutines同时处理计划很好，代码也简单，按某个字段F取余决定分到某张表，然后按照字段F分组后，每组交由一个go协程处理然而，运行后不久就会报错123connectex: A connection attempt failed because the conn">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-17T08:43:41.680Z">
+<meta property="og:updated_time" content="2019-04-18T06:27:32.581Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="mysql connectex: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond">
 <meta name="twitter:description" content="有一项MySQL数据迁移的工作，将原表（2000W+数据量）的数据处理后，分表（256张）存储是用Go来完成，计划使用相当于表数量的goroutines同时处理计划很好，代码也简单，按某个字段F取余决定分到某张表，然后按照字段F分组后，每组交由一个go协程处理然而，运行后不久就会报错123connectex: A connection attempt failed because the conn">
@@ -407,6 +407,8 @@
         <p>有一项MySQL数据迁移的工作，将原表（2000W+数据量）的数据处理后，分表（256张）存储<br>是用Go来完成，计划使用相当于表数量的goroutines同时处理<br>计划很好，代码也简单，按某个字段F取余决定分到某张表，然后按照字段F分组后，每组交由一个go协程处理<br>然而，运行后不久就会报错<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">connectex: A connection attempt failed because the connected party did</span><br><span class="line">  not properly respond after a period of time, or established connection failed</span><br><span class="line">  because connected host has failed to respond</span><br></pre></td></tr></table></figure></p>
 <a id="more"></a>
 <h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>原本以为是链接超时，但报错时间最短的在运行后20秒左右，所以排除<br>然后转而关注数据库的连接数限制，毕竟本地测试库，max_connections设置是500，遂增加至800，问题依旧<br>于是转而求助Google，但相关的报错搜索结果并没有精确的案例<br>于是减少协程数量，通过chan控制协程数量到16，出错，8也出错，直到1个才正常运行，然而这样肯定不行，至少需要两个小时<br>然后通过数据库监控查看processlist，发现在出错之前，大量的进程<code>State</code>为<code>Writing to net</code>于是搜素相关问题得以找到真实的原因<br><code>max_allowed_packet</code>参数才是问题的症结所在，当前数据库设置为<code>16M</code>而单次查询最多可能有10W+数据，超过1M，同时上百个查询的话，就会造成<code>Writing to net</code><br>进而引发上述报错<br>之前了解的<code>max_allowed_packet</code>是限制单条写（insert/update）大小<br>而这次了解到该参数是控制其通信缓冲区的最大长度，当大量结果集很大的查询同时存在时，就会超出其限制，导致报错</p>
+<p><strong>PS</strong><br>后续的迁移测试中，触发了另一个问题<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[mysql] 2019/04/18 11:20:58 packets.go:36: unexpected EOF</span><br><span class="line">[mysql] 2019/04/18 11:20:58 packets.go:393: busy buffer</span><br></pre></td></tr></table></figure></p>
+<p>而它的解决方案是设置最大空闲连接数为0<code>db.SetMaxIdleConns(0)</code><br>同时，也意识到A connection attempt failed …的问题，还有一个重要原因就是服务器的性能太差了。。。  </p>
 <h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><ol>
 <li>修改my.cnf<br>添加或修改<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">max_allowed_packet = 128M</span><br></pre></td></tr></table></figure>
 </li>
@@ -417,6 +419,7 @@
 </li>
 </ol>
 <p>当然，这样的修改重启mysql后就失效了，并且只对之后新创建的连接起作用</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://github.com/go-sql-driver/mysql/issues/674" target="_blank" rel="noopener">unexpected EOF</a></p>
 
       
     </div>
@@ -617,7 +620,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原因"><span class="nav-number">1.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方法"><span class="nav-number">2.</span> <span class="nav-text">解决方法</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原因"><span class="nav-number">1.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方法"><span class="nav-number">2.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">3.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
             
 
           </div>
