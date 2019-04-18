@@ -32,6 +32,14 @@ connectex: A connection attempt failed because the connected party did
 之前了解的`max_allowed_packet`是限制单条写（insert/update）大小  
 而这次了解到该参数是控制其通信缓冲区的最大长度，当大量结果集很大的查询同时存在时，就会超出其限制，导致报错
 
+**PS**  
+后续的迁移测试中，触发了另一个问题
+```
+[mysql] 2019/04/18 11:20:58 packets.go:36: unexpected EOF
+[mysql] 2019/04/18 11:20:58 packets.go:393: busy buffer
+```
+而它的解决方案是设置最大空闲连接数为0``db.SetMaxIdleConns(0)``  
+同时，也意识到A connection attempt failed ...的问题，还有一个重要原因就是服务器的性能太差了。。。  
 ## 解决方法
 1. 修改my.cnf
 添加或修改
@@ -45,3 +53,6 @@ max_allowed_packet = 128M
 set global max_allowed_packet = 128*1024*1024
 ```
 当然，这样的修改重启mysql后就失效了，并且只对之后新创建的连接起作用
+
+## 参考链接
+[unexpected EOF](https://github.com/go-sql-driver/mysql/issues/674)
