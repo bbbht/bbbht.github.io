@@ -40,6 +40,12 @@ connectex: A connection attempt failed because the connected party did
 ```
 而它的解决方案是设置最大空闲连接数为0``db.SetMaxIdleConns(0)``  
 同时，也意识到A connection attempt failed ...的问题，还有一个重要原因就是服务器的性能太差了。。。  
+
+**PS**
+偶然翻开，感觉并没有实际解决掉问题  
+于是又用了半个小时进行测试，这次应该是真正有效的解决方案了吧  
+思路是，因为是连接时的问题，所以在目标数据库性能较差，连接较多时失败几率增大，只要保持一定量的长连接，减少创建/重连次数  
+那就是设置空闲连接数量`db.SetMaxIdleConns(32)`的同时，设置最大生命周期`db.SetConnMaxLifetime(time.Minute * 30)`
 ## 解决方法
 1. 修改my.cnf
 添加或修改
@@ -53,6 +59,17 @@ max_allowed_packet = 128M
 set global max_allowed_packet = 128*1024*1024
 ```
 当然，这样的修改重启mysql后就失效了，并且只对之后新创建的连接起作用
+
+3. 修改数据库连接参数
+```golang
+db.SetMaxIdleConns(32)
+db.SetMaxOpenConns(64)
+db.SetConnMaxLifetime(time.Minute * 30)
+```
+首先，所有参数要考虑实际业务限制，具体的参数要视情况调整/尝试  
+SetMaxOpenConns不能超过数据库最大连接数限制  
+SetMaxIdleConns不能超过SetMaxOpenConns的设置  
+SetConnMaxLifetime的时间要小于数据库`wait_timeout`设置的时间
 
 ## 参考链接
 [unexpected EOF](https://github.com/go-sql-driver/mysql/issues/674)
