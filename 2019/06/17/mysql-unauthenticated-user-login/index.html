@@ -86,18 +86,18 @@
 
 
 
-<meta name="description" content="继续关注数据库问题，access记录中有大量超时请求，但慢日志却并没有记录。随即通过show full processlist发现线上数据库出现大量（数百）的非正常process| Server       | Id         | User                 | Host            | db  | Command | Time | State | Info || —">
+<meta name="description" content="继续关注数据库问题，access记录中有大量超时请求，但慢日志却并没有记录。随即通过show full processlist发现线上数据库出现大量（数百）的非正常process      Server Id User Host db Command Time State Info     svc_database 1076500670 unauthenticated user connectin">
 <meta name="keywords" content="mysql">
 <meta property="og:type" content="article">
 <meta property="og:title" content="mysql unauthenticated user login">
 <meta property="og:url" content="http://yoursite.com/2019/06/17/mysql-unauthenticated-user-login/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
-<meta property="og:description" content="继续关注数据库问题，access记录中有大量超时请求，但慢日志却并没有记录。随即通过show full processlist发现线上数据库出现大量（数百）的非正常process| Server       | Id         | User                 | Host            | db  | Command | Time | State | Info || —">
+<meta property="og:description" content="继续关注数据库问题，access记录中有大量超时请求，但慢日志却并没有记录。随即通过show full processlist发现线上数据库出现大量（数百）的非正常process      Server Id User Host db Command Time State Info     svc_database 1076500670 unauthenticated user connectin">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-06-21T08:20:29.735Z">
+<meta property="og:updated_time" content="2019-06-21T08:23:56.895Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="mysql unauthenticated user login">
-<meta name="twitter:description" content="继续关注数据库问题，access记录中有大量超时请求，但慢日志却并没有记录。随即通过show full processlist发现线上数据库出现大量（数百）的非正常process| Server       | Id         | User                 | Host            | db  | Command | Time | State | Info || —">
+<meta name="twitter:description" content="继续关注数据库问题，access记录中有大量超时请求，但慢日志却并没有记录。随即通过show full processlist发现线上数据库出现大量（数百）的非正常process      Server Id User Host db Command Time State Info     svc_database 1076500670 unauthenticated user connectin">
 
 
 
@@ -404,11 +404,162 @@
       
 
       
-        <p>继续关注数据库问题，access记录中有大量超时请求，但慢日志却并没有记录。<br>随即通过<code>show full processlist</code>发现线上数据库出现大量（数百）的非正常process<br>| Server       | Id         | User                 | Host            | db  | Command | Time | State | Info |<br>| ———— | ———- | ——————– | ————— | — | ——- | —- | —– | —- |<br>| svc_database | 1076500670 | unauthenticated user | connecting host |     | Connect | 29   | login |      |</p>
+        <p>继续关注数据库问题，access记录中有大量超时请求，但慢日志却并没有记录。<br>随即通过<code>show full processlist</code>发现线上数据库出现大量（数百）的非正常process  </p>
+<table>
+<thead>
+<tr>
+<th>Server</th>
+<th>Id</th>
+<th>User</th>
+<th>Host</th>
+<th>db</th>
+<th>Command</th>
+<th>Time</th>
+<th>State</th>
+<th>Info</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>svc_database</td>
+<td>1076500670</td>
+<td>unauthenticated user</td>
+<td>connecting host</td>
+<td></td>
+<td>Connect</td>
+<td>29</td>
+<td>login</td>
+</tr>
+</tbody>
+</table>
 <a id="more"></a>
-<p>对完整的process分析后，筛选出了以下有效内容<br>| Server       | Id         | User                 | Host               | db  | Command     | Time   | State                                                         | Info                                                                                                                                                                                                                                                                                                                                                                                                                         |<br>| ———— | ———- | ——————– | —————— | — | ———– | —— | ————————————————————- | —————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————- |<br>| svc_database | 1072733149 | unauthenticated user | connecting host    |     | Connect     | 8      | login                                                         |                                                                                                                                                                                                                                                                                                                                                                                                                              |<br>| svc_database | 1072733085 | unauthenticated user | connecting host    |     | Connect     | 10     | login                                                         |                                                                                                                                                                                                                                                                                                                                                                                                                              |<br>| svc_database | 1072733021 | unauthenticated user | connecting host    |     | Connect     | 10     | login                                                         |                                                                                                                                                                                                                                                                                                                                                                                                                              |<br>| svc_database | 1072732957 | unauthenticated user | connecting host    |     | Connect     | 12     | login                                                         |                                                                                                                                                                                                                                                                                                                                                                                                                              |<br>| svc_database | 1072732893 | unauthenticated user | connecting host    |     | Connect     | 14     | login                                                         |                                                                                                                                                                                                                                                                                                                                                                                                                              |<br>| svc_database | 1072732829 | unauthenticated user | connecting host    |     | Connect     | 15     | login                                                         |                                                                                                                                                                                                                                                                                                                                                                                                                              |<br>| svc_database | 1062235623 | root                 | 192.168.1.25:56926 |     | Binlog Dump | 333003 | Master has sent all binlog to slave; waiting for more updates |                                                                                                                                                                                                                                                                                                                                                                                                                              |<br>| svc_database | 1072731869 | root                 | 192.168.1.25:59566 |     | Query       | 37     | executing                                                     | SELECT t_info.TABLE_SCHEMA,t_info.TABLE_NAME, t_info.TABLE_ROWS from information_schema.TABLES t_info where exists (select SCHEMA_NAME from information_schema.schemata where SCHEMA_NAME=t_info.TABLE_SCHEMA and SCHEMA_NAME !=’information_schema’ and SCHEMA_NAME !=’mysql’ and SCHEMA_NAME !=’performance_schema’ and SCHEMA_NAME !=’sys’) and t_info.TABLE_TYPE = ‘BASE TABLE’ ORDER BY t_info.TABLE_NAME limit 1000000 |</p>
+<p>对完整的process分析后，筛选出了以下有效内容</p>
+<table>
+<thead>
+<tr>
+<th>Server</th>
+<th>Id</th>
+<th>User</th>
+<th>Host</th>
+<th>db</th>
+<th>Command</th>
+<th>Time</th>
+<th>State</th>
+<th>Info</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>svc_database</td>
+<td>1072733149</td>
+<td>unauthenticated user</td>
+<td>connecting host</td>
+<td></td>
+<td>Connect</td>
+<td>8</td>
+<td>login</td>
+<td></td>
+</tr>
+<tr>
+<td>svc_database</td>
+<td>1072733085</td>
+<td>unauthenticated user</td>
+<td>connecting host</td>
+<td></td>
+<td>Connect</td>
+<td>10</td>
+<td>login</td>
+<td></td>
+</tr>
+<tr>
+<td>svc_database</td>
+<td>1072733021</td>
+<td>unauthenticated user</td>
+<td>connecting host</td>
+<td></td>
+<td>Connect</td>
+<td>10</td>
+<td>login</td>
+<td></td>
+</tr>
+<tr>
+<td>svc_database</td>
+<td>1072732957</td>
+<td>unauthenticated user</td>
+<td>connecting host</td>
+<td></td>
+<td>Connect</td>
+<td>12</td>
+<td>login</td>
+<td></td>
+</tr>
+<tr>
+<td>svc_database</td>
+<td>1072732893</td>
+<td>unauthenticated user</td>
+<td>connecting host</td>
+<td></td>
+<td>Connect</td>
+<td>14</td>
+<td>login</td>
+<td></td>
+</tr>
+<tr>
+<td>svc_database</td>
+<td>1072732829</td>
+<td>unauthenticated user</td>
+<td>connecting host</td>
+<td></td>
+<td>Connect</td>
+<td>15</td>
+<td>login</td>
+<td></td>
+</tr>
+<tr>
+<td>svc_database</td>
+<td>1062235623</td>
+<td>root</td>
+<td>192.168.1.25:56926</td>
+<td></td>
+<td>Binlog Dump</td>
+<td>333003</td>
+<td>Master has sent all binlog to slave; waiting for more updates</td>
+<td></td>
+</tr>
+<tr>
+<td>svc_database</td>
+<td>1072731869</td>
+<td>root</td>
+<td>192.168.1.25:59566</td>
+<td></td>
+<td>Query</td>
+<td>37</td>
+<td>executing</td>
+<td>SELECT t_info.TABLE_SCHEMA,t_info.TABLE_NAME, t_info.TABLE_ROWS from information_schema.TABLES t_info where exists (select SCHEMA_NAME from information_schema.schemata where SCHEMA_NAME=t_info.TABLE_SCHEMA and SCHEMA_NAME !=’information_schema’ and SCHEMA_NAME !=’mysql’ and SCHEMA_NAME !=’performance_schema’ and SCHEMA_NAME !=’sys’) and t_info.TABLE_TYPE = ‘BASE TABLE’ ORDER BY t_info.TABLE_NAME limit 1000000</td>
+</tr>
+</tbody>
+</table>
 <p>MySQL线程池（Thread Pool）根据参数thread_pool_size设为若干个group,每个group都负责维护客户端所发起的connections,<br>当建立 connection 时, MySQL根据connection的thread id 对thread_pool_size取模,<br>将connection交由对应的group处理。<br>而每个group的最大worker数量为thread_pool_oversubscribe+1，listener线程不包含在内<br>如果worker达到最大值后还是不足以处理请求,则后续connection将等待,从而导致了大量的unauthenticated user的login状态连接  </p>
-<p>再看到最后那条，问题基本就清楚了<br>是某云商的RDS数据库主从同步的一个查询超级慢所引发的<br>结合数据库线程池相关配置<br>| key                      | value |<br>| ———————— | —– |<br>| threadpool_oversubscribe | 1     |<br>| threadpool_size          | 64    |<br>1072731869 % 64 = 29<br>1072733149 % 64 = 29<br>1072733085 % 64 = 29<br>。。。</p>
+<p>再看到最后那条，问题基本就清楚了<br>是某云商的RDS数据库主从同步的一个查询超级慢所引发的<br>结合数据库线程池相关配置  </p>
+<table>
+<thead>
+<tr>
+<th>key</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>threadpool_oversubscribe</td>
+<td>1</td>
+</tr>
+<tr>
+<td>threadpool_size</td>
+<td>64</td>
+</tr>
+</tbody>
+</table>
+<p>1072731869 % 64 = 29<br>1072733149 % 64 = 29<br>1072733085 % 64 = 29<br>。。。</p>
 <p>都属于29号group</p>
 <h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>threadpool_oversubscribe的值设置的不合理（1）导致一旦有大的查询，其它的连接就会一直处于连接状态，即在连接过程就耗费了过长的时间</p>
 <h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><ol>
