@@ -1,4 +1,4 @@
-clone_depth: 5
+clone_depth: 2
 
 branches:
   only:
@@ -9,7 +9,7 @@ environment:
     secure: 5HxyfAl0UZepf91fiYjqf+lmv088lzREYdpLKKAOlbZw5zleCkh9tVW3lFPWwtVX
 
 install:
-  - ps: Install-Product node 6.0
+  - ps: Install-Product node 8.15.1
   - node --version
   - npm --version
   - npm install
