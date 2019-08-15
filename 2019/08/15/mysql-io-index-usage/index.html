@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="mysql,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="项目中很多表由于接手人很多，所以管生不管养的建立了大量索引。造成索引比数据大很多的奇葩现象，于是要找一找什么方式能方便的统计到索引的使用情况。于是发现了performance_schema库中的表table_io_waits_summary_by_index_usage。它聚合了所有表索引I / O等待事件">
+<meta name="keywords" content="mysql">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql的io与索引使用分析">
+<meta property="og:url" content="http://yoursite.com/2019/08/15/mysql-io-index-usage/index.html">
+<meta property="og:site_name" content="Don&#39;t Panic">
+<meta property="og:description" content="项目中很多表由于接手人很多，所以管生不管养的建立了大量索引。造成索引比数据大很多的奇葩现象，于是要找一找什么方式能方便的统计到索引的使用情况。于是发现了performance_schema库中的表table_io_waits_summary_by_index_usage。它聚合了所有表索引I / O等待事件">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-08-15T06:43:48.929Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mysql的io与索引使用分析">
+<meta name="twitter:description" content="项目中很多表由于接手人很多，所以管生不管养的建立了大量索引。造成索引比数据大很多的奇葩现象，于是要找一找什么方式能方便的统计到索引的使用情况。于是发现了performance_schema库中的表table_io_waits_summary_by_index_usage。它聚合了所有表索引I / O等待事件">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/08/15/mysql-io-index-usage/">
+
+
+
+
+
+  <meta name="google-site-verification" content="aVUEVKghcpKmqD1MgxttjI8n8mrd1iSrStqvpDlEAdg">
+  <title>mysql的io与索引使用分析 | Don't Panic</title>
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-116292975-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?a42c6bb7f27c4efdbc6c2deba01acaba";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Don't Panic</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Try Again</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-issues">
+          <a href="/issues/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            issues
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/15/mysql-io-index-usage/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="bbbht">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars1.githubusercontent.com/u/6995166?s=400&u=7ec51c88d4058afe78bd6e5d1c32da816dd7413c&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Don't Panic">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">mysql的io与索引使用分析</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-15T06:19:29+00:00">
+                2019-08-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index">
+                    <span itemprop="name">mysql</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/08/15/mysql-io-index-usage/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/08/15/mysql-io-index-usage/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>项目中很多表由于接手人很多，所以管生不管养的建立了大量索引。<br>造成索引比数据大很多的奇葩现象，于是要找一找什么方式能方便的统计到索引的使用情况。<br>于是发现了<code>performance_schema</code>库中的表<code>table_io_waits_summary_by_index_usage</code>。<br>它聚合了所有表索引I / O等待事件<br><a id="more"></a><br>从网上找到了不少可用的SQL语句来解决问题，同时还关注到了这几张表。<br>看描述就是系统优化的利器，虽然如今各种云RDS，能了解一些原生方式也是不错的。<br>尴尬的是阿里云RDS下面的表默认情况下是空的，所以只能用他们的性能分析优化工具了</p>
+<blockquote>
+<p>table_io_waits_summary_by_index_usage: Table I/O waits per index<br>table_io_waits_summary_by_table: Table I/O waits per table<br>table_lock_waits_summary_by_table: Table lock waits per table</p>
+</blockquote>
+<h2 id="一些使用栗子"><a href="#一些使用栗子" class="headerlink" title="一些使用栗子"></a>一些使用栗子</h2><p>其实只用了第一个查询就满足了需求，其他的只是好奇玩玩，<code>Ctrl + C</code>而来<br>具体的可查询MySQL文档，如参考链接</p>
+<h3 id="查询具体库-表的索引使用情况"><a href="#查询具体库-表的索引使用情况" class="headerlink" title="查询具体库/表的索引使用情况"></a>查询具体库/表的索引使用情况</h3><p>index_name为NULL则表示未使用索引，文档中提到插入语句被计入此项<br><code>TRUNCATE TABLE</code>操作会重置表的值，更改表结构也可能会影响到统计<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">	object_type,</span><br><span class="line">	object_schema,</span><br><span class="line">	object_name,</span><br><span class="line">	index_name,</span><br><span class="line">	count_star,</span><br><span class="line">	count_read,</span><br><span class="line">	COUNT_FETCH </span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">	<span class="string">`performance_schema`</span>.table_io_waits_summary_by_index_usage </span><br><span class="line"><span class="keyword">WHERE</span></span><br><span class="line">    object_schema = <span class="string">'database_name'</span> <span class="keyword">AND</span></span><br><span class="line">	object_name =<span class="string">'table_name'</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="反映表的读写压力"><a href="#反映表的读写压力" class="headerlink" title="反映表的读写压力"></a>反映表的读写压力</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> file_name <span class="keyword">AS</span> <span class="keyword">file</span>,</span><br><span class="line">    count_read,</span><br><span class="line">    sum_number_of_bytes_read <span class="keyword">AS</span> total_read,</span><br><span class="line">    count_write,</span><br><span class="line">    sum_number_of_bytes_write <span class="keyword">AS</span> total_written,</span><br><span class="line">    (sum_number_of_bytes_read + sum_number_of_bytes_write) <span class="keyword">AS</span> total</span><br><span class="line"> <span class="keyword">FROM</span> <span class="string">`performance_schema`</span>.file_summary_by_instance</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> sum_number_of_bytes_read+ sum_number_of_bytes_write <span class="keyword">DESC</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="反映文件的延迟"><a href="#反映文件的延迟" class="headerlink" title="反映文件的延迟"></a>反映文件的延迟</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> (file_name) <span class="keyword">AS</span> <span class="keyword">file</span>,</span><br><span class="line">    count_star <span class="keyword">AS</span> total,</span><br><span class="line">    <span class="keyword">CONCAT</span>(<span class="keyword">ROUND</span>(sum_timer_wait / <span class="number">3600000000000000</span>, <span class="number">2</span>), <span class="string">'h'</span>) <span class="keyword">AS</span> total_latency,</span><br><span class="line">    count_read,</span><br><span class="line">    <span class="keyword">CONCAT</span>(<span class="keyword">ROUND</span>(sum_timer_read / <span class="number">1000000000000</span>, <span class="number">2</span>), <span class="string">'s'</span>) <span class="keyword">AS</span> read_latency,</span><br><span class="line">    count_write,</span><br><span class="line">    <span class="keyword">CONCAT</span>(<span class="keyword">ROUND</span>(sum_timer_write / <span class="number">3600000000000000</span>, <span class="number">2</span>), <span class="string">'h'</span>)<span class="keyword">AS</span> write_latency</span><br><span class="line"> <span class="keyword">FROM</span> <span class="string">`performance_schema`</span>.file_summary_by_instance</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> sum_timer_wait <span class="keyword">DESC</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="table-的读写延迟"><a href="#table-的读写延迟" class="headerlink" title="table 的读写延迟"></a>table 的读写延迟</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> object_schema <span class="keyword">AS</span> table_schema,</span><br><span class="line">       object_name <span class="keyword">AS</span> table_name,</span><br><span class="line">       count_star <span class="keyword">AS</span> total,</span><br><span class="line">       <span class="keyword">CONCAT</span>(<span class="keyword">ROUND</span>(sum_timer_wait / <span class="number">3600000000000000</span>, <span class="number">2</span>), <span class="string">'h'</span>) <span class="keyword">as</span> total_latency,</span><br><span class="line">       <span class="keyword">CONCAT</span>(<span class="keyword">ROUND</span>((sum_timer_wait / count_star) / <span class="number">1000000</span>, <span class="number">2</span>), <span class="string">'us'</span>) <span class="keyword">AS</span> avg_latency,</span><br><span class="line">       <span class="keyword">CONCAT</span>(<span class="keyword">ROUND</span>(max_timer_wait / <span class="number">1000000000</span>, <span class="number">2</span>), <span class="string">'ms'</span>) <span class="keyword">AS</span> max_latency</span><br><span class="line"> <span class="keyword">FROM</span> <span class="string">`performance_schema`</span>.objects_summary_global_by_type</span><br><span class="line">    <span class="keyword">ORDER</span> <span class="keyword">BY</span> sum_timer_wait <span class="keyword">DESC</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="查看表操作频度"><a href="#查看表操作频度" class="headerlink" title="查看表操作频度"></a>查看表操作频度</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> object_schema <span class="keyword">AS</span> table_schema,</span><br><span class="line">      object_name <span class="keyword">AS</span> table_name,</span><br><span class="line">      count_star <span class="keyword">AS</span> rows_io_total,</span><br><span class="line">      count_read <span class="keyword">AS</span> rows_read,</span><br><span class="line">      count_write <span class="keyword">AS</span> rows_write,</span><br><span class="line">      count_fetch <span class="keyword">AS</span> rows_fetchs,</span><br><span class="line">      count_insert <span class="keyword">AS</span> rows_inserts,</span><br><span class="line">      count_update <span class="keyword">AS</span> rows_updates,</span><br><span class="line">      count_delete <span class="keyword">AS</span> rows_deletes,</span><br><span class="line">       <span class="keyword">CONCAT</span>(<span class="keyword">ROUND</span>(sum_timer_fetch / <span class="number">3600000000000000</span>, <span class="number">2</span>), <span class="string">'h'</span>) <span class="keyword">AS</span> fetch_latency,</span><br><span class="line">       <span class="keyword">CONCAT</span>(<span class="keyword">ROUND</span>(sum_timer_insert / <span class="number">3600000000000000</span>, <span class="number">2</span>), <span class="string">'h'</span>) <span class="keyword">AS</span> insert_latency,</span><br><span class="line">       <span class="keyword">CONCAT</span>(<span class="keyword">ROUND</span>(sum_timer_update / <span class="number">3600000000000000</span>, <span class="number">2</span>), <span class="string">'h'</span>) <span class="keyword">AS</span> update_latency,</span><br><span class="line">       <span class="keyword">CONCAT</span>(<span class="keyword">ROUND</span>(sum_timer_delete / <span class="number">3600000000000000</span>, <span class="number">2</span>), <span class="string">'h'</span>) <span class="keyword">AS</span> delete_latency</span><br><span class="line">   <span class="keyword">FROM</span> <span class="string">`performance_schema`</span>.table_io_waits_summary_by_table</span><br><span class="line">    <span class="keyword">ORDER</span> <span class="keyword">BY</span> sum_timer_wait <span class="keyword">DESC</span> ;</span><br></pre></td></tr></table></figure>
+<h3 id="索引状况"><a href="#索引状况" class="headerlink" title="索引状况"></a>索引状况</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> OBJECT_SCHEMA <span class="keyword">AS</span> table_schema,</span><br><span class="line">        OBJECT_NAME <span class="keyword">AS</span> table_name,</span><br><span class="line">        INDEX_NAME <span class="keyword">as</span> index_name,</span><br><span class="line">        COUNT_FETCH <span class="keyword">AS</span> rows_fetched,</span><br><span class="line">        <span class="keyword">CONCAT</span>(<span class="keyword">ROUND</span>(SUM_TIMER_FETCH / <span class="number">3600000000000000</span>, <span class="number">2</span>), <span class="string">'h'</span>) <span class="keyword">AS</span> select_latency,</span><br><span class="line">        COUNT_INSERT <span class="keyword">AS</span> rows_inserted,</span><br><span class="line">        <span class="keyword">CONCAT</span>(<span class="keyword">ROUND</span>(SUM_TIMER_INSERT / <span class="number">3600000000000000</span>, <span class="number">2</span>), <span class="string">'h'</span>) <span class="keyword">AS</span> insert_latency,</span><br><span class="line">        COUNT_UPDATE <span class="keyword">AS</span> rows_updated,</span><br><span class="line">        <span class="keyword">CONCAT</span>(<span class="keyword">ROUND</span>(SUM_TIMER_UPDATE / <span class="number">3600000000000000</span>, <span class="number">2</span>), <span class="string">'h'</span>) <span class="keyword">AS</span> update_latency,</span><br><span class="line">        COUNT_DELETE <span class="keyword">AS</span> rows_deleted,</span><br><span class="line">        <span class="keyword">CONCAT</span>(<span class="keyword">ROUND</span>(SUM_TIMER_DELETE / <span class="number">3600000000000000</span>, <span class="number">2</span>), <span class="string">'h'</span>)<span class="keyword">AS</span> delete_latency</span><br><span class="line"><span class="keyword">FROM</span> <span class="string">`performance_schema`</span>.table_io_waits_summary_by_index_usage</span><br><span class="line"><span class="keyword">WHERE</span> index_name <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="literal">NULL</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> sum_timer_wait <span class="keyword">DESC</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="全表扫描情况"><a href="#全表扫描情况" class="headerlink" title="全表扫描情况"></a>全表扫描情况</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> object_schema,</span><br><span class="line">    object_name,</span><br><span class="line">    count_read <span class="keyword">AS</span> rows_full_scanned</span><br><span class="line"> <span class="keyword">FROM</span> <span class="string">`performance_schema`</span>.table_io_waits_summary_by_index_usage</span><br><span class="line"><span class="keyword">WHERE</span> index_name <span class="keyword">IS</span> <span class="literal">NULL</span></span><br><span class="line">  <span class="keyword">AND</span> count_read &gt; <span class="number">0</span></span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> count_read <span class="keyword">DESC</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="没有使用的index"><a href="#没有使用的index" class="headerlink" title="没有使用的index"></a>没有使用的index</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> object_schema,</span><br><span class="line">    object_name,</span><br><span class="line">    index_name</span><br><span class="line">  <span class="keyword">FROM</span> <span class="string">`performance_schema`</span>.table_io_waits_summary_by_index_usage</span><br><span class="line"> <span class="keyword">WHERE</span> index_name <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="literal">NULL</span></span><br><span class="line">  <span class="keyword">AND</span> count_star = <span class="number">0</span></span><br><span class="line">  <span class="keyword">AND</span> object_schema <span class="keyword">not</span> <span class="keyword">in</span> (<span class="string">'mysql'</span>,<span class="string">'v_monitor'</span>)</span><br><span class="line">  <span class="keyword">AND</span> index_name &lt;&gt; <span class="string">'PRIMARY'</span></span><br><span class="line"> <span class="keyword">ORDER</span> <span class="keyword">BY</span> object_schema, object_name;</span><br></pre></td></tr></table></figure>
+<h3 id="糟糕的sql问题摘要"><a href="#糟糕的sql问题摘要" class="headerlink" title="糟糕的sql问题摘要"></a>糟糕的sql问题摘要</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> (DIGEST_TEXT) <span class="keyword">AS</span> <span class="keyword">query</span>,</span><br><span class="line">    SCHEMA_NAME <span class="keyword">AS</span> db,</span><br><span class="line">    <span class="keyword">IF</span>(SUM_NO_GOOD_INDEX_USED &gt; <span class="number">0</span> <span class="keyword">OR</span> SUM_NO_INDEX_USED &gt; <span class="number">0</span>, <span class="string">'*'</span>, <span class="string">''</span>) <span class="keyword">AS</span> full_scan,</span><br><span class="line">    COUNT_STAR <span class="keyword">AS</span> exec_count,</span><br><span class="line">    SUM_ERRORS <span class="keyword">AS</span> err_count,</span><br><span class="line">    SUM_WARNINGS <span class="keyword">AS</span> warn_count,</span><br><span class="line">    (SUM_TIMER_WAIT) <span class="keyword">AS</span> total_latency,</span><br><span class="line">    (MAX_TIMER_WAIT) <span class="keyword">AS</span> max_latency,</span><br><span class="line">    (AVG_TIMER_WAIT) <span class="keyword">AS</span> avg_latency,</span><br><span class="line">    (SUM_LOCK_TIME) <span class="keyword">AS</span> lock_latency,</span><br><span class="line">    <span class="keyword">format</span>(SUM_ROWS_SENT,<span class="number">0</span>) <span class="keyword">AS</span> rows_sent,</span><br><span class="line">    <span class="keyword">ROUND</span>(<span class="keyword">IFNULL</span>(SUM_ROWS_SENT / <span class="keyword">NULLIF</span>(COUNT_STAR, <span class="number">0</span>), <span class="number">0</span>)) <span class="keyword">AS</span> rows_sent_avg,</span><br><span class="line">    SUM_ROWS_EXAMINED <span class="keyword">AS</span> rows_examined,</span><br><span class="line">    <span class="keyword">ROUND</span>(<span class="keyword">IFNULL</span>(SUM_ROWS_EXAMINED / <span class="keyword">NULLIF</span>(COUNT_STAR, <span class="number">0</span>), <span class="number">0</span>)) <span class="keyword">AS</span> rows_examined_avg,</span><br><span class="line">    SUM_CREATED_TMP_TABLES <span class="keyword">AS</span> tmp_tables,</span><br><span class="line">    SUM_CREATED_TMP_DISK_TABLES <span class="keyword">AS</span> tmp_disk_tables,</span><br><span class="line">    SUM_SORT_ROWS <span class="keyword">AS</span> rows_sorted,</span><br><span class="line">    SUM_SORT_MERGE_PASSES <span class="keyword">AS</span> sort_merge_passes,</span><br><span class="line">    DIGEST <span class="keyword">AS</span> digest,</span><br><span class="line">    FIRST_SEEN <span class="keyword">AS</span> first_seen,</span><br><span class="line">    LAST_SEEN <span class="keyword">as</span> last_seen</span><br><span class="line">  <span class="keyword">FROM</span> <span class="string">`performance_schema`</span>.events_statements_summary_by_digest d</span><br><span class="line"><span class="keyword">where</span> d</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> SUM_TIMER_WAIT <span class="keyword">DESC</span></span><br><span class="line"><span class="keyword">limit</span> <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://dev.mysql.com/doc/refman/5.6/en/table-waits-summary-tables.html#table-io-waits-summary-by-index-usage-table" target="_blank" rel="noopener">Table I/O and Lock Wait Summary Tables</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mysql/" rel="tag"># mysql</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/17/mysql-unauthenticated-user-login/" rel="next" title="mysql unauthenticated user login">
+                <i class="fa fa-chevron-left"></i> mysql unauthenticated user login
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars1.githubusercontent.com/u/6995166?s=400&u=7ec51c88d4058afe78bd6e5d1c32da816dd7413c&v=4" alt="bbbht">
+            
+              <p class="site-author-name" itemprop="name">bbbht</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">50</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/bbbht" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:plateau.loess@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一些使用栗子"><span class="nav-number">1.</span> <span class="nav-text">一些使用栗子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#查询具体库-表的索引使用情况"><span class="nav-number">1.1.</span> <span class="nav-text">查询具体库/表的索引使用情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#反映表的读写压力"><span class="nav-number">1.2.</span> <span class="nav-text">反映表的读写压力</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#反映文件的延迟"><span class="nav-number">1.3.</span> <span class="nav-text">反映文件的延迟</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#table-的读写延迟"><span class="nav-number">1.4.</span> <span class="nav-text">table 的读写延迟</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查看表操作频度"><span class="nav-number">1.5.</span> <span class="nav-text">查看表操作频度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#索引状况"><span class="nav-number">1.6.</span> <span class="nav-text">索引状况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#全表扫描情况"><span class="nav-number">1.7.</span> <span class="nav-text">全表扫描情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#没有使用的index"><span class="nav-number">1.8.</span> <span class="nav-text">没有使用的index</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#糟糕的sql问题摘要"><span class="nav-number">1.9.</span> <span class="nav-text">糟糕的sql问题摘要</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">2.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bbbht</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 本站访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 本站总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://loessplateau.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2019/08/15/mysql-io-index-usage/';
+          this.page.identifier = '2019/08/15/mysql-io-index-usage/';
+          this.page.title = 'mysql的io与索引使用分析';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://loessplateau.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
+
+  
+
+</body>
+</html>
