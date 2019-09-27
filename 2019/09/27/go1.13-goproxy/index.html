@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="go,fmt,">
+  <meta name="keywords" content="go,">
 
 
 
@@ -86,18 +86,18 @@
 
 
 
-<meta name="description" content="发现代码中竟存在大段json数据靠字符串拼接的方式完成，着实尴尬通过修改记录追溯，果然是从一个小数据量逐渐增量的如今出了bug才暴露问题看来’前辈们‘信奉的是又不是不能用.jpg">
-<meta name="keywords" content="go,fmt">
+<meta name="description" content="go更新到了1.13版本，期待已久的goproxy支持私有库特性终于来了一次配置，告别代理">
+<meta name="keywords" content="go">
 <meta property="og:type" content="article">
-<meta property="og:title" content="go fmt.Sprintf字符串占位符输出引号">
-<meta property="og:url" content="http://yoursite.com/2019/02/15/go-fmt-Sprintf-string-qutoes-verbs/index.html">
+<meta property="og:title" content="go1.13 使用 GOPROXY">
+<meta property="og:url" content="http://yoursite.com/2019/09/27/go1.13-goproxy/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
-<meta property="og:description" content="发现代码中竟存在大段json数据靠字符串拼接的方式完成，着实尴尬通过修改记录追溯，果然是从一个小数据量逐渐增量的如今出了bug才暴露问题看来’前辈们‘信奉的是又不是不能用.jpg">
+<meta property="og:description" content="go更新到了1.13版本，期待已久的goproxy支持私有库特性终于来了一次配置，告别代理">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-09-27T07:52:18.677Z">
+<meta property="og:updated_time" content="2019-09-27T07:52:18.693Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="go fmt.Sprintf字符串占位符输出引号">
-<meta name="twitter:description" content="发现代码中竟存在大段json数据靠字符串拼接的方式完成，着实尴尬通过修改记录追溯，果然是从一个小数据量逐渐增量的如今出了bug才暴露问题看来’前辈们‘信奉的是又不是不能用.jpg">
+<meta name="twitter:title" content="go1.13 使用 GOPROXY">
+<meta name="twitter:description" content="go更新到了1.13版本，期待已久的goproxy支持私有库特性终于来了一次配置，告别代理">
 
 
 
@@ -127,14 +127,14 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2019/02/15/go-fmt-Sprintf-string-qutoes-verbs/">
+  <link rel="canonical" href="http://yoursite.com/2019/09/27/go1.13-goproxy/">
 
 
 
 
 
   <meta name="google-site-verification" content="aVUEVKghcpKmqD1MgxttjI8n8mrd1iSrStqvpDlEAdg">
-  <title>go fmt.Sprintf字符串占位符输出引号 | Don't Panic</title>
+  <title>go1.13 使用 GOPROXY | Don't Panic</title>
   
 
 
@@ -300,7 +300,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/15/go-fmt-Sprintf-string-qutoes-verbs/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/27/go1.13-goproxy/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="bbbht">
@@ -317,7 +317,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">go fmt.Sprintf字符串占位符输出引号</h2>
+          <h2 class="post-title" itemprop="name headline">go1.13 使用 GOPROXY</h2>
         
 
         <div class="post-meta">
@@ -329,8 +329,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-02-15T11:59:45+00:00">
-                2019-02-15
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-27T05:49:45+00:00">
+                2019-09-27
               </time>
             
 
@@ -370,8 +370,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2019/02/15/go-fmt-Sprintf-string-qutoes-verbs/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/02/15/go-fmt-Sprintf-string-qutoes-verbs/" itemprop="commentCount"></span>
+                <a href="/2019/09/27/go1.13-goproxy/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/09/27/go1.13-goproxy/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -404,26 +404,19 @@
       
 
       
-        <p>发现代码中竟存在大段json数据靠字符串拼接的方式完成，着实尴尬<br>通过修改记录追溯，果然是从一个小数据量逐渐增量的<br>如今出了bug才暴露问题<br>看来’前辈们‘信奉的是<strong>又不是不能用.jpg</strong></p>
+        <p>go更新到了1.13版本，期待已久的goproxy支持私有库特性终于来了<br>一次配置，告别代理  </p>
 <a id="more"></a>
-<p>有客户反映数据缺失，发现是json格式不规范，数据被直接丢弃，蒸发了<br>之前的json数据是字符串拼接而成，发送给另一个服务，然后解析不了，因为数据中存在未转义的双引号<code>&quot;</code><br>拼接时字符串的占位符是<code>%s</code><br>异常数据的生成过程形如<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">name := <span class="string">`老"三'家`</span></span><br><span class="line">postData := fmt.Sprintf(<span class="string">"&#123;\"name\":\"%s\"&#125;"</span>, name)</span><br></pre></td></tr></table></figure></p>
-<p>fmt.Sprintf的部分占位符使用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">%s 	直接输出原始字符串</span><br><span class="line">%q 	字符串由双引号包裹，字符串中的双引号会带转义符</span><br><span class="line">%#q	字符串由反引号包裹，如果字符串内有反引号，则用双引号包裹</span><br></pre></td></tr></table></figure></p>
-<p>示例</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> input <span class="keyword">string</span></span><br><span class="line">	fmt.Scanln(&amp;input)</span><br><span class="line">	fmt.Printf(<span class="string">"%s\n"</span>, input)</span><br><span class="line">	fmt.Printf(<span class="string">"%q\n"</span>, input)</span><br><span class="line">	fmt.Printf(<span class="string">"%#q\n"</span>, input)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>运行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ go run main.go</span><br><span class="line">&quot;&apos;	// input</span><br><span class="line">&quot;&apos;</span><br><span class="line">&quot;\&quot;&apos;&quot;</span><br><span class="line">`&quot;&apos;`</span><br><span class="line"></span><br><span class="line">$ go run main.go</span><br><span class="line">`&quot;&apos;`	// input</span><br><span class="line">`&quot;&apos;`</span><br><span class="line">&quot;`\&quot;&apos;`&quot;</span><br><span class="line">&quot;`\&quot;&apos;`&quot;</span><br></pre></td></tr></table></figure></p>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><ol>
-<li>入库数据未转义，直接使用用户输入的数据是个致命伤</li>
-<li>编码不规范，json数据靠字符串拼接，除了引号，还有花括号等问题会被暴露，只是时间问题</li>
-<li>数据解析错误没有记录日志</li>
-</ol>
-<p>编码不规范，程序泪两行。。。</p>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>使用<code>%q</code>做占位符只是治标不治本，这个场景不合适  </p>
-<ol>
-<li>不能信任用户输入，包括第三方接口提供</li>
-<li>编码要规范，应通过对<code>map struct</code>或其它自定义类型，调用<code>json.Marshal</code>或自定义序列化方法来实现json输出</li>
-</ol>
-<p>历史遗留的这些安全问题，目前还是通过解决暴露的bug来排雷，牵涉面还很广，十分尴尬的境地</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://golang.org/pkg/fmt/" target="_blank" rel="noopener">Package fmt</a></p>
+<h2 id="安装、升级GO"><a href="#安装、升级GO" class="headerlink" title="安装、升级GO"></a>安装、升级GO</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo add-apt-repository ppa:longsleep/golang-backports</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install golang-go</span><br></pre></td></tr></table></figure>
+<p>安装完后检查版本<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">go versino</span><br><span class="line">go version go1.12.7 linux/amd64</span><br></pre></td></tr></table></figure></p>
+<p>好像是之前手动安装造成的，修改下PATH<br>同时要修改GOROOT，GOTOOLDIR，不修改的话，会造成<code>missing dot in first path element</code>的报错问题<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">go version</span><br><span class="line">go version go1.13 linux/amd64</span><br></pre></td></tr></table></figure></p>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>执行<code>go env</code>，会发多了几个配置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">GOPROXY=&quot;https://proxy.golang.org,direct&quot;</span><br><span class="line">GOSUMDB=&quot;sum.golang.org&quot;</span><br><span class="line">GOPRIVATE=&quot;&quot;</span><br><span class="line">GONOSUMDB=&quot;&quot;</span><br><span class="line">GONOPROXY=&quot;&quot;</span><br></pre></td></tr></table></figure></p>
+<h3 id="GOPROXY"><a href="#GOPROXY" class="headerlink" title="GOPROXY"></a>GOPROXY</h3><p>有了默认值，不过并不能用。。。<br>设置可用的GOPROXY<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go env -w GOPROXY=https://goproxy.cn,direct</span><br></pre></td></tr></table></figure></p>
+<p><code>goproxy.cn</code>是七牛维护的，很稳定<br><code>direct</code>是此版本新增的，作用是在拉取仓库遇到<code>404</code>时，直接拉取源代码，比如私有仓库  </p>
+<h3 id="GONOPROXY"><a href="#GONOPROXY" class="headerlink" title="GONOPROXY"></a>GONOPROXY</h3><p>用来配置哪些module path下的模块需要忽略<code>GOPROXY</code>，直接回源拉取<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go env -w GONOPROXY=<span class="string">"*.abc.com,*.def.com"</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="GOSUMDB"><a href="#GOSUMDB" class="headerlink" title="GOSUMDB"></a>GOSUMDB</h3><p>用来防止从公共模块代理中抓取的模块被篡改<br>其原理是通过制定一个可信任的模块校验和数据库地址，当从公共模块代理中抓取模块之后，对其进行hash校验<br>校验结果一致则认为没有被篡改</p>
+<h3 id="GONOSUMDB"><a href="#GONOSUMDB" class="headerlink" title="GONOSUMDB"></a>GONOSUMDB</h3><p>同<code>GONOPROXY</code>,用来配置忽略校验制定module path下的模块</p>
+<h3 id="GOPRIVATE"><a href="#GOPRIVATE" class="headerlink" title="GOPRIVATE"></a>GOPRIVATE</h3><p>设置私有仓库地址<br>它的作用相当于同时设置<code>GONOPROXY</code>和<code>GONOSUMDB</code><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go env -w GOPRIVATE=<span class="string">"*.abc.com,*.def.com"</span></span><br></pre></td></tr></table></figure></p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://github.com/goproxy/goproxy.cn" target="_blank" rel="noopener">goproxy.cn</a><br><a href="http://docs.studygolang.com/doc/go1.13" target="_blank" rel="noopener">go1.13</a></p>
 
       
     </div>
@@ -443,8 +436,6 @@
           
             <a href="/tags/go/" rel="tag"># go</a>
           
-            <a href="/tags/fmt/" rel="tag"># fmt</a>
-          
         </div>
       
 
@@ -456,8 +447,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/02/12/go-labels-with-continue-break-goto/" rel="next" title="go循环控制（break label，continue label，goto label）">
-                <i class="fa fa-chevron-left"></i> go循环控制（break label，continue label，goto label）
+              <a href="/2019/09/11/php-is-LAN-ip/" rel="next" title="PHP判断是否为局域网IP">
+                <i class="fa fa-chevron-left"></i> PHP判断是否为局域网IP
               </a>
             
           </div>
@@ -465,10 +456,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/02/24/go-redis-can-t-marshal-xxx-implement-encoding-BinaryMarshaler/" rel="prev" title="go redis can't marshal xxx (implement encoding.BinaryMarshaler)">
-                go redis can't marshal xxx (implement encoding.BinaryMarshaler) <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -628,7 +615,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原因"><span class="nav-number">1.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方法"><span class="nav-number">2.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">3.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装、升级GO"><span class="nav-number">1.</span> <span class="nav-text">安装、升级GO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置"><span class="nav-number">2.</span> <span class="nav-text">配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GOPROXY"><span class="nav-number">2.1.</span> <span class="nav-text">GOPROXY</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GONOPROXY"><span class="nav-number">2.2.</span> <span class="nav-text">GONOPROXY</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GOSUMDB"><span class="nav-number">2.3.</span> <span class="nav-text">GOSUMDB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GONOSUMDB"><span class="nav-number">2.4.</span> <span class="nav-text">GONOSUMDB</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GOPRIVATE"><span class="nav-number">2.5.</span> <span class="nav-text">GOPRIVATE</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">3.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
             
 
           </div>
@@ -811,9 +798,9 @@
     
       <script type="text/javascript">
         var disqus_config = function () {
-          this.page.url = 'http://yoursite.com/2019/02/15/go-fmt-Sprintf-string-qutoes-verbs/';
-          this.page.identifier = '2019/02/15/go-fmt-Sprintf-string-qutoes-verbs/';
-          this.page.title = 'go fmt.Sprintf字符串占位符输出引号';
+          this.page.url = 'http://yoursite.com/2019/09/27/go1.13-goproxy/';
+          this.page.identifier = '2019/09/27/go1.13-goproxy/';
+          this.page.title = 'go1.13 使用 GOPROXY';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://loessplateau.disqus.com/embed.js';
