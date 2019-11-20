@@ -1,13 +1,14 @@
 ---
-title: 设置cookie时的domain配置
+title: 设置cookie时的domain与path配置
 date: 2018-07-16 14:39:50
 tags: cookie
 categories: web
 ---
 
 虽然cookie用了很多年，从第一次面试就有cookie和session的区别相关的问题  
-但是，今天却又在cookie上栽了个跟头——cookie注销失败
-而原因则是domain导致的，所以把domain的相关内容再记录下
+但是，今天却又在cookie上栽了个跟头——cookie注销失败  
+而原因则是domain导致    
+以此为契机，把cookie的path、domain属性重新了解记录下
 <!-- more -->
 
 ## 原因
@@ -70,10 +71,26 @@ setcookie('xyz', 'xyz', 0, '/');
 ## 解决方法
 > 无谓的设置cookie只会产生安全隐患以及带宽压力
 
-
 无法注销的原因就在于删除cookie时未指定domain，而设置时指定了domain  
 虽然字面上是用一个域名，但并不能操作成功  
 设置与修改、删除时的参数保持一致即可解决问题
+
+## path与domain
+只有name，path、domain都相等时，才被认为是同一个cookie  
+如果两个cookie的name相同，path不同，那么两个cookie将同时存在，且满足条件时，将同时发送两个cookie  
+由此，将出现请求header中携带两个甚至多个同名cookie的问题，服务端取值时将出现混乱  
+所以设置cookie时一定要明确指定path，否则会有意想不到的问题发生，不同语言、浏览器可能对默认path设置行为并不相同  
+
+### path
+path表示cookie所在的目录，指定一个 URL 路径，这个路径必须出现在要请求的资源的路径中才可以发送 Cookie  
+如果设置了path为`/`的cookie1，又设置了path为`/a`的cookie2，path为`/a/b`的cookie3  
+当访问`www.example.com`时，将带上cookie1  
+当访问`www.example.com/a`时，将带上cookie1、cookie2
+当访问`www.example.com/a/b`时，将带上cookie1、cookie2、cookie3
+当访问`www.example.com/a/b/c`时，将带上cookie1、cookie2、cookie3
+
+### domain
+domain表示的是cookie所在的域，假如没有指定，那么默认值为当前文档访问地址中的主机部分（但是不包含子域名）
 
 ## 参考链接
 [setcookie manual](http://php.net/manual/zh/function.setcookie.php)
