@@ -12,30 +12,40 @@ demo为hexo开发环境，与上次的版本比较，在使用上有了很大的
 <!-- more -->
 
 ### Dockerfile
+为了调试，RUN分了很多步
 ```dockerfile
-FROM node:6-alpine
+FROM node:lts-alpine
 MAINTAINER bbbht <plateau.loess@gmail.com>
 WORKDIR /hexo
 ENV LANG C.UTF-8
+VOLUME [ "/sys/fs/cgroup" ]
 
-RUN apk update && \
+COPY hexo /hexo
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories && \
+    apk update && \
     apk add --no-cache openrc openssh git tzdata && \
-    rc-update add sshd && \
-    rc-status && \
-    touch /run/openrc/softlevel && \
     echo -e root:root | chpasswd && \
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone && \
-    npm install hexo-cli -g --no-optional && \
-    echo "PermitRootLogin yes" >> /etc/ssh/sshd_config && \
-    git clone https://github.com/bbbht/bbbht.github.io.git --branch hexo /hexo && \
-    cd /hexo && \
     git config user.name bbbht && \
     git config user.email plateau.loess@gmail.com && \
-    git config core.fileMode false && \
+    git config core.fileMode false
+
+RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config && \
+	mkdir /run/openrc/ && \
+	touch /run/openrc/softlevel && \
+	rc-update add sshd && \
+    rc-status && \
+    /etc/init.d/sshd start
+
+RUN npm install hexo-cli -g --no-optional && \
+	npm set registry https://registry.npmjs.org/ && \
     npm install --no-optional --no-bin-links && \
     rm -rf /var/cache/apk/* /tmp/*
-    
+
+RUN hexo version
+
 # 注意命令执行顺序
 CMD rc-service sshd restart && hexo s
 ```
@@ -51,6 +61,20 @@ docker build -t hexo:alpine .
 # 运行容器，不指定CMD命令，使用Dockerfile中的默认命令，启动sshd及hexo
 docker run -d --name hexo-server -p 4000:4000 -p 4022:22 hexo:alpine
 ```
+#### 遇到的问题
+github的项目都是使用ssh的方式访问，迁移新电脑后，sshkey都复制了，所以要使用ssh方式替换https
+```sh
+git remote set-url origin git@github.com:<username>/<project name>.git
+```
+然后，报错了
+> Host key verification failed.
+> fatal: Could not read from remote repository.
+
+需要重新将github加入信任域名
+```
+ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+```
+之后就没问题来了
 
 ### 配置sftp插件
 安装插件
@@ -60,11 +84,11 @@ docker run -d --name hexo-server -p 4000:4000 -p 4022:22 hexo:alpine
 ```json
 {
     "protocol": "sftp",
-    "host": "192.168.3.144",
+    "host": "192.168.3.1",
     "username": "root",
     "password": "root",
     "port": 4022,
-    "uploadOnSave": false,
+    "uploadOnSave": true,
     "downloadOnOpen": false,
     "watcher": {
         "files": "**/*",
