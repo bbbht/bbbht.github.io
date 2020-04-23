@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="go,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Go中使用json很多，玩法也很多，整理了一下go中关于json的tag使用包含了一些遇到的问题与解决方案">
+<meta name="keywords" content="go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go的json与tag">
+<meta property="og:url" content="http://yoursite.com/2020/04/23/go-tag/index.html">
+<meta property="og:site_name" content="Don&#39;t Panic">
+<meta property="og:description" content="Go中使用json很多，玩法也很多，整理了一下go中关于json的tag使用包含了一些遇到的问题与解决方案">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-04-23T12:04:55.273Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="go的json与tag">
+<meta name="twitter:description" content="Go中使用json很多，玩法也很多，整理了一下go中关于json的tag使用包含了一些遇到的问题与解决方案">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/04/23/go-tag/">
+
+
+
+
+
+  <meta name="google-site-verification" content="aVUEVKghcpKmqD1MgxttjI8n8mrd1iSrStqvpDlEAdg">
+  <title>go的json与tag | Don't Panic</title>
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-116292975-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?a42c6bb7f27c4efdbc6c2deba01acaba";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Don't Panic</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Try Again</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-issues">
+          <a href="/issues/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            issues
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/23/go-tag/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="bbbht">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars1.githubusercontent.com/u/6995166?s=400&u=7ec51c88d4058afe78bd6e5d1c32da816dd7413c&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Don't Panic">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">go的json与tag</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-23T11:52:12+00:00">
+                2020-04-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/go/" itemprop="url" rel="index">
+                    <span itemprop="name">go</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/04/23/go-tag/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/04/23/go-tag/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Go中使用json很多，玩法也很多，整理了一下go中关于json的tag使用<br>包含了一些遇到的问题与解决方案</p>
+<a id="more"></a>
+<blockquote>
+<p>A field declaration may be followed by an optional string literal tag, which becomes an attribute for all the fields in the corresponding field declaration. The tags are made visible through a reflection interface but are otherwise ignored.</p>
+</blockquote>
+<p>官方的解释是这个标签信息可以通过反射获取，自定义一些规则，比如常见的<code>db json</code><br>Tag是一个以反引号 <code>`</code>包围， 空格分隔的 <code>k:v</code> 对，常用于数据解析，关系映射等</p>
+<p>Go中数据类型与Json支持的类型对应关系<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">bool, for JSON booleans</span><br><span class="line">float64, for JSON numbers</span><br><span class="line">string, for JSON strings</span><br><span class="line">[]interface&#123;&#125;, for JSON arrays</span><br><span class="line">map[string]interface&#123;&#125;, for JSON objects</span><br><span class="line">nil for JSON null</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"encoding/json"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"time"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	Age      <span class="keyword">uint8</span>     <span class="string">`json:"age"`</span></span><br><span class="line">	Name     <span class="keyword">string</span>    <span class="string">`json:"name"`</span></span><br><span class="line">	Address  <span class="keyword">string</span>    <span class="string">`json:"address,omitempty"`</span></span><br><span class="line">	Phone    []<span class="keyword">string</span>  <span class="string">`json:"phone"`</span></span><br><span class="line">	Skill    []<span class="keyword">string</span>  <span class="string">`json:"skill"`</span></span><br><span class="line">	Birthday time.Time <span class="string">`json:"birthday,omitempty"`</span></span><br><span class="line">	Password <span class="keyword">string</span>    <span class="string">`json:"-"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    l,_ := time.LoadLocation(<span class="string">"Asia/Shanghai"</span>)</span><br><span class="line">	birthday := time.Date(<span class="number">2000</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">10</span>, <span class="number">8</span>, <span class="number">0</span>, <span class="number">0</span>, l)</span><br><span class="line">	someOne := User&#123;</span><br><span class="line">		Age:      <span class="number">20</span>,</span><br><span class="line">		Name:     <span class="string">"老王"</span>,</span><br><span class="line">		Address:  <span class="string">""</span>,</span><br><span class="line">		Skill:    []<span class="keyword">string</span>&#123;&#125;,</span><br><span class="line">		Phone:    []<span class="keyword">string</span>&#123;<span class="string">"18888888888"</span>,<span class="string">"15555555555"</span>&#125;,</span><br><span class="line">		Birthday: birthday,</span><br><span class="line">		Password: <span class="string">"admin123"</span>,</span><br><span class="line">	&#125;</span><br><span class="line">	b, err := json.Marshal(someOne)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">"json.Marshal failed, err:%v\n"</span>, err)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">"%s\n"</span>, b)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="指定json字段名"><a href="#指定json字段名" class="headerlink" title="指定json字段名"></a>指定json字段名</h3><p><code>User</code>结构体中，<code>json</code>标签指定了它的输出字段名，执行将输出<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">"age"</span>:<span class="number">20</span>,<span class="attr">"name"</span>:<span class="string">"老王"</span>,<span class="attr">"phone"</span>:[<span class="string">"18888888888"</span>,<span class="string">"15555555555"</span>],<span class="attr">"skill"</span>:<span class="literal">null</span>,<span class="attr">"birthday"</span>:<span class="string">"2000-01-01T10:08:00+08:00"</span>&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="输出了null"><a href="#输出了null" class="headerlink" title="输出了null"></a>输出了null</h3><p>切片、map、等零值为<code>nil</code>，对应json的值为null<br>如果要输出<code>[]</code>则要赋值为空切片<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// someOne赋值为</span></span><br><span class="line">someOne := User&#123;</span><br><span class="line">		Age:      <span class="number">20</span>,</span><br><span class="line">		Name:     <span class="string">"老王"</span>,</span><br><span class="line">		Address:  <span class="string">""</span>,</span><br><span class="line">		Skill:    []<span class="keyword">string</span>&#123;&#125;,</span><br><span class="line">		Phone:    []<span class="keyword">string</span>&#123;<span class="string">"18888888888"</span>,<span class="string">"15555555555"</span>&#125;,</span><br><span class="line">		Birthday: birthday,</span><br><span class="line">		Password: <span class="string">"admin123"</span>,</span><br><span class="line">	&#125;</span><br><span class="line"><span class="comment">// 对应的输出</span></span><br><span class="line">&#123;<span class="string">"age"</span>:<span class="number">20</span>,<span class="string">"name"</span>:<span class="string">"老王"</span>,<span class="string">"skill"</span>:[],<span class="string">"phone"</span>:[<span class="string">"18888888888"</span>,<span class="string">"15555555555"</span>],<span class="string">"birthday"</span>:<span class="string">"2000-01-01T10:08:00+08:00"</span>&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>要注意的是空map对应的json输出为 <strong>{}</strong> 而非 []</p>
+</blockquote>
+<h3 id="忽略零值字段"><a href="#忽略零值字段" class="headerlink" title="忽略零值字段"></a>忽略零值字段</h3><p>通过设置tag添加<code>omitempty</code>，当字段值为其类型对应的零值时，可达到忽略零值字段的目的。<br>在输出结果中<code>Address</code>被设置为空字符串，也未被输出，因为<code>string</code>类型的零值即为<code>&quot;&quot;</code></p>
+<h3 id="忽略指定字段"><a href="#忽略指定字段" class="headerlink" title="忽略指定字段"></a>忽略指定字段</h3><p><code>User</code>结构体中<code>Password</code>的tag被指定为<code>-</code>所以，即便被设置了具体的值，在json中也未被输出</p>
+<h3 id="结构体嵌套输出"><a href="#结构体嵌套输出" class="headerlink" title="结构体嵌套输出"></a>结构体嵌套输出</h3><p>比如将用户的技能和新增的个人主页地址，并将一些展示信息独立为<code>Profile</code>结构<br>​<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Profile <span class="keyword">struct</span> &#123;</span><br><span class="line">    Phone    []<span class="keyword">string</span>  <span class="string">`json:"phone,omitempty"`</span></span><br><span class="line">    Skill    []<span class="keyword">string</span>  <span class="string">`json:"skill,omitempty"`</span></span><br><span class="line">    Birthday time.Time <span class="string">`json:"birthday,omitempty"`</span></span><br><span class="line">    HomePage <span class="keyword">string</span>    <span class="string">`json:"url"`</span></span><br><span class="line">    Address  <span class="keyword">string</span>    <span class="string">`json:"address,omitempty"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">    Profile</span><br><span class="line"></span><br><span class="line">	Age      <span class="keyword">uint8</span>     <span class="string">`json:"age"`</span></span><br><span class="line">	Name     <span class="keyword">string</span>    <span class="string">`json:"name"`</span></span><br><span class="line">	Password <span class="keyword">string</span>    <span class="string">`json:"-"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// someOne 赋值为</span></span><br><span class="line">someOne := User&#123;</span><br><span class="line">    Profile: Profile&#123;</span><br><span class="line">        Skill: []<span class="keyword">string</span>&#123;<span class="string">"吃"</span>,<span class="string">"喝"</span>,<span class="string">"玩"</span>,<span class="string">"乐"</span>&#125;,</span><br><span class="line">        Birthday: birthday,</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    Age:      <span class="number">20</span>,</span><br><span class="line">    Name:     <span class="string">"老王"</span>,</span><br><span class="line">    Password: <span class="string">"admin123"</span>,</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 对应输出为</span></span><br><span class="line">&#123;<span class="string">"skill"</span>:[<span class="string">"吃"</span>,<span class="string">"喝"</span>,<span class="string">"玩"</span>,<span class="string">"乐"</span>],<span class="string">"birthday"</span>:<span class="string">"2000-01-01T10:08:00+08:00"</span>,<span class="string">"url"</span>:<span class="string">""</span>,<span class="string">"age"</span>:<span class="number">20</span>,<span class="string">"name"</span>:<span class="string">"老王"</span>&#125;</span><br></pre></td></tr></table></figure></p>
+<p>由于是匿名嵌套，所以<code>Profile</code>中的字段与<code>User</code>同级输出</p>
+<h4 id="层级输出"><a href="#层级输出" class="headerlink" title="层级输出"></a>层级输出</h4><p>修改定义<br>​<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">    Profile <span class="string">`json:"profile"`</span></span><br><span class="line"></span><br><span class="line">	Age      <span class="keyword">uint8</span>     <span class="string">`json:"age"`</span></span><br><span class="line">	Name     <span class="keyword">string</span>    <span class="string">`json:"name"`</span></span><br><span class="line">	Password <span class="keyword">string</span>    <span class="string">`json:"-"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>输出为<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">"profile"</span>:&#123;<span class="attr">"skill"</span>:[<span class="string">"吃"</span>,<span class="string">"喝"</span>,<span class="string">"玩"</span>,<span class="string">"乐"</span>],<span class="attr">"birthday"</span>:<span class="string">"2000-01-01T10:08:00+08:00"</span>,<span class="attr">"url"</span>:<span class="string">""</span>&#125;,<span class="attr">"age"</span>:<span class="number">20</span>,<span class="attr">"name"</span>:<span class="string">"老王"</span>&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="忽略嵌套结构体"><a href="#忽略嵌套结构体" class="headerlink" title="忽略嵌套结构体"></a>忽略嵌套结构体</h4><p>仅设置<code>omitempty</code>是无法屏蔽嵌套字段的输出的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">type User struct &#123;</span><br><span class="line">    Profile `json:&quot;profile,omitempty&quot;`</span><br><span class="line"></span><br><span class="line">	Age      uint8     `json:&quot;age&quot;`</span><br><span class="line">	Name     string    `json:&quot;name&quot;`</span><br><span class="line">	Password string    `json:&quot;-&quot;`</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>输出为<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">"profile"</span>:&#123;<span class="attr">"birthday"</span>:<span class="string">"0001-01-01T00:00:00Z"</span>,<span class="attr">"url"</span>:<span class="string">""</span>&#125;,<span class="attr">"age"</span>:<span class="number">20</span>,<span class="attr">"name"</span>:<span class="string">"老王"</span>&#125;</span><br></pre></td></tr></table></figure></p>
+<p>解决方案为使用嵌套结构体指针<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">    *Profile <span class="string">`json:"profile,omitempty"`</span></span><br><span class="line"></span><br><span class="line">	Age      <span class="keyword">uint8</span>     <span class="string">`json:"age"`</span></span><br><span class="line">	Name     <span class="keyword">string</span>    <span class="string">`json:"name"`</span></span><br><span class="line">	Password <span class="keyword">string</span>    <span class="string">`json:"-"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>输出为<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">"age"</span>:<span class="number">20</span>,<span class="attr">"name"</span>:<span class="string">"老王"</span>&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="忽略字段输出（不修改原结构体）"><a href="#忽略字段输出（不修改原结构体）" class="headerlink" title="忽略字段输出（不修改原结构体）"></a>忽略字段输出（不修改原结构体）</h3><p>比如要忽略<code>Name</code>输出，利用的是定义相同json tag来完成<br>可使用任意类型，空struct有利于节省内存及统一<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Omit *<span class="keyword">struct</span>&#123;&#125;</span><br><span class="line"><span class="keyword">type</span> JsonUser <span class="keyword">struct</span> &#123;</span><br><span class="line">	*User</span><br><span class="line">	Name Omit <span class="string">`json:"name,omitempty"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>临时使用的话，一个匿名结构体也可以</p>
+<h3 id="json-RawMessage-延迟解析"><a href="#json-RawMessage-延迟解析" class="headerlink" title="json.RawMessage 延迟解析"></a>json.RawMessage 延迟解析</h3><p>可通过一个结构体灵活匹配多种类型定义<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> MultiType <span class="keyword">struct</span> &#123;</span><br><span class="line">	Type <span class="keyword">string</span> <span class="string">`json:"type"`</span></span><br><span class="line">	Data json.RawMessage <span class="string">`json:"data"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以通过先匹配type再对应解析数据，如<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">"type"</span>:<span class="string">"array"</span>,</span><br><span class="line">	<span class="attr">"data"</span>: [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>]</span><br><span class="line">&#125;</span><br><span class="line">&#123;</span><br><span class="line">	<span class="attr">"type"</span>:<span class="string">"string"</span>,</span><br><span class="line">	<span class="attr">"data"</span>: <span class="string">"any"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="json传递数字"><a href="#json传递数字" class="headerlink" title="json传递数字"></a>json传递数字</h3><p>json的数字，对应的是go的float64类型<br>这就意味着只有显示的指定字段类型，go才会将数字转换，所以如果超出float64范围的数字，就需要特殊处理<br>另外，如果字段定义为数字类型，<code>int int8</code>等，但入参为字符串<code>&quot;42&quot;</code>这种，会解析错误<br>以上问题可通过使用<code>json.Number</code>类型解决，见参考链接<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	Age      json.Number     <span class="string">`json:"age"`</span></span><br><span class="line">	Name     <span class="keyword">string</span>          <span class="string">`json:"name"`</span></span><br><span class="line">	Password <span class="keyword">string</span>          <span class="string">`json:"-"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果确定入参类型只为字符串类型数字，也可通过tag中指定类型来解决  </p>
+<blockquote>
+<p>通过这种定义，输出的数字也将是字符串类型</p>
+</blockquote>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	Age      <span class="keyword">uint8</span>     <span class="string">`json:"age,string"`</span></span><br><span class="line">	Name     <span class="keyword">string</span>    <span class="string">`json:"name"`</span></span><br><span class="line">	Password <span class="keyword">string</span>    <span class="string">`json:"-"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="自定义规则"><a href="#自定义规则" class="headerlink" title="自定义规则"></a>自定义规则</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Marshaler <span class="keyword">interface</span> &#123;</span><br><span class="line">    MarshalJSON() ([]<span class="keyword">byte</span>, error)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">type</span> Unmarshaler <span class="keyword">interface</span> &#123;</span><br><span class="line">    UnmarshalJSON([]<span class="keyword">byte</span>) error</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过实现以上两个接口，达到自定义json格式或解析的目的<br>比如修改time的输出格式以及兼容各种格式的时间字符串解析，时间戳的转换等<br>扩展类型的方式或者内嵌方式<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> CustomTime <span class="keyword">struct</span> &#123;</span><br><span class="line">    time.Time</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// MarshalJSON 输出常用的时间格式</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t CustomTime)</span> <span class="title">MarshalJSON</span><span class="params">()</span> <span class="params">([]<span class="keyword">byte</span>, error)</span></span> &#123;</span><br><span class="line">    tune := t.Format(<span class="string">`"2006-01-02 15:04:05"`</span>)</span><br><span class="line">    <span class="keyword">return</span> []<span class="keyword">byte</span>(tune), <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://golang.org/ref/spec#The_zero_value" target="_blank" rel="noopener">Go 零值定义</a><br><a href="https://golang.org/pkg/encoding/json/#Number" target="_blank" rel="noopener">json.Number</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/go/" rel="tag"># go</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/10/docker-ce-ubuntu18-install-uninstall/" rel="next" title="Ubuntu18.04中安装及彻底卸载Docker-CE">
+                <i class="fa fa-chevron-left"></i> Ubuntu18.04中安装及彻底卸载Docker-CE
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars1.githubusercontent.com/u/6995166?s=400&u=7ec51c88d4058afe78bd6e5d1c32da816dd7413c&v=4" alt="bbbht">
+            
+              <p class="site-author-name" itemprop="name">bbbht</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">55</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/bbbht" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:plateau.loess@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#指定json字段名"><span class="nav-number">1.</span> <span class="nav-text">指定json字段名</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#输出了null"><span class="nav-number">2.</span> <span class="nav-text">输出了null</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#忽略零值字段"><span class="nav-number">3.</span> <span class="nav-text">忽略零值字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#忽略指定字段"><span class="nav-number">4.</span> <span class="nav-text">忽略指定字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结构体嵌套输出"><span class="nav-number">5.</span> <span class="nav-text">结构体嵌套输出</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#层级输出"><span class="nav-number">5.1.</span> <span class="nav-text">层级输出</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#忽略嵌套结构体"><span class="nav-number">5.2.</span> <span class="nav-text">忽略嵌套结构体</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#忽略字段输出（不修改原结构体）"><span class="nav-number">6.</span> <span class="nav-text">忽略字段输出（不修改原结构体）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#json-RawMessage-延迟解析"><span class="nav-number">7.</span> <span class="nav-text">json.RawMessage 延迟解析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#json传递数字"><span class="nav-number">8.</span> <span class="nav-text">json传递数字</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义规则"><span class="nav-number">9.</span> <span class="nav-text">自定义规则</span></a></li></ol><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number"></span> <span class="nav-text">参考</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bbbht</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 本站访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 本站总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://loessplateau.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2020/04/23/go-tag/';
+          this.page.identifier = '2020/04/23/go-tag/';
+          this.page.title = 'go的json与tag';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://loessplateau.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
+
+  
+
+</body>
+</html>
