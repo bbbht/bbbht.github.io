@@ -12,7 +12,6 @@ demo为hexo开发环境，与上次的版本比较，在使用上有了很大的
 <!-- more -->
 
 ### Dockerfile
-为了调试，RUN分了很多步
 ```dockerfile
 FROM node:lts-alpine
 MAINTAINER bbbht <plateau.loess@gmail.com>
@@ -61,20 +60,6 @@ docker build -t hexo:alpine .
 # 运行容器，不指定CMD命令，使用Dockerfile中的默认命令，启动sshd及hexo
 docker run -d --name hexo-server -p 4000:4000 -p 4022:22 hexo:alpine
 ```
-#### 遇到的问题
-github的项目都是使用ssh的方式访问，迁移新电脑后，sshkey都复制了，所以要使用ssh方式替换https
-```sh
-git remote set-url origin git@github.com:<username>/<project name>.git
-```
-然后，报错了
-> Host key verification failed.
-> fatal: Could not read from remote repository.
-
-需要重新将github加入信任域名
-```
-ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-```
-之后就没问题来了
 
 ### 配置sftp插件
 安装插件
@@ -84,11 +69,11 @@ ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 ```json
 {
     "protocol": "sftp",
-    "host": "192.168.3.1",
+    "host": "192.168.3.144",
     "username": "root",
     "password": "root",
     "port": 4022,
-    "uploadOnSave": true,
+    "uploadOnSave": false,
     "downloadOnOpen": false,
     "watcher": {
         "files": "**/*",
