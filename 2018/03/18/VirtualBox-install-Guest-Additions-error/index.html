@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="Don&#39;t Panic">
 <meta property="og:description" content="因为想要在主机和虚拟机之间共享目录，所以要安装增强功能但是直接点击 设备-&amp;gt;安装增强功能 的操作是失败的失败提示未能加载虚拟光盘 … vboxguestadditions.iso …使用的环境如下：  virtubox：版本 5.2.8 虚拟机：Ubuntu server 14.04 主机系统：win10 版本1079  最终是通过虚拟机内直接安装来解决">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-04-09T08:15:53.119Z">
+<meta property="og:updated_time" content="2020-04-23T09:26:36.404Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="VirtualBox使用共享目录及安装增强功能失败的解决方案">
 <meta name="twitter:description" content="因为想要在主机和虚拟机之间共享目录，所以要安装增强功能但是直接点击 设备-&amp;gt;安装增强功能 的操作是失败的失败提示未能加载虚拟光盘 … vboxguestadditions.iso …使用的环境如下：  virtubox：版本 5.2.8 虚拟机：Ubuntu server 14.04 主机系统：win10 版本1079  最终是通过虚拟机内直接安装来解决">
@@ -418,7 +418,7 @@
 <li>iso文件损坏</li>
 <li>虚拟机是server版本而非desktop</li>
 </ul>
-<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p>虚拟机内手动安装<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install virtualbox-guest-dkms</span><br></pre></td></tr></table></figure></p>
+<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p>虚拟机内手动安装<br>在对应的虚拟机-&gt;设置-&gt;存储-&gt;控制器IDE 中加载VBox自带的增强文件，在安装路径下<code>C:\Program Files\Oracle\VirtualBox\VBoxGuestAdditions.iso</code><br>然后打开虚拟机<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo mkdir /media/cdrom</span><br><span class="line">sudo mount /dev/sr0 /media/cdrom</span><br><span class="line"><span class="comment"># reboot</span></span><br><span class="line"><span class="comment"># 进入 /media/cdrom</span></span><br><span class="line"><span class="built_in">cd</span> /media/cdrom</span><br><span class="line">sudo sh ./VBoxLinuxAdditions.run</span><br><span class="line"><span class="comment"># reboot</span></span><br></pre></td></tr></table></figure></p>
 <h2 id="自动挂载共享目录并设置权限"><a href="#自动挂载共享目录并设置权限" class="headerlink" title="自动挂载共享目录并设置权限"></a>自动挂载共享目录并设置权限</h2><p>并没有使用virtualbox的自动挂载功能，只是选择了固定分配</p>
 <h3 id="手动挂载"><a href="#手动挂载" class="headerlink" title="手动挂载"></a>手动挂载</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 目标文件夹需提前创建</span></span><br><span class="line">sudo mount -t vboxsf &lt;共享目录配置的名称&gt; &lt;目标路径&gt;</span><br></pre></td></tr></table></figure>
 <h3 id="自动挂载并设置权限"><a href="#自动挂载并设置权限" class="headerlink" title="自动挂载并设置权限"></a>自动挂载并设置权限</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 修改系统文件</span></span><br><span class="line">sudo vim /etc/rc.local</span><br><span class="line"><span class="comment"># 在最后加入一行</span></span><br><span class="line">mount -o <span class="built_in">umask</span>=002,gid=bbbht,uid=bbbht -t vboxsf &lt;共享目录配置的名称&gt; &lt;目标路径&gt;</span><br></pre></td></tr></table></figure>
@@ -554,7 +554,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">53</span>
+                  <span class="site-state-item-count">54</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
