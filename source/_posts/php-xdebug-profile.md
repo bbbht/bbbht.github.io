@@ -11,7 +11,24 @@ categories: php
 优化虽好，可不能痴迷啊
 <!-- more -->
 
-Xdebug的安装配置无需多言，这次这是在配置中增加了profiler的内容  
+Xdebug的安装配置无需多言，顺便提一下xdebug的使用配置。  
+一般都是通过远程调试的方式使用，配置一般如下
+```ini
+zend_extension=xdebug.so
+xdebug.remote_autostart=1
+xdebug.remote_enable=1
+#xdebug.remote_connect_back=1
+xdebug.remote_host=192.168.3.188
+xdebug.remote_port=9000
+display_errors = On
+html_errors = On
+```
+有个问题就是remote_host是固定的，有的时候使用场景切换，主机换了ip就会造成无法使用  
+所以如果是本地调试，主机IP又经常发生变化，要适应多个IP调试  
+解决方案就是使用remote_connect_back（取消注释）  
+此配置打开后忽略remote_host配置，达到任意主机IP访问均可进行调试的目的  
+
+这次这是在配置中增加了profiler的内容  
 ```ini
 xdebug.profiler_enable = 0
 xdebug.profiler_enable_trigger = 1
