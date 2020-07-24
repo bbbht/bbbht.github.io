@@ -13,29 +13,38 @@ demo为hexo开发环境，与上次的版本比较，在使用上有了很大的
 
 ### Dockerfile
 ```dockerfile
-FROM node:6-alpine
+FROM node:lts-alpine
 MAINTAINER bbbht <plateau.loess@gmail.com>
 WORKDIR /hexo
 ENV LANG C.UTF-8
+VOLUME [ "/sys/fs/cgroup" ]
 
-RUN apk update && \
+COPY hexo /hexo
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories && \
+    apk update && \
     apk add --no-cache openrc openssh git tzdata && \
-    rc-update add sshd && \
-    rc-status && \
-    touch /run/openrc/softlevel && \
     echo -e root:root | chpasswd && \
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo "Asia/Shanghai" > /etc/timezone && \
-    npm install hexo-cli -g --no-optional && \
-    echo "PermitRootLogin yes" >> /etc/ssh/sshd_config && \
-    git clone https://github.com/bbbht/bbbht.github.io.git --branch hexo /hexo && \
-    cd /hexo && \
     git config user.name bbbht && \
     git config user.email plateau.loess@gmail.com && \
-    git config core.fileMode false && \
+    git config core.fileMode false
+
+RUN echo "PermitRootLogin yes" >> /etc/ssh/sshd_config && \
+	mkdir /run/openrc/ && \
+	touch /run/openrc/softlevel && \
+	rc-update add sshd && \
+    rc-status && \
+    /etc/init.d/sshd start
+
+RUN npm install hexo-cli -g --no-optional && \
+	npm set registry https://registry.npmjs.org/ && \
     npm install --no-optional --no-bin-links && \
     rm -rf /var/cache/apk/* /tmp/*
-    
+
+RUN hexo version
+
 # 注意命令执行顺序
 CMD rc-service sshd restart && hexo s
 ```
