@@ -28,9 +28,17 @@ categories: 虚拟机
 
 ### 解决方法
 虚拟机内手动安装
+在对应的虚拟机->设置->存储->控制器IDE 中加载VBox自带的增强文件，在安装路径下`C:\Program Files\Oracle\VirtualBox\VBoxGuestAdditions.iso`  
+然后打开虚拟机
 ```sh
 sudo apt-get update
-sudo apt-get install virtualbox-guest-dkms
+sudo mkdir /media/cdrom
+sudo mount /dev/sr0 /media/cdrom
+# reboot
+# 进入 /media/cdrom
+cd /media/cdrom
+sudo sh ./VBoxLinuxAdditions.run
+# reboot
 ```
 
 ## 自动挂载共享目录并设置权限
