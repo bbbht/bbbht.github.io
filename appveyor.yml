@@ -1,4 +1,4 @@
-clone_depth: 2
+clone_depth: 1
 
 branches:
   only:
@@ -9,7 +9,7 @@ environment:
     secure: 5HxyfAl0UZepf91fiYjqf+lmv088lzREYdpLKKAOlbZw5zleCkh9tVW3lFPWwtVX
 
 install:
-  - ps: Install-Product node
+  - ps: Install-Product node 13.6
   - node --version
   - npm --version
   - npm install
@@ -26,11 +26,12 @@ on_success:
   - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
   - git config --global user.email "%GIT_USER_EMAIL%"
   - git config --global user.name "%GIT_USER_NAME%"
-  - git clone --depth 5 -q --branch=%TARGET_BRANCH% %STATIC_SITE_REPO% %TEMP%\static-site
+  - git clone --depth 1 -q --branch=%TARGET_BRANCH% %STATIC_SITE_REPO% %TEMP%\static-site
   - cd %TEMP%\static-site
   - del * /f /q
   - for /d %%p IN (*) do rmdir "%%p" /s /q
   - SETLOCAL EnableDelayedExpansion & robocopy "%APPVEYOR_BUILD_FOLDER%\public" "%TEMP%\static-site" /e & IF !ERRORLEVEL! EQU 1 (exit 0) ELSE (IF !ERRORLEVEL! EQU 3 (exit 0) ELSE (exit 1))
+  - ls -l
   - git add -A
   - git commit -m "Update Static Site"
   - git push origin %TARGET_BRANCH%
