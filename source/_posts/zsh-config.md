@@ -70,6 +70,7 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 alias ddnone="docker images | grep none | awk '{print \$3}' |xargs docker rmi"
+alias disize="docker images --format '{{.Size}}\t{{.Repository}}\t{{.Tag}}\t{{.ID}}' | sed 's/ //' | sort -h -r | column -t"
 alias hexo="docker exec hexo-server hexo"
 alias glg="git log --graph --date-order --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %C(green)(%cn)%Creset %C(cyan)(%cr)%Creset' --abbrev-commit --date=relative"
 

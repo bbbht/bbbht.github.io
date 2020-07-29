@@ -85,14 +85,22 @@ PHP Warning:  PHP Startup: Unable to load dynamic library '/usr/local/lib/php/ex
 
 ## 安装扩展的Dockfile
 暂时只包含了扩展安装，这也是比较让人头疼的内容了，作为基础镜像，再从下层继续构建完整运行环境  
-当前线上使用7.1，暂时未升级，使用了相同版本
+当前线上使用7.1，暂时未升级，使用了相同版本  
+有个不解，tzdata如果被删除`apk del tzdata`，时区设置就失效，大部分文章内容都是删除的  
 ```dockerfile
 FROM php:7.1.33-fpm-alpine3.10
 
 LABEL MAINTAINER plateau.loess@gmail.com
 LABEL description="基于官方alpine php安装了基础扩展的php-fpm镜像"
 
-ENV TZ "Asia/Shanghai"
+# fix timezone
+ARG TIME_ZONE=Asia/Shanghai
+ENV TZ ${TIME_ZONE}
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
+ && apk add --no-cache tzdata \
+ && cp /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime \
+ && echo "${TIME_ZONE}" > /etc/timezone
 
 # 构建环境依赖项
 ENV PHP_INSTALL_EXT_DEPS \
