@@ -237,10 +237,12 @@ cpu消耗在15%
 
 所以，要合理调整定时器间隔，小间隔考虑其他方案如时间轮等统一处理代替  
 针对协程数量控制及阻塞操作，有更多好的方案可用，如channel、select、sync、、协程池等等  
-而引发`runtime.futex`高占比的原因也就是空间竞争，无论协程还是线程，操作对象总是存在竞争，竞争就会有锁，就有消耗  
+而引发`runtime.futex`高占比的原因也就是空间竞争，详见参考连接  
+无论协程还是线程，操作对象总是存在竞争，竞争就会有锁，就有消耗  
 针对锁竞争，也有各种方案，原则就是小  
 另外，语言工具的升级迭代也要关注，吭哧吭哧的去优化，有时候不如升级带来的提升明显
 
 ## 参考链接
-[谁占了该CPU核的30% - 一个较意外的Go性能问题](https://zhuanlan.zhihu.com/p/45959147)
-[confluent-kafka-go examples](https://github.com/confluentinc/confluent-kafka-go/blob/master/examples/consumer_example/consumer_example.go)
+[谁占了该CPU核的30% - 一个较意外的Go性能问题](https://zhuanlan.zhihu.com/p/45959147)  
+[confluent-kafka-go examples](https://github.com/confluentinc/confluent-kafka-go/blob/master/examples/consumer_example/consumer_example.go)  
+[Linux futex](https://juejin.im/post/6844903688478146574)
