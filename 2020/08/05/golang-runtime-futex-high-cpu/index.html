@@ -97,7 +97,7 @@
 <meta property="og:image" content="http://yoursite.com/images/Snipaste_2020-08-06_14-20-05.png">
 <meta property="og:image" content="http://yoursite.com/images/Snipaste_2020-08-06_15-26-13.png">
 <meta property="og:image" content="http://yoursite.com/images/Snipaste_2020-08-06_15-34-56.png">
-<meta property="og:updated_time" content="2020-08-11T02:01:09.885Z">
+<meta property="og:updated_time" content="2020-08-13T11:16:04.777Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="golang程序profileruntime.futex占用大量 cpu 资源">
 <meta name="twitter:description" content="线上数据库CPU100%，纯粹的查询量过大导致，放下不表但排查过程中，业务系统（Go）运行还正常，于是看了一下pprof的profile和heap、block等数据在profile中发现了异常，runtime.futex占比高达50%，相当异常了">
@@ -1119,8 +1119,8 @@
 </ol>
 </li>
 </ol>
-<p>所以，要合理调整定时器间隔，小间隔考虑其他方案如时间轮等统一处理代替<br>针对协程数量控制及阻塞操作，有更多好的方案可用，如channel、select、sync、、协程池等等<br>而引发<code>runtime.futex</code>高占比的原因也就是空间竞争，无论协程还是线程，操作对象总是存在竞争，竞争就会有锁，就有消耗<br>针对锁竞争，也有各种方案，原则就是小<br>另外，语言工具的升级迭代也要关注，吭哧吭哧的去优化，有时候不如升级带来的提升明显</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://zhuanlan.zhihu.com/p/45959147" target="_blank" rel="noopener">谁占了该CPU核的30% - 一个较意外的Go性能问题</a><br><a href="https://github.com/confluentinc/confluent-kafka-go/blob/master/examples/consumer_example/consumer_example.go" target="_blank" rel="noopener">confluent-kafka-go examples</a></p>
+<p>所以，要合理调整定时器间隔，小间隔考虑其他方案如时间轮等统一处理代替<br>针对协程数量控制及阻塞操作，有更多好的方案可用，如channel、select、sync、、协程池等等<br>而引发<code>runtime.futex</code>高占比的原因也就是空间竞争，详见参考连接<br>无论协程还是线程，操作对象总是存在竞争，竞争就会有锁，就有消耗<br>针对锁竞争，也有各种方案，原则就是小<br>另外，语言工具的升级迭代也要关注，吭哧吭哧的去优化，有时候不如升级带来的提升明显</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://zhuanlan.zhihu.com/p/45959147" target="_blank" rel="noopener">谁占了该CPU核的30% - 一个较意外的Go性能问题</a><br><a href="https://github.com/confluentinc/confluent-kafka-go/blob/master/examples/consumer_example/consumer_example.go" target="_blank" rel="noopener">confluent-kafka-go examples</a><br><a href="https://juejin.im/post/6844903688478146574" target="_blank" rel="noopener">Linux futex</a></p>
 
       
     </div>
@@ -1160,6 +1160,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/13/mysql-query-space/" rel="prev" title="mysql中varchar与char对结尾空格的不同处理逻辑">
+                mysql中varchar与char对结尾空格的不同处理逻辑 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -1248,7 +1252,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">57</span>
+                  <span class="site-state-item-count">58</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

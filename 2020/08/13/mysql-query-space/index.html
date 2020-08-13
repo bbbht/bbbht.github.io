@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="git,">
+  <meta name="keywords" content="mysql,">
 
 
 
@@ -86,18 +86,18 @@
 
 
 
-<meta name="description" content="pull代码的时候突然疯狂aborting12345error: The following untracked working tree files would be overwritten by checkout:        api/origin/abc123ABC.mdPlease move or remove them before you switch branches.Aborti">
-<meta name="keywords" content="git">
+<meta name="description" content="根据某个字段a的条件查询，查询到的结果却验证失败，一切都是空格的错之前已经发生过字符串开头不可见特殊字符引发的类似问题太久不碰到允许存储空格的业务，还是掉坑了">
+<meta name="keywords" content="mysql">
 <meta property="og:type" content="article">
-<meta property="og:title" content="git pull issues - The following untracked working tree files would be overwritten by checkout">
-<meta property="og:url" content="http://yoursite.com/2018/05/30/git-pull-issues/index.html">
+<meta property="og:title" content="mysql中varchar与char对结尾空格的不同处理逻辑">
+<meta property="og:url" content="http://yoursite.com/2020/08/13/mysql-query-space/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
-<meta property="og:description" content="pull代码的时候突然疯狂aborting12345error: The following untracked working tree files would be overwritten by checkout:        api/origin/abc123ABC.mdPlease move or remove them before you switch branches.Aborti">
+<meta property="og:description" content="根据某个字段a的条件查询，查询到的结果却验证失败，一切都是空格的错之前已经发生过字符串开头不可见特殊字符引发的类似问题太久不碰到允许存储空格的业务，还是掉坑了">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2020-08-13T11:16:04.777Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="git pull issues - The following untracked working tree files would be overwritten by checkout">
-<meta name="twitter:description" content="pull代码的时候突然疯狂aborting12345error: The following untracked working tree files would be overwritten by checkout:        api/origin/abc123ABC.mdPlease move or remove them before you switch branches.Aborti">
+<meta name="twitter:title" content="mysql中varchar与char对结尾空格的不同处理逻辑">
+<meta name="twitter:description" content="根据某个字段a的条件查询，查询到的结果却验证失败，一切都是空格的错之前已经发生过字符串开头不可见特殊字符引发的类似问题太久不碰到允许存储空格的业务，还是掉坑了">
 
 
 
@@ -127,14 +127,14 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/05/30/git-pull-issues/">
+  <link rel="canonical" href="http://yoursite.com/2020/08/13/mysql-query-space/">
 
 
 
 
 
   <meta name="google-site-verification" content="aVUEVKghcpKmqD1MgxttjI8n8mrd1iSrStqvpDlEAdg">
-  <title>git pull issues - The following untracked working tree files would be overwritten by checkout | Don't Panic</title>
+  <title>mysql中varchar与char对结尾空格的不同处理逻辑 | Don't Panic</title>
   
 
 
@@ -300,7 +300,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/30/git-pull-issues/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/13/mysql-query-space/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="bbbht">
@@ -317,7 +317,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">git pull issues - The following untracked working tree files would be overwritten by checkout</h2>
+          <h2 class="post-title" itemprop="name headline">mysql中varchar与char对结尾空格的不同处理逻辑</h2>
         
 
         <div class="post-meta">
@@ -329,8 +329,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-30T09:04:20+00:00">
-                2018-05-30
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-13T10:43:00+00:00">
+                2020-08-13
               </time>
             
 
@@ -352,8 +352,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/git/" itemprop="url" rel="index">
-                    <span itemprop="name">git</span>
+                  <a href="/categories/mysql/" itemprop="url" rel="index">
+                    <span itemprop="name">mysql</span>
                   </a>
                 </span>
 
@@ -370,8 +370,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/05/30/git-pull-issues/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/05/30/git-pull-issues/" itemprop="commentCount"></span>
+                <a href="/2020/08/13/mysql-query-space/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/08/13/mysql-query-space/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -404,14 +404,21 @@
       
 
       
-        <p>pull代码的时候突然疯狂aborting<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">error: The following untracked working tree files would be overwritten by checkout:</span><br><span class="line">        api/origin/abc123ABC.md</span><br><span class="line">Please move or remove them before you switch branches.</span><br><span class="line">Aborting</span><br><span class="line">could not detach HEAD</span><br></pre></td></tr></table></figure></p>
-<p>然而并没有改动这个文件，所以应该并不是冲突<br>事情并没有那么简单<br><a id="more"></a></p>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>最终的原因是有人修改了这个文件<br>并且还修改了文件名的大小写<br>问题就出在Windows以系统对文件名大小写不敏感，而Linux是大小写敏感的</p>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>网上一堆通过<code>git clean -d -fx</code>命令来解决问题的<br>然而，在尝试之后，损失严重<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ git clean -d -fx</span><br><span class="line">Removing .vscode/</span><br><span class="line">Removing assets/cache/</span><br><span class="line">Removing assets/log/</span><br><span class="line">Removing assets/upload/</span><br><span class="line">Removing config.php</span><br></pre></td></tr></table></figure></p>
-<p>丢失了全部的日志，本地测试上传文件，以及各种配置文件<br>所以还是那句话 <strong>有备无患</strong></p>
-<p>最终的解决方案是修改git配置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config core.ignorecase false</span><br></pre></td></tr></table></figure></p>
-<p>然后正常pull即可</p>
-<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://git-scm.com/docs/git-config" target="_blank" rel="noopener">git config Documentation</a></p>
+        <p>根据某个字段a的条件查询，查询到的结果却验证失败，一切都是空格的错<br>之前已经发生过字符串开头不可见特殊字符引发的类似问题<br>太久不碰到允许存储空格的业务，还是掉坑了  </p>
+<a id="more"></a>
+<p>测试表<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> <span class="string">`test`</span> (</span><br><span class="line">  <span class="string">`id`</span> <span class="built_in">int</span>(<span class="number">11</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span> AUTO_INCREMENT,</span><br><span class="line">  <span class="string">`varchar_str`</span> <span class="built_in">varchar</span>(<span class="number">64</span>) <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">  <span class="string">`char_str`</span> <span class="built_in">char</span>(<span class="number">64</span>) <span class="built_in">CHARACTER</span> <span class="keyword">SET</span> utf8mb4 <span class="keyword">NOT</span> <span class="literal">NULL</span>,</span><br><span class="line">  PRIMARY <span class="keyword">KEY</span> (<span class="string">`id`</span>) <span class="keyword">USING</span> BTREE</span><br><span class="line">) <span class="keyword">ENGINE</span>=<span class="keyword">InnoDB</span>;</span><br></pre></td></tr></table></figure></p>
+<p>测试数据<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="string">`test`</span>(<span class="string">`id`</span>, <span class="string">`varchar_str`</span>, <span class="string">`char_str`</span>) <span class="keyword">VALUES</span> (<span class="number">1</span>, <span class="string">' a'</span>, <span class="string">' a'</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="string">`test`</span>(<span class="string">`id`</span>, <span class="string">`varchar_str`</span>, <span class="string">`char_str`</span>) <span class="keyword">VALUES</span> (<span class="number">2</span>, <span class="string">'a '</span>, <span class="string">'a '</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="string">`test`</span>(<span class="string">`id`</span>, <span class="string">`varchar_str`</span>, <span class="string">`char_str`</span>) <span class="keyword">VALUES</span> (<span class="number">3</span>, <span class="string">' a '</span>, <span class="string">' a '</span>);</span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> <span class="string">`test`</span>(<span class="string">`id`</span>, <span class="string">`varchar_str`</span>, <span class="string">`char_str`</span>) <span class="keyword">VALUES</span> (<span class="number">4</span>, <span class="string">'a'</span>, <span class="string">'a'</span>);</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; select id, CONCAT(&apos;&quot;&apos;, varchar_str, &apos;&quot;&apos;) as v, CONCAT(&apos;&quot;&apos;, char_str, &apos;&quot;&apos;) as c from test  where `varchar_str`=&apos;a&apos;;</span><br><span class="line">+----+------+-----+</span><br><span class="line">| id | v    | c   |</span><br><span class="line">+----+------+-----+</span><br><span class="line">|  2 | &quot;a &quot; | &quot;a&quot; |</span><br><span class="line">|  4 | &quot;a&quot;  | &quot;a&quot; |</span><br><span class="line">+----+------+-----+</span><br><span class="line">2 rows in set (0.03 sec)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">mysql&gt; select id, CONCAT(&apos;&quot;&apos;, varchar_str, &apos;&quot;&apos;) as v, CONCAT(&apos;&quot;&apos;, char_str, &apos;&quot;&apos;) as c from test  where `varchar_str`=&apos;a &apos;;</span><br><span class="line">+----+------+-----+</span><br><span class="line">| id | v    | c   |</span><br><span class="line">+----+------+-----+</span><br><span class="line">|  2 | &quot;a &quot; | &quot;a&quot; |</span><br><span class="line">|  4 | &quot;a&quot;  | &quot;a&quot; |</span><br><span class="line">+----+------+-----+</span><br><span class="line">2 rows in set (0.04 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; select id, CONCAT(&apos;&quot;&apos;, varchar_str, &apos;&quot;&apos;) as v, CONCAT(&apos;&quot;&apos;, char_str, &apos;&quot;&apos;) as c from test  where `varchar_str`=&apos; a&apos;;</span><br><span class="line">+----+-------+------+</span><br><span class="line">| id | v     | c    |</span><br><span class="line">+----+-------+------+</span><br><span class="line">|  1 | &quot; a&quot;  | &quot; a&quot; |</span><br><span class="line">|  3 | &quot; a &quot; | &quot; a&quot; |</span><br><span class="line">+----+-------+------+</span><br><span class="line">2 rows in set (0.04 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; select id, CONCAT(&apos;&quot;&apos;, varchar_str, &apos;&quot;&apos;) as v, CONCAT(&apos;&quot;&apos;, char_str, &apos;&quot;&apos;) as c from test  where `char_str`=  &apos;a &apos;;</span><br><span class="line">+----+------+-----+</span><br><span class="line">| id | v    | c   |</span><br><span class="line">+----+------+-----+</span><br><span class="line">|  2 | &quot;a &quot; | &quot;a&quot; |</span><br><span class="line">|  4 | &quot;a&quot;  | &quot;a&quot; |</span><br><span class="line">+----+------+-----+</span><br><span class="line">2 rows in set (0.04 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; select id, CONCAT(&apos;&quot;&apos;, varchar_str, &apos;&quot;&apos;) as v, CONCAT(&apos;&quot;&apos;, char_str, &apos;&quot;&apos;) as c from test  where `varchar_str`= binary &apos; a&apos;;</span><br><span class="line">+----+------+------+</span><br><span class="line">| id | v    | c    |</span><br><span class="line">+----+------+------+</span><br><span class="line">|  1 | &quot; a&quot; | &quot; a&quot; |</span><br><span class="line">+----+------+------+</span><br><span class="line">1 row in set (0.04 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; select id, CONCAT(&apos;&quot;&apos;, varchar_str, &apos;&quot;&apos;) as v, CONCAT(&apos;&quot;&apos;, char_str, &apos;&quot;&apos;) as c from test  where `varchar_str`= binary &apos;a&apos;;</span><br><span class="line">+----+-----+-----+</span><br><span class="line">| id | v   | c   |</span><br><span class="line">+----+-----+-----+</span><br><span class="line">|  4 | &quot;a&quot; | &quot;a&quot; |</span><br><span class="line">+----+-----+-----+</span><br><span class="line">1 row in set (0.03 sec)</span><br><span class="line"></span><br><span class="line">mysql&gt; select id, CONCAT(&apos;&quot;&apos;, varchar_str, &apos;&quot;&apos;) as v, CONCAT(&apos;&quot;&apos;, char_str, &apos;&quot;&apos;) as c from test  where `char_str`= binary &apos;a &apos;;</span><br><span class="line">Empty set</span><br></pre></td></tr></table></figure>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>从上述的查询案例中应该已经可以说明<br>如果字段类型为<code>char</code>或<code>varchar</code>，MySQL在进行字符串比较的时候，会使用<code>PADSPACE</code>规则，即忽视末尾空格<br>另外要注意一点，<code>char</code>类型的字段，存储的数据取出时已经没有了结尾的空格了，所以查询时结尾的空格也是无意义的  </p>
+<blockquote>
+<p>The length of a CHAR column is fixed to the length that you declare when you create the table. The length can be any value from 0 to 255. When CHAR values are stored, they are right-padded with spaces to the specified length. When CHAR values are retrieved, trailing spaces are removed unless the PAD_CHAR_TO_FULL_LENGTH SQL mode is enabled.<br>For nonbinary strings (CHAR, VARCHAR, and TEXT values), the string collation pad attribute determines treatment in comparisons of trailing spaces at the end of strings. NO PAD collations treat trailing spaces as significant in comparisons, like any other character. PAD SPACE collations treat trailing spaces as insignificant in comparisons; strings are compared without regard to trailing spaces. See Trailing Space Handling in Comparisons. The server SQL mode has no effect on comparison behavior with respect to trailing spaces.</p>
+</blockquote>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><ol>
+<li>使用<code>binary</code></li>
+<li>使用like （不推荐）</li>
+<li>同时比较字符串的长度（不推荐）</li>
+</ol>
+<h2 id="参考连接"><a href="#参考连接" class="headerlink" title="参考连接"></a>参考连接</h2><p><a href="https://dev.mysql.com/doc/refman/8.0/en/char.html" target="_blank" rel="noopener">MySQL文档</a></p>
 
       
     </div>
@@ -429,7 +436,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/git/" rel="tag"># git</a>
+            <a href="/tags/mysql/" rel="tag"># mysql</a>
           
         </div>
       
@@ -442,8 +449,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/05/09/php-hindsight/" rel="next" title="新Get的PHP使用方式">
-                <i class="fa fa-chevron-left"></i> 新Get的PHP使用方式
+              <a href="/2020/08/05/golang-runtime-futex-high-cpu/" rel="next" title="golang程序profileruntime.futex占用大量 cpu 资源">
+                <i class="fa fa-chevron-left"></i> golang程序profileruntime.futex占用大量 cpu 资源
               </a>
             
           </div>
@@ -451,10 +458,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/05/31/linux-update-alternatives/" rel="prev" title="linux下指定程序或版本——update-alternatives">
-                linux下指定程序或版本——update-alternatives <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -614,7 +617,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原因"><span class="nav-number">1.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方法"><span class="nav-number">2.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">3.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原因"><span class="nav-number">1.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方法"><span class="nav-number">2.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考连接"><span class="nav-number">3.</span> <span class="nav-text">参考连接</span></a></li></ol></div>
             
 
           </div>
@@ -797,9 +800,9 @@
     
       <script type="text/javascript">
         var disqus_config = function () {
-          this.page.url = 'http://yoursite.com/2018/05/30/git-pull-issues/';
-          this.page.identifier = '2018/05/30/git-pull-issues/';
-          this.page.title = 'git pull issues - The following untracked working tree files would be overwritten by checkout';
+          this.page.url = 'http://yoursite.com/2020/08/13/mysql-query-space/';
+          this.page.identifier = '2020/08/13/mysql-query-space/';
+          this.page.title = 'mysql中varchar与char对结尾空格的不同处理逻辑';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://loessplateau.disqus.com/embed.js';
