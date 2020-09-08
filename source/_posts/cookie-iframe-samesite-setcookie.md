@@ -52,6 +52,8 @@ setcookie('sessionKey', $sessionKey, $expired, '/; secure; SameSite=none;');
 2. 设置 `SameSite=None`有个前提，即必须同时设置 Secure 属性（只通过https发送）
     如果非https页面接收该设置，同样会收获黄色感叹号，无法完成设置
 
+> this set-cookie was blocked because it was not sent over a secure connection
+
 ### Nginx设置Cookie属性
 ```
 location ^/abc/ {
@@ -61,6 +63,7 @@ location ^/abc/ {
 问题同代码设置的第二点，且更严重，因为全局设置，如果有其它属性，可能被覆盖
 
 ### 使用LocalStorage
+要注意的是， LocalStorage 在安全性上差于 cookie，如面对XSS时，如果cookie设置了httponly，则较难被获取cookie，但localstorage一锅端  
 
 ## 参考链接
 [SameSIte Cookies](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Set-Cookie/SameSite)   
