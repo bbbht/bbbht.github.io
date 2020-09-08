@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="Don&#39;t Panic">
 <meta property="og:description" content="前天解决了mysql的索引合并(using intersect)造成的死锁后，变刘鑫观察死锁信息于是又发现一个造成死锁的常规语句1insert into xxx(x,y,z) values(a,b,c) on duplicate key update z = c;">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-08-13T11:16:04.777Z">
+<meta property="og:updated_time" content="2020-09-08T08:26:05.341Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="mysql on duplicate key update deadlock">
 <meta name="twitter:description" content="前天解决了mysql的索引合并(using intersect)造成的死锁后，变刘鑫观察死锁信息于是又发现一个造成死锁的常规语句1insert into xxx(x,y,z) values(a,b,c) on duplicate key update z = c;">
@@ -410,13 +410,26 @@
 <h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>首先，5.6版本好像并没有这个问题，现在使用的是5.7版本，至于后续版本并未测试<br>其次，发生死锁的原因<br>执行insert into … on duplicate key语句顺序  </p>
 <ol>
 <li>innodb引擎会先判断插入的行是否产生重复key错误</li>
+<li>如果不存在，则忽略duplicate后的update语句，返回</li>
 <li>如果存在，对该记录加上S锁（共享锁）</li>
-<li>返回记录</li>
 <li>继续执行duplicate后的update语句，对该记录加上X锁（排他锁）</li>
-<li>进行update写入<br>所以问题应该在于S锁和X锁互斥，造成两个事务中都获取到了S锁，但要等待随访释放后获取X锁，死锁</li>
+<li>进行update写入</li>
+</ol>
+<p>所以问题发生的场景为：</p>
+<ol>
+<li>S锁和X锁互斥，造成两个事务中都获取到了S锁，但都要等待S锁释放后获取X锁，死锁</li>
+<li>t1、t2两个同时执行</li>
+<li>表中已存在重复键值的记录，导致会话先后尝试INSERT失败</li>
+<li>会话t1尝试获取记录的S锁(步骤3)，该记录未被其他会话加锁，获取S锁成功。</li>
+<li>会话t2尝试获取记录的S锁(步骤3)，该记录上被加持S锁，但由于S锁与S锁兼容，获取S锁成功</li>
+<li>会话t1尝试获取记录的X锁(步骤4)，由于会话t2也持有该记录的S锁，S锁与X锁不兼容，获取X锁失败，会话t1被阻塞</li>
+<li>会话t2尝试获取记录的X锁(步骤4)，由于会话t1对该记录持有S锁，S锁与X锁不兼容，获取X锁失败，会话t2被阻塞</li>
+<li>会话t2被阻塞后进入死锁检查环节，发现阻塞t1-&gt;t2和t2-&gt;t1形成死锁环路，触发死锁机制强制回滚t1或t2事务</li>
 </ol>
 <h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><ol>
 <li>调整事务级别？这个好像不太合适</li>
+<li>生产环境还是要尽量避免使用INSERT INTO ON DUPLICATE UPDATE语句</li>
+<li>对Insert语句错误进行校验，重复记录时触发执行update</li>
 <li>分拆语句，先查，再插入或更新，而且on duplicate key 还会造成自增主键的疯狂增长</li>
 </ol>
 <h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://bugs.mysql.com/bug.php?id=58637" target="_blank" rel="noopener">MySQL bug 58637</a></p>
@@ -551,7 +564,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">58</span>
+                  <span class="site-state-item-count">61</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -562,7 +575,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-count">22</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -573,7 +586,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">30</span>
+                  <span class="site-state-item-count">31</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
