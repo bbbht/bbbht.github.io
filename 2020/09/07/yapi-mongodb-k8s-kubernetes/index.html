@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="yapi,kubernetes,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="技术选型选择了 yapi 作为内部接口管理系统，由于测试环境都部署在 kubernetes 集群中，所以官网提供的docker镜像还需要修改才能使用同时，还需要启用并配置 LDAP 实现内网统一认证">
+<meta name="keywords" content="yapi,kubernetes">
+<meta property="og:type" content="article">
+<meta property="og:title" content="kubernetes内网部署yapi使用mongodb并启用LDAP">
+<meta property="og:url" content="http://yoursite.com/2020/09/07/yapi-mongodb-k8s-kubernetes/index.html">
+<meta property="og:site_name" content="Don&#39;t Panic">
+<meta property="og:description" content="技术选型选择了 yapi 作为内部接口管理系统，由于测试环境都部署在 kubernetes 集群中，所以官网提供的docker镜像还需要修改才能使用同时，还需要启用并配置 LDAP 实现内网统一认证">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-09-08T10:59:31.353Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="kubernetes内网部署yapi使用mongodb并启用LDAP">
+<meta name="twitter:description" content="技术选型选择了 yapi 作为内部接口管理系统，由于测试环境都部署在 kubernetes 集群中，所以官网提供的docker镜像还需要修改才能使用同时，还需要启用并配置 LDAP 实现内网统一认证">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/09/07/yapi-mongodb-k8s-kubernetes/">
+
+
+
+
+
+  <meta name="google-site-verification" content="aVUEVKghcpKmqD1MgxttjI8n8mrd1iSrStqvpDlEAdg">
+  <title>kubernetes内网部署yapi使用mongodb并启用LDAP | Don't Panic</title>
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-116292975-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?a42c6bb7f27c4efdbc6c2deba01acaba";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Don't Panic</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <h1 class="site-subtitle" itemprop="description">Try Again</h1>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-issues">
+          <a href="/issues/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            issues
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-commonweal">
+          <a href="/404/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            公益404
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/07/yapi-mongodb-k8s-kubernetes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="bbbht">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://avatars1.githubusercontent.com/u/6995166?s=400&u=7ec51c88d4058afe78bd6e5d1c32da816dd7413c&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Don't Panic">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">kubernetes内网部署yapi使用mongodb并启用LDAP</h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-07T03:44:10+00:00">
+                2020-09-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/yapi/" itemprop="url" rel="index">
+                    <span itemprop="name">yapi</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/09/07/yapi-mongodb-k8s-kubernetes/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/09/07/yapi-mongodb-k8s-kubernetes/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv">总阅读量
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>技术选型选择了 yapi 作为内部接口管理系统，由于测试环境都部署在 kubernetes 集群中，所以官网提供的docker镜像还需要修改才能使用<br>同时，还需要启用并配置 LDAP 实现内网统一认证<br><a id="more"></a><br>完成的内容，分享出来  </p>
+<h2 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h2><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> node:<span class="number">14.4</span>.<span class="number">0</span>-alpine3.<span class="number">12</span> as builder</span><br><span class="line"></span><br><span class="line"><span class="keyword">MAINTAINER</span> plateau.loess@gmail.com</span><br><span class="line"></span><br><span class="line"><span class="keyword">ARG</span> NPM_REGISTRY=<span class="string">"http://registry.npm.taobao.org/"</span></span><br><span class="line"><span class="keyword">ARG</span> YAPI_VERSION=<span class="string">"1.9.2"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /app/yapi</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#ADD https://github.com/YMFE/yapi/archive/v$&#123;YAPI_VERSION&#125;.tar.gz .</span></span><br><span class="line"><span class="comment"># 也可以预下载后，直接使用</span></span><br><span class="line"><span class="keyword">ADD</span><span class="bash"> v<span class="variable">$&#123;YAPI_VERSION&#125;</span>.tar.gz ./</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 适当精简镜像内容</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> sed -i <span class="string">'s/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g'</span> /etc/apk/repositories \</span></span><br><span class="line"><span class="bash">    &amp;&amp; mv yapi-<span class="variable">$&#123;YAPI_VERSION&#125;</span>/* . \</span></span><br><span class="line"><span class="bash">    &amp;&amp; rm -r yapi-<span class="variable">$&#123;YAPI_VERSION&#125;</span> ./docs \</span></span><br><span class="line"><span class="bash">    &amp;&amp; apk add --virtual .build-dep git python3 make \</span></span><br><span class="line"><span class="bash">    &amp;&amp; npm install --production --registry <span class="variable">$&#123;NPM_REGISTRY&#125;</span> \</span></span><br><span class="line"><span class="bash">    &amp;&amp; apk del .build-dep</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">FROM</span> node:<span class="number">14.4</span>.<span class="number">0</span>-alpine3.<span class="number">12</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ARG</span> NPM_REGISTRY=<span class="string">"http://registry.npm.taobao.org/"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="bash"> /app/yapi</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> --from=builder /app/yapi .</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> docker-entrypoint.sh /app/</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> config.json /app/</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash">  sed -i <span class="string">'s/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g'</span> /etc/apk/repositories \</span></span><br><span class="line"><span class="bash">     &amp;&amp; apk add --no-cache bash \</span></span><br><span class="line"><span class="bash">     &amp;&amp; chmod +x /app/docker-entrypoint.sh \</span></span><br><span class="line"><span class="bash">     &amp;&amp; npm install -g yapi-cli --registry <span class="variable">$&#123;NPM_REGISTRY&#125;</span> \</span></span><br><span class="line"><span class="bash">     &amp;&amp; rm -rf /var/cache/apk/* ~/.npm/</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">3000</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">CMD</span><span class="bash"> [ <span class="string">"/app/docker-entrypoint.sh"</span> ]</span></span><br></pre></td></tr></table></figure>
+<h2 id="docker-entrypoint-sh"><a href="#docker-entrypoint-sh" class="headerlink" title="docker-entrypoint.sh"></a>docker-entrypoint.sh</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">set</span> -eo pipefail</span><br><span class="line"><span class="built_in">shopt</span> -s nullglob</span><br><span class="line"></span><br><span class="line">PS4=<span class="string">'+ $(date +"%F %T%z") $&#123;BASH_SOURCE&#125;:$&#123;LINENO&#125;): $&#123;FUNCNAME[0]:+$&#123;FUNCNAME[0]&#125;(): &#125;'</span></span><br><span class="line"></span><br><span class="line">YAPI_DEBUG=<span class="string">"<span class="variable">$&#123;YAPI_DEBUG:=&#125;</span>"</span></span><br><span class="line">YAPI_CLOSE_REGISTER=<span class="string">"<span class="variable">$&#123;YAPI_CLOSE_REGISTER:=true&#125;</span>"</span></span><br><span class="line">YAPI_DELAY=<span class="string">"<span class="variable">$&#123;YAPI_DELAY:=3&#125;</span>"</span></span><br><span class="line">YAPI_DIR=<span class="string">"<span class="variable">$&#123;YAPI_DIR:=/app/yapi&#125;</span>"</span></span><br><span class="line"></span><br><span class="line">YAPI_PORT=<span class="string">"<span class="variable">$&#123;YAPI_PORT:=3000&#125;</span>"</span></span><br><span class="line">YAPI_ACOUNT=<span class="string">"<span class="variable">$&#123;YAPI_ACOUNT:=yapi@admin.cn&#125;</span>"</span></span><br><span class="line">YAPI_INIT=<span class="string">"<span class="variable">$&#123;YAPI_INIT:=false&#125;</span>"</span></span><br><span class="line"></span><br><span class="line">YAPI_DB_CONNECT_STRING=<span class="string">"<span class="variable">$&#123;YAPI_DB_CONNECT_STRING:=&#125;</span>"</span></span><br><span class="line"></span><br><span class="line">YAPI_DB_HOST=<span class="string">"<span class="variable">$&#123;YAPI_DB_HOST:=127.0.0.1&#125;</span>"</span></span><br><span class="line">YAPI_DB_NAME=<span class="string">"<span class="variable">$&#123;YAPI_DB_NAME:=yapi&#125;</span>"</span></span><br><span class="line">YAPI_DB_PORT=<span class="string">"<span class="variable">$&#123;YAPI_DB_PORT:=27017&#125;</span>"</span></span><br><span class="line">YAPI_DB_USER=<span class="string">"<span class="variable">$&#123;YAPI_DB_USER:=&#125;</span>"</span></span><br><span class="line">YAPI_DB_PASS=<span class="string">"<span class="variable">$&#123;YAPI_DB_PASS:=&#125;</span>"</span></span><br><span class="line">YAPI_DB_AUTH=<span class="string">"<span class="variable">$&#123;YAPI_DB_AUTH:=&#125;</span>"</span></span><br><span class="line"></span><br><span class="line">YAPI_MAIL_ENABLE=<span class="string">"<span class="variable">$&#123;YAPI_MAIL_ENABLE:=false&#125;</span>"</span></span><br><span class="line">YAPI_MAIL_HOST=<span class="string">"<span class="variable">$&#123;YAPI_MAIL_HOST:=smtpdm.aliyun.com&#125;</span>"</span></span><br><span class="line">YAPI_MAIL_PORT=<span class="string">"<span class="variable">$&#123;YAPI_MAIL_PORT:=465&#125;</span>"</span></span><br><span class="line">YAPI_MAIL_FROM=<span class="string">"<span class="variable">$&#123;YAPI_MAIL_FROM:=&#125;</span>"</span></span><br><span class="line">YAPI_MAIL_USER=<span class="string">"<span class="variable">$&#123;YAPI_MAIL_USER:=$&#123;YAPI_MAIL_FROM&#125;</span>&#125;"</span></span><br><span class="line">YAPI_MAIL_PASS=<span class="string">"<span class="variable">$&#123;YAPI_MAIL_PASS:=&#125;</span>"</span></span><br><span class="line"></span><br><span class="line">YAPI_LDAP_ENABLE=<span class="string">"<span class="variable">$&#123;YAPI_LDAP_ENABLE:=false&#125;</span>"</span></span><br><span class="line">YAPI_LDAP_SERVER=<span class="string">"<span class="variable">$&#123;YAPI_LDAP_SERVER:=&#125;</span>"</span></span><br><span class="line">YAPI_LDAP_BASE_DN=<span class="string">"<span class="variable">$&#123;YAPI_LDAP_BASE_DN:=&#125;</span>"</span></span><br><span class="line">YAPI_LDAP_BIND_PASSWORD=<span class="string">"<span class="variable">$&#123;YAPI_LDAP_BIND_PASSWORD:=&#125;</span>"</span></span><br><span class="line">YAPI_LDAP_SEARCH_DN=<span class="string">"<span class="variable">$&#123;YAPI_LDAP_SEARCH_DN:=&#125;</span>"</span></span><br><span class="line">YAPI_LDAP_SEARCH_STANDARD=<span class="string">"<span class="variable">$&#123;YAPI_LDAP_SEARCH_STANDARD:=mail&#125;</span>"</span></span><br><span class="line">YAPI_LDAP_EMAIL_POSTFIX=<span class="string">"<span class="variable">$&#123;YAPI_LDAP_EMAIL_POSTFIX:=@xxxxxxxxxxxxxx.com&#125;</span>"</span></span><br><span class="line">YAPI_LDAP_EMAIL_KEY=<span class="string">"<span class="variable">$&#123;YAPI_LDAP_EMAIL_KEY:=mail&#125;</span>"</span></span><br><span class="line">YAPI_LDAP_USERNAME_KEY=<span class="string">"<span class="variable">$&#123;YAPI_LDAP_USERNAME_KEY:=name&#125;</span>"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">yapi_debug</span></span>() &#123;</span><br><span class="line">    <span class="keyword">if</span> [ <span class="string">"<span class="variable">$&#123;YAPI_DEBUG&#125;</span>"</span> == 1 ]; <span class="keyword">then</span></span><br><span class="line">        <span class="built_in">set</span> -xe</span><br><span class="line">        PS4=<span class="string">'+ $(date +"%F %T%z") $&#123;BASH_SOURCE&#125;:$&#123;LINENO&#125;): $&#123;FUNCNAME[0]:+$&#123;FUNCNAME[0]&#125;(): &#125;'</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">    <span class="keyword">if</span> [ <span class="string">"<span class="variable">$&#123;YAPI_DELAY&#125;</span>"</span> -gt 0 ]; <span class="keyword">then</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">""</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"Yapi will start in <span class="variable">$&#123;YAPI_DELAY&#125;</span> seconds..."</span></span><br><span class="line">        <span class="built_in">echo</span> <span class="string">""</span></span><br><span class="line">        sleep <span class="variable">$&#123;YAPI_DELAY&#125;</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line">    sed -i <span class="string">"s#\"YAPI_CLOSE_REGISTER\"#<span class="variable">$&#123;YAPI_CLOSE_REGISTER&#125;</span>#g"</span> /app/config.json</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="title">yapi_mail_config</span></span>() &#123;</span><br><span class="line">    <span class="built_in">local</span> holder</span><br><span class="line">    <span class="keyword">if</span> [ <span class="string">"<span class="variable">$&#123;YAPI_MAIL_ENABLE&#125;</span>"</span> == <span class="string">"true"</span> ]; <span class="keyword">then</span></span><br><span class="line">        <span class="keyword">for</span> envar <span class="keyword">in</span> YAPI_MAIL_ENABLE YAPI_MAIL_HOST YAPI_MAIL_FROM YAPI_MAIL_USER YAPI_MAIL_PASS</span><br><span class="line">        <span class="keyword">do</span></span><br><span class="line">            <span class="built_in">local</span> holder=$(<span class="built_in">eval</span> <span class="built_in">echo</span> <span class="string">'$'</span><span class="variable">$&#123;envar&#125;</span>)</span><br><span class="line">            sed -i <span class="string">"s#<span class="variable">$&#123;envar&#125;</span>#<span class="variable">$&#123;holder&#125;</span>#g"</span>       /app/config.json</span><br><span class="line">        <span class="keyword">done</span></span><br><span class="line">        sed -i <span class="string">"s#YAPI_MAIL_PORT#<span class="variable">$&#123;YAPI_MAIL_PORT&#125;</span>#g"</span> /app/config.json</span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">yapi_ldap_config</span></span>() &#123;</span><br><span class="line">    <span class="built_in">local</span> holder</span><br><span class="line">    <span class="keyword">if</span> [ <span class="string">"<span class="variable">$&#123;YAPI_LDAP_ENABLE&#125;</span>"</span> == <span class="string">"true"</span> ]; <span class="keyword">then</span></span><br><span class="line">        <span class="keyword">for</span> envar <span class="keyword">in</span> YAPI_LDAP_ENABLE YAPI_LDAP_SERVER YAPI_LDAP_BASE_DN YAPI_LDAP_BIND_PASSWORD YAPI_LDAP_SEARCH_DN YAPI_LDAP_SEARCH_STANDARD YAPI_LDAP_EMAIL_POSTFIX YAPI_LDAP_EMAIL_KEY YAPI_LDAP_USERNAME_KEY</span><br><span class="line">        <span class="keyword">do</span></span><br><span class="line">            <span class="built_in">local</span> holder=$(<span class="built_in">eval</span> <span class="built_in">echo</span> <span class="string">'$'</span><span class="variable">$&#123;envar&#125;</span>)</span><br><span class="line">            sed -i <span class="string">"s#<span class="variable">$&#123;envar&#125;</span>#<span class="variable">$&#123;holder&#125;</span>#g"</span>       /app/config.json</span><br><span class="line">        <span class="keyword">done</span></span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">yapi_db_check</span></span>() &#123;</span><br><span class="line">    <span class="built_in">set</span> +e</span><br><span class="line">    <span class="built_in">local</span> retry=0</span><br><span class="line">    <span class="keyword">while</span> (:;)</span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">        nc -zv <span class="variable">$&#123;YAPI_DB_HOST&#125;</span> <span class="variable">$&#123;YAPI_DB_PORT&#125;</span></span><br><span class="line">        <span class="keyword">if</span> [ $? -ne 0 ]; <span class="keyword">then</span></span><br><span class="line">            <span class="built_in">echo</span> <span class="string">"[<span class="variable">$(date '+%F %T%z')</span>] [error] Failed to connect mongodb <span class="variable">$(hostname)</span>-&gt;<span class="variable">$&#123;YAPI_DB_HOST&#125;</span>:<span class="variable">$&#123;YAPI_DB_PORT&#125;</span>, retrying <span class="variable">$&#123;retry&#125;</span> ..."</span></span><br><span class="line">            retry=$[ retry + 1 ]</span><br><span class="line">            sleep 1</span><br><span class="line">            <span class="built_in">continue</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="built_in">echo</span> <span class="string">"[<span class="variable">$(date '+%F %T%z')</span>] [info] Sucessfully connect mongodb <span class="variable">$(hostname)</span>-&gt;<span class="variable">$&#123;YAPI_DB_HOST&#125;</span>:<span class="variable">$&#123;YAPI_DB_PORT&#125;</span>, retry <span class="variable">$&#123;retry&#125;</span> times."</span></span><br><span class="line">            <span class="built_in">break</span></span><br><span class="line">        <span class="keyword">fi</span></span><br><span class="line">    <span class="keyword">done</span></span><br><span class="line">    <span class="built_in">set</span> +e</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="title">yapi_db_config</span></span>() &#123;</span><br><span class="line">    <span class="keyword">for</span> envar <span class="keyword">in</span> YAPI_ACOUNT YAPI_DB_HOST YAPI_DB_NAME YAPI_DB_PORT YAPI_DB_USER YAPI_DB_PASS YAPI_DB_AUTH YAPI_DB_CONNECT_STRING</span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">        <span class="built_in">local</span> holder=$(<span class="built_in">eval</span> <span class="built_in">echo</span> <span class="string">'$'</span><span class="variable">$&#123;envar&#125;</span>)</span><br><span class="line">        sed -i <span class="string">"s#<span class="variable">$&#123;envar&#125;</span>#<span class="variable">$&#123;holder&#125;</span>#g"</span>   /app/config.json</span><br><span class="line">    <span class="keyword">done</span></span><br><span class="line"></span><br><span class="line">    sed -i <span class="string">"s#YAPI_PORT#<span class="variable">$&#123;YAPI_PORT&#125;</span>#g"</span> /app/config.json</span><br><span class="line">    sed -i <span class="string">"s#YAPI_DB_PORT#<span class="variable">$&#123;YAPI_DB_PORT&#125;</span>#g"</span> /app/config.json</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">yapi_debug</span><br><span class="line">yapi_mail_config</span><br><span class="line">yapi_ldap_config</span><br><span class="line">yapi_db_config</span><br><span class="line">yapi_db_check</span><br><span class="line"></span><br><span class="line"><span class="comment">#初始化账号判断，在脚本同层，未设置lock文件且开启init才执行</span></span><br><span class="line"><span class="keyword">if</span> [ ! -e <span class="string">"init.lock"</span> ] &amp;&amp; [ <span class="string">"<span class="variable">$&#123;YAPI_INIT&#125;</span>"</span> == <span class="string">"true"</span> ]; <span class="keyword">then</span></span><br><span class="line">    node <span class="variable">$&#123;YAPI_DIR&#125;</span>/server/install.js</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">exec</span> node <span class="variable">$&#123;YAPI_DIR&#125;</span>/server/app.js <span class="string">"<span class="variable">$&#123;@&#125;</span>"</span></span><br></pre></td></tr></table></figure>
+<h2 id="config-json"><a href="#config-json" class="headerlink" title="config.json"></a>config.json</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"port"</span>: <span class="string">"YAPI_PORT"</span>,</span><br><span class="line">  <span class="attr">"closeRegister"</span>:<span class="string">"YAPI_CLOSE_REGISTER"</span>,</span><br><span class="line">  <span class="attr">"adminAccount"</span>: <span class="string">"YAPI_ACOUNT"</span>,</span><br><span class="line">  <span class="attr">"db"</span>: &#123;</span><br><span class="line">    <span class="attr">"connectString"</span>:<span class="string">"YAPI_DB_CONNECT_STRING"</span>,</span><br><span class="line">    <span class="attr">"servername"</span>: <span class="string">"YAPI_DB_HOST"</span>,</span><br><span class="line">    <span class="attr">"DATABASE"</span>: <span class="string">"YAPI_DB_NAME"</span>,</span><br><span class="line">    <span class="attr">"port"</span>: <span class="string">"YAPI_DB_PORT"</span>,</span><br><span class="line">    <span class="attr">"user"</span>: <span class="string">"YAPI_DB_USER"</span>,</span><br><span class="line">    <span class="attr">"pass"</span>: <span class="string">"YAPI_DB_PASS"</span>,</span><br><span class="line">    <span class="attr">"authSource"</span>: <span class="string">"YAPI_DB_AUTH"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"mail"</span>: &#123;</span><br><span class="line">    <span class="attr">"enable"</span>: <span class="string">"YAPI_MAIL_ENABLE"</span>,</span><br><span class="line">    <span class="attr">"host"</span>: <span class="string">"YAPI_MAIL_HOST"</span>,</span><br><span class="line">    <span class="attr">"port"</span>: <span class="string">"YAPI_MAIL_PORT"</span>,</span><br><span class="line">    <span class="attr">"from"</span>: <span class="string">"YAPI_MAIL_FROM"</span>,</span><br><span class="line">    <span class="attr">"auth"</span>: &#123;</span><br><span class="line">      <span class="attr">"user"</span>: <span class="string">"YAPI_MAIL_FROM"</span>,</span><br><span class="line">      <span class="attr">"pass"</span>: <span class="string">"YAPI_MAIL_PASS"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="attr">"ldapLogin"</span>: &#123;</span><br><span class="line">    <span class="attr">"enable"</span>: <span class="string">"YAPI_LDAP_ENABLE"</span>,</span><br><span class="line">    <span class="attr">"server"</span>: <span class="string">"YAPI_LDAP_SERVER"</span>,</span><br><span class="line">    <span class="attr">"baseDn"</span>: <span class="string">"YAPI_LDAP_BASE_DN"</span>,</span><br><span class="line">    <span class="attr">"bindPassword"</span>: <span class="string">"YAPI_LDAP_BIND_PASSWORD"</span>,</span><br><span class="line">    <span class="attr">"searchDn"</span>: <span class="string">"YAPI_LDAP_SEARCH_DN"</span>,</span><br><span class="line">    <span class="attr">"searchStandard"</span>: <span class="string">"YAPI_LDAP_SEARCH_STANDARD"</span>,</span><br><span class="line">    <span class="attr">"emailPostfix"</span>: <span class="string">"YAPI_LDAP_EMAIL_POSTFIX"</span>,</span><br><span class="line">    <span class="attr">"emailKey"</span>: <span class="string">"YAPI_LDAP_EMAIL_KEY"</span>,</span><br><span class="line">    <span class="attr">"usernameKey"</span>: <span class="string">"YAPI_LDAP_USERNAME_KEY"</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="mongodb"><a href="#mongodb" class="headerlink" title="mongodb"></a>mongodb</h2><p>由于线上是购买的云数据库，只在测试时通过docker部署运行了mongodb，命令如下<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 启用了权限认证</span></span><br><span class="line">docker run -d -p 27017:27017 -v /data/yapi-mongo:/data/db --name mongo-server mongo --auth</span><br></pre></td></tr></table></figure></p>
+<p>然后进入容器，添加管理员，yapi所需的db及用户<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">mongo</span><br><span class="line"></span><br><span class="line">use admin</span><br><span class="line"></span><br><span class="line"><span class="comment"># 增加一个超级管理员</span></span><br><span class="line">db.createUser(&#123;</span><br><span class="line">    user: <span class="string">"adminname"</span>,</span><br><span class="line">    <span class="built_in">pwd</span>: <span class="string">"password"</span>,</span><br><span class="line">    roles:[</span><br><span class="line">       &#123;</span><br><span class="line">           role:<span class="string">"userAdminAnyDatabase"</span>,</span><br><span class="line">           db:<span class="string">"admin"</span></span><br><span class="line">       &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建yapi的db，名字固定yapi</span></span><br><span class="line">use yapi</span><br><span class="line"><span class="comment"># 为其增加一个用户</span></span><br><span class="line">db.createUser(&#123;</span><br><span class="line">    user: <span class="string">"yapi-admin"</span>,</span><br><span class="line">    <span class="built_in">pwd</span>: <span class="string">"123456"</span>,</span><br><span class="line">    roles:[</span><br><span class="line">       &#123;</span><br><span class="line">           role:<span class="string">"readWrite"</span>,</span><br><span class="line">           db:<span class="string">"yapi"</span></span><br><span class="line">       &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></p>
+<h2 id="LDAP验证"><a href="#LDAP验证" class="headerlink" title="LDAP验证"></a>LDAP验证</h2><p>通过修改填充下面的命令来测试ldap服务器搜索制定邮箱<br>具体命令请参考链接，下面的值请对应config.json的设置<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ldapsearch -x -LLL -H <span class="string">"YAPI_LDAP_SERVER"</span> -D <span class="string">"YAPI_LDAP_BASE_DN"</span> -w <span class="string">"YAPI_LDAP_BIND_PASSWORD"</span> -b<span class="string">"YAPI_LDAP_SEARCH_DN"</span> YAPI_LDAP_EMAIL_KEY=要搜索的邮箱 YAPI_LDAP_USERNAME_KEY</span><br></pre></td></tr></table></figure></p>
+<h2 id="使用注意"><a href="#使用注意" class="headerlink" title="使用注意"></a>使用注意</h2><ol>
+<li>各项配置请参考官方文档</li>
+<li>DOckerfile编译的镜像，也可用于docker部署允许</li>
+<li>kubernetes部署，要记得设置 启动命令为 <code>/app/docker-entrypoint.sh</code></li>
+<li>kubernetes部署的配置文件不再赘述，重点在于设置所需的环境变量</li>
+<li>1.9.2版本为此时最新版，很久不更新了，如果后续版本再更新，dockerfile的部署方式有可能发生变化</li>
+<li>使用LDAP登录时，不需要数据库中有对应用户，会自动注册生成。同时如果已存在，也可无缝对接使用</li>
+</ol>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://hellosean1025.github.io/yapi/devops/index.html#%e9%85%8d%e7%bd%aeldap%e7%99%bb%e5%bd%95" target="_blank" rel="noopener">Yapi官方文档LDAP配置说明</a><br><a href="https://blog.csdn.net/liumiaocn/article/details/83990918" target="_blank" rel="noopener">ldapsearch使用</a>    </p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/yapi/" rel="tag"># yapi</a>
+          
+            <a href="/tags/kubernetes/" rel="tag"># kubernetes</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/19/windows-usage-record/" rel="next" title="windows的使用">
+                <i class="fa fa-chevron-left"></i> windows的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/09/08/cookie-iframe-samesite-setcookie/" rel="prev" title="PHP中Iframe的Cookie属性Samesite">
+                PHP中Iframe的Cookie属性Samesite <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars1.githubusercontent.com/u/6995166?s=400&u=7ec51c88d4058afe78bd6e5d1c32da816dd7413c&v=4" alt="bbbht">
+            
+              <p class="site-author-name" itemprop="name">bbbht</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">62</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">23</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/bbbht" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:plateau.loess@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Dockerfile"><span class="nav-number">1.</span> <span class="nav-text">Dockerfile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#docker-entrypoint-sh"><span class="nav-number">2.</span> <span class="nav-text">docker-entrypoint.sh</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#config-json"><span class="nav-number">3.</span> <span class="nav-text">config.json</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mongodb"><span class="nav-number">4.</span> <span class="nav-text">mongodb</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LDAP验证"><span class="nav-number">5.</span> <span class="nav-text">LDAP验证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用注意"><span class="nav-number">6.</span> <span class="nav-text">使用注意</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考链接"><span class="nav-number">7.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bbbht</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 本站访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 本站总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://loessplateau.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2020/09/07/yapi-mongodb-k8s-kubernetes/';
+          this.page.identifier = '2020/09/07/yapi-mongodb-k8s-kubernetes/';
+          this.page.title = 'kubernetes内网部署yapi使用mongodb并启用LDAP';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://loessplateau.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.4"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.4"></script>
+
+
+  
+
+</body>
+</html>

@@ -94,7 +94,7 @@
 <meta property="og:site_name" content="Don&#39;t Panic">
 <meta property="og:description" content="近期有需求要将系统页面完整嵌入到其它平台，测试中发现cookie异常，无法完成设置。response中，Set-Cookie 有黄色感叹号标记之前也了解过chrome 80+ 之后的安全策略调整导致跨域问题，但没想到系统中对cookie的使用过于泛滥">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-09-08T08:26:05.333Z">
+<meta property="og:updated_time" content="2020-09-08T10:59:31.326Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="PHP中Iframe的Cookie属性Samesite">
 <meta name="twitter:description" content="近期有需求要将系统页面完整嵌入到其它平台，测试中发现cookie异常，无法完成设置。response中，Set-Cookie 有黄色感叹号标记之前也了解过chrome 80+ 之后的安全策略调整导致跨域问题，但没想到系统中对cookie的使用过于泛滥">
@@ -419,9 +419,13 @@
 <li>部分浏览器（IOS12safari等）特殊行为（未验证）<br> 会将 <code>SameSite=none</code> 识别成 <code>SameSite=Strict</code>，所以可能需要对UA判断后再设置 </li>
 <li>设置 <code>SameSite=None</code>有个前提，即必须同时设置 Secure 属性（只通过https发送）<br> 如果非https页面接收该设置，同样会收获黄色感叹号，无法完成设置</li>
 </ol>
+<blockquote>
+<p>this set-cookie was blocked because it was not sent over a secure connection</p>
+</blockquote>
 <h3 id="Nginx设置Cookie属性"><a href="#Nginx设置Cookie属性" class="headerlink" title="Nginx设置Cookie属性"></a>Nginx设置Cookie属性</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location ^/abc/ &#123;</span><br><span class="line">    proxy_cookie_path / &quot;/; secure; SameSite=None&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>问题同代码设置的第二点，且更严重，因为全局设置，如果有其它属性，可能被覆盖</p>
-<h3 id="使用LocalStorage"><a href="#使用LocalStorage" class="headerlink" title="使用LocalStorage"></a>使用LocalStorage</h3><h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Set-Cookie/SameSite" target="_blank" rel="noopener">SameSIte Cookies</a><br><a href="https://stackoverflow.com/questions/39750906/php-setcookie-samesite-strict" target="_blank" rel="noopener">PHP SetCookie</a>  </p>
+<h3 id="使用LocalStorage"><a href="#使用LocalStorage" class="headerlink" title="使用LocalStorage"></a>使用LocalStorage</h3><p>要注意的是， LocalStorage 在安全性上差于 cookie，如面对XSS时，如果cookie设置了httponly，则较难被获取cookie，但localstorage一锅端  </p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Set-Cookie/SameSite" target="_blank" rel="noopener">SameSIte Cookies</a><br><a href="https://stackoverflow.com/questions/39750906/php-setcookie-samesite-strict" target="_blank" rel="noopener">PHP SetCookie</a>  </p>
 
       
     </div>
@@ -454,8 +458,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/08/19/windows-usage-record/" rel="next" title="windows的使用">
-                <i class="fa fa-chevron-left"></i> windows的使用
+              <a href="/2020/09/07/yapi-mongodb-k8s-kubernetes/" rel="next" title="kubernetes内网部署yapi使用mongodb并启用LDAP">
+                <i class="fa fa-chevron-left"></i> kubernetes内网部署yapi使用mongodb并启用LDAP
               </a>
             
           </div>
@@ -551,7 +555,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">61</span>
+                  <span class="site-state-item-count">62</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -562,7 +566,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-count">23</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -573,7 +577,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-count">33</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
