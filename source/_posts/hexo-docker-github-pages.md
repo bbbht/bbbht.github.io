@@ -11,44 +11,44 @@ categories: hexo
 只用来本地预览，发布还是由appveyor完成
 顺手够用就好
 <!-- more -->
-# 废弃
-以下Dockerfile等不再使用，参考
+参考
 [VSCode 配合sftp同步编辑远程代码](/2018/03/30/vscode-sftp/)
 ## 源码
 ### Dockerfile
 Dockerfile
 ```dockerfile
-FROM node:6-alpine
-MAINTAINER bbbht <plateau.loess@gmail.com>
+FROM node:lts-alpine
+
 WORKDIR /hexo
-VOLUME ['/hexo']
-EXPOSE 4000
 ENV LANG C.UTF-8
 
-RUN apk add --update git && \
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories && \
+    apk update && \
+    apk add --no-cache git tzdata && \
+    ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo "Asia/Shanghai" > /etc/timezone && \
+    npm config set registry https://registry.npm.taobao.org && \
     npm install hexo-cli -g --no-optional && \
-    rm -rf /var/cache/apk/*
+    rm -rf /var/cache/apk/* /tmp/*
 
-COPY entrypoint.sh /
-ENTRYPOINT ["sh", "/entrypoint.sh"]
-CMD ['hexo', 's']
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+
+RUN hexo version
+
+# 注意命令执行顺序
+ENTRYPOINT ["/docker-entrypoint.sh"]
 ```
 
 ### 容器运行初始化脚本
 entrypoint.sh
 ```sh
-#!/bin/bash
+#!/bin/sh
 set -x
+
 HEXO_DIR=/hexo
-if [ ! -d $HEXO_DIR/.git ]; then
-    git clone https://github.com/bbbht/bbbht.github.io.git --branch hexo $HEXO_DIR
-else
-    echo $HEXO_DIR" is not empty"
-fi
-cd $HEXO_DIR
-git config user.name bbbht
-git config user.email plateau.loess@gmail.com
-git config core.fileMode false
+
+cd $HEXO_DIR 
+
 npm install --no-optional --no-bin-links 
 
 exec "$@"
@@ -58,8 +58,9 @@ exec "$@"
 将Dockerfile，entrypoint.sh存为文件，放在在同一目录下
 执行命令
 ```sh
-docker build -t hexo:alpine .
-docker run -d --name hexo-server -p 4000:4000 -v /hexo:/hexo hexo:alpine hexo s -w
+docker build -t hexo:node-lts-alpine .
+docker run -d --restart=always --name hexo-server -p 4000:4000 -v /path-to-hexo:/hexo hexo:node-lts-alpine hexo s
+
 #  配置别名，方便本地化使用hexo命令
 alias hexo="docker exec hexo-server hexo"
 ```
