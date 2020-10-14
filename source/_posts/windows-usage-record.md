@@ -69,6 +69,10 @@ Markdown编辑器
 开源数据压缩程序  
 [链接](https://www.7-zip.org/download.html)
 
+### WinDirStat
+硬盘空间分析，就是界面有点丑   
+[链接](https://windirstat.net/download.html)
+
 ## 高 DPI 的适配问题
 原因当然是微软以及程序对高DPI、不同屏幕不同缩放比的处理不好导致  
 比如笔记本内置显示器分辨率`2560 X 1600`，缩放比`200%` 而外接显示器`1920 X 1080`，缩放比`100%`  
