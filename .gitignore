@@ -1,9 +1,11 @@
 .DS_Store
-Thumbs.db
-db.json
-*.log
 node_modules/
 public/
 .vscode/
 .deploy*/
+.history/
+
 package-lock.json
+Thumbs.db
+db.json
+*.log
