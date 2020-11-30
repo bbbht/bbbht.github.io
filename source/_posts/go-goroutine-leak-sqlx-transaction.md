@@ -1,7 +1,9 @@
 ---
 title: go通过sqlx使用事务导致的goroutine泄露问题记录
 date: 2020-11-25 01:19:34
-tags: go
+tags: 
+	- go
+	- mysql
 categories: go
 ---
 问题的起因是收到预警，某个服务的请求持续出现504，而服务本身的记录没有504记录，触发的是负载均衡超时  
@@ -40,6 +42,16 @@ pod的内存占用也从200M持续飙升到2G，且持续增加
 			return ret.conn, ret.err
 		}
 ```
+此代码并无bug（不要首先怀疑开源代码），最终根据实际的协程池配置，找到了可疑的数据，以及16个独立的，且未增长变化的conn连接阻塞（同上）  
+```
+16 @ 0x432aa0 0x407708 0x4076de 0x4073cb 0x9cf20b 0x45fd51
+#	0x9cf20a	database/sql.(*Tx).awaitDone+0x4a	/usr/local/go/src/database/sql/sql.go:2002
+```
+```
+16 @ 0x432aa0 0x44224b 0xad7f9f 0x45fd51
+#	0xad7f9e	github.com/go-sql-driver/mysql.(*mysqlConn).startWatcher.func1+0xbe	/go/pkg/mod/github.com/go-sql-driver/mysql@v1.5.0/connection.go:621
+```
+根据几个数据，最终确定了问题原因是连接池被错误的耗尽
 ## 原因
 1. 次要，事务未设置超时，直接调用 `Beginx()`，未通过上下文设置超时时间
 2. 次要，http请求未设置超时时间
