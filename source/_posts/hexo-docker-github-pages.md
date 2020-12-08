@@ -29,6 +29,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/re
     echo "Asia/Shanghai" > /etc/timezone && \
     npm config set registry https://registry.npm.taobao.org && \
     npm install hexo-cli -g --no-optional && \
+    npm install hexo-tag-plantuml --save && \
     rm -rf /var/cache/apk/* /tmp/*
 
 COPY docker-entrypoint.sh /docker-entrypoint.sh
