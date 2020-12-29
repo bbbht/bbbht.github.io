@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="go,">
+  <meta name="keywords" content="go,mysql,">
 
 
 
@@ -87,14 +87,14 @@
 
 
 <meta name="description" content="问题的起因是收到预警，某个服务的请求持续出现504，而服务本身的记录没有504记录，触发的是负载均衡超时最终通过pprof定位到了问题并解决">
-<meta name="keywords" content="go">
+<meta name="keywords" content="go,mysql">
 <meta property="og:type" content="article">
 <meta property="og:title" content="go通过sqlx使用事务导致的goroutine泄露问题记录">
 <meta property="og:url" content="http://yoursite.com/2020/11/24/go-goroutine-leak-sqlx-transaction/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
 <meta property="og:description" content="问题的起因是收到预警，某个服务的请求持续出现504，而服务本身的记录没有504记录，触发的是负载均衡超时最终通过pprof定位到了问题并解决">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-11-26T05:40:14.066Z">
+<meta property="og:updated_time" content="2020-12-29T03:01:14.777Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="go通过sqlx使用事务导致的goroutine泄露问题记录">
 <meta name="twitter:description" content="问题的起因是收到预警，某个服务的请求持续出现504，而服务本身的记录没有504记录，触发的是负载均衡超时最终通过pprof定位到了问题并解决">
@@ -407,6 +407,9 @@
         <p>问题的起因是收到预警，某个服务的请求持续出现504，而服务本身的记录没有504记录，触发的是负载均衡超时<br>最终通过pprof定位到了问题并解决<br><a id="more"></a><br>go版本为14<br>通过pprof查看，好家伙，goroutine数4W+，如下  </p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">goroutine profile: total 40269</span><br><span class="line">30633 @ 0x432aa0 0x44224b 0x9ca93c 0x9cd106 0x9cce51 0x9e349e 0x9e3432 0x9e5d5d 0xa17457 0xa17365 0xa32339 0xaa6c26 0xa9f333 0xa81bea 0xa9bae4 0xa9c42e 0xa7a2e2 0x740254 0x73bbf5 0x45fd51</span><br><span class="line">#	0x9ca93b	database/sql.(*DB).conn+0x7ab									/usr/local/go/src/database/sql/sql.go:1183</span><br><span class="line">#	0x9cd105	database/sql.(*DB).query+0x65									/usr/local/go/src/database/sql/sql.go:1565</span><br><span class="line">#	0x9cce50	database/sql.(*DB).QueryContext+0xd0								/usr/local/go/src/database/sql/sql.go:1547</span><br><span class="line">#	0x9e349d	database/sql.(*DB).Query+0x8d									/usr/local/go/src/database/sql/sql.go:1561</span><br><span class="line">#	0x9e3431	github.com/jmoiron/sqlx.(*DB).QueryRowx+0x21							/go/pkg/mod/github.com/jmoiron/sqlx@v1.2.1-0.20190826204134-d7d95172beb5/sqlx.go:363</span><br><span class="line">#	0x9e5d5c	github.com/jmoiron/sqlx.Get+0x6c								/go/pkg/mod/github.com/jmoiron/sqlx@v1.2.1-0.20190826204134-d7d95172beb5/sqlx.go:685</span><br><span class="line">#	0xa17456	github.com/jmoiron/sqlx.(*DB).Get+0x246								/go/pkg/mod/github.com/jmoiron/sqlx@v1.2.1-0.20190826204134-d7d95172beb5/sqlx.go:328</span><br><span class="line">...业务代码</span><br><span class="line">#	0xa81be9	github.com/labstack/echo.(*Echo).Add.func1+0x89							/go/pkg/mod/github.com/labstack/echo@v3.3.10+incompatible/echo.go:490</span><br><span class="line">#	0xa9bae3	github.com/labstack/echo/middleware.LoggerWithConfig.func2.1+0x123				/go/pkg/mod/github.com/labstack/echo@v3.3.10+incompatible/middleware/logger.go:118</span><br><span class="line">#	0xa9c42d	github.com/labstack/echo/middleware.RecoverWithConfig.func1.1+0x10d				/go/pkg/mod/github.com/labstack/echo@v3.3.10+incompatible/middleware/recover.go:78</span><br><span class="line">#	0xa7a2e1	github.com/labstack/echo.(*Echo).ServeHTTP+0x221						/go/pkg/mod/github.com/labstack/echo@v3.3.10+incompatible/echo.go:593</span><br><span class="line">#	0x740253	net/http.serverHandler.ServeHTTP+0xa3								/usr/local/go/src/net/http/server.go:2802</span><br><span class="line">#	0x73bbf4	net/http.(*conn).serve+0x874									/usr/local/go/src/net/http/server.go:1890</span><br></pre></td></tr></table></figure>
 <p>pod的内存占用也从200M持续飙升到2G，且持续增加<br>其它的协程也都是阻塞在了 /usr/local/go/src/database/sql/sql.go:1183，代码简化如下<br><figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> &#123;</span><br><span class="line"><span class="keyword">case</span> &lt;-ctx.Done():</span><br><span class="line">          ....</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span>, ctx.Err()</span><br><span class="line"><span class="keyword">case</span> ret, ok := &lt;-req:</span><br><span class="line">          ....</span><br><span class="line">	<span class="keyword">return</span> ret.conn, ret.err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>此代码并无bug（不要首先怀疑开源代码），最终根据实际的协程池配置，找到了可疑的数据，以及16个独立的，且未增长变化的conn连接阻塞（同上）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">16 @ 0x432aa0 0x407708 0x4076de 0x4073cb 0x9cf20b 0x45fd51</span><br><span class="line">#	0x9cf20a	database/sql.(*Tx).awaitDone+0x4a	/usr/local/go/src/database/sql/sql.go:2002</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">16 @ 0x432aa0 0x44224b 0xad7f9f 0x45fd51</span><br><span class="line">#	0xad7f9e	github.com/go-sql-driver/mysql.(*mysqlConn).startWatcher.func1+0xbe	/go/pkg/mod/github.com/go-sql-driver/mysql@v1.5.0/connection.go:621</span><br></pre></td></tr></table></figure>
+<p>根据几个数据，最终确定了问题原因是连接池被错误的耗尽</p>
 <h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><ol>
 <li>次要，事务未设置超时，直接调用 <code>Beginx()</code>，未通过上下文设置超时时间</li>
 <li>次要，http请求未设置超时时间</li>
@@ -445,6 +448,8 @@
           
             <a href="/tags/go/" rel="tag"># go</a>
           
+            <a href="/tags/mysql/" rel="tag"># mysql</a>
+          
         </div>
       
 
@@ -465,6 +470,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/12/08/go-continue-label-break-label-goto-label/" rel="prev" title="go中跳出多层循环continue、break、goto示例">
+                go中跳出多层循环continue、break、goto示例 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -553,7 +562,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">66</span>
+                  <span class="site-state-item-count">68</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -564,7 +573,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-count">25</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -575,7 +584,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">33</span>
+                  <span class="site-state-item-count">34</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
