@@ -55,6 +55,9 @@ export TERM="xterm-256color"
 # Path to your oh-my-zsh installation.
 export ZSH=/home/bbbht/.oh-my-zsh
 
+# Windows ip（from wsl2）
+export win_host_ip=$(cat /etc/resolv.conf |grep "nameserver" |cut -f 2 -d " ")
+
 ZSH_THEME="ys"
 
 # Add wisely, as too many plugins slow down shell startup.
@@ -73,6 +76,9 @@ alias ddnone="docker images | grep none | awk '{print \$3}' |xargs docker rmi"
 alias disize="docker images --format '{{.Size}}\t{{.Repository}}\t{{.Tag}}\t{{.ID}}' | sed 's/ //' | sort -h -r | column -t"
 alias hexo="docker exec hexo-server hexo"
 alias glg="git log --graph --date-order --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %C(green)(%cn)%Creset %C(cyan)(%cr)%Creset' --abbrev-commit --date=relative"
+# curl ip.sb
+alias proxy='export all_proxy="http://${win_host_ip}:7890"'
+alias unproxy='unset all_proxy'
 
 # key bindings
 bindkey "\e[1~" beginning-of-line
