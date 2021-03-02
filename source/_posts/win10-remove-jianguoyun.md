@@ -20,3 +20,10 @@ categories: windows
 
 ### 提示
 不同电脑的 ID 可能不同，定位到具体目录即可，或者使用搜索，记得搜索时选择 `全字匹配`，并确保输入的字符串正确
+
+### WindowsTerminal
+每次更新`Windows Terminal`，都会在右键菜单增加一个`Open in Windows Terminal`，已自定义了其它打开方式（主要这个太长，右键菜单不美观），故有需要将其移除  
+一劳永逸的方式为在如下注册表路径中添加一项，值为WindowsTerminal，作为标记即可
+```
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Shell Extensions\Blocked\{9F156763-7844-4DC4-B2B1-901F640F5155}
+```
