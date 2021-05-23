@@ -68,3 +68,22 @@ DISKPART> compact vdisk
 ```powershell
 Optimize-VHD -Path <VHDX 文件路径> -Mode Full 
 ```
+
+## 补充
+wsl提供了系统的备份恢复功能，只需要两个命令即可，定期备份一下更安心
+```sh
+# 查看子系统列表
+PS C:\WINDOWS\System32> wsl -l
+适用于 Linux 的 Windows 子系统分发版:
+Ubuntu-18.04 (默认)
+。。。
+
+# 停止wsl
+wsl --shutdown
+
+# 备份指定系统到指定位置
+wsl --export Ubuntu-18.04 d:\Ubuntu-18.04.tar
+
+# 还原指定系统
+wsl --import Ubuntu-18.04 d:\Ubuntu-18.04.tar
+```
