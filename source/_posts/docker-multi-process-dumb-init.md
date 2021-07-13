@@ -110,12 +110,61 @@ CMD [ "/start.sh" ]
 /app/app_60s
 ```
 ### 结果
-|      | 条件                                      | 进程树                                                       | log                                                          | 备注                                                         |
+不适用dumb-init
+```sh
+/ # pstree && ps -eo pid,ppid,args
+start.sh-+-app_30s---6*[{app_30s}]
+         |-app_600s---6*[{app_600s}]
+         `-app_60s---6*[{app_60s}]
+PID   PPID  COMMAND
+    1     0 {start.sh} /bin/sh /start.sh
+    6     1 /app/app_30s
+    7     1 /app/app_600s
+    8     1 /app/app_60s
+   27     0 sh
+   33    27 ps -eo pid,ppid,args
+```
+ENTRYPOINT
+```sh
+/ # pstree && ps -eo pid,ppid,args
+dumb-init---start.sh-+-app_30s---5*[{app_30s}]
+                     |-app_600s---6*[{app_600s}]
+                     `-app_60s---6*[{app_60s}]
+PID   PPID  COMMAND
+    1     0 /usr/bin/dumb-init -- /start.sh
+    6     1 {start.sh} /bin/sh /start.sh
+    7     6 /app/app_30s
+    8     6 /app/app_600s
+    9     6 /app/app_60s
+   27     0 sh
+   33    27 ps -eo pid,ppid,args
+```
+ENTRYPOINT + shebang
+```sh
+/ # pstree && ps -eo pid,ppid,args
+dumb-init---start.sh---sh-+-app_30s---7*[{app_30s}]
+                          |-app_600s---5*[{app_600s}]
+                          `-app_60s---6*[{app_60s}]
+PID   PPID  COMMAND
+    1     0 /usr/bin/dumb-init -- /start.sh
+    6     1 {start.sh} /usr/bin/dumb-init /bin/sh /start.sh
+    7     6 /bin/sh /start.sh
+    8     7 /app/app_30s
+    9     7 /app/app_600s
+   10     7 /app/app_60s
+   29     0 sh
+   35    29 ps -eo pid,ppid,args
+```
+
+> shenbang、ENTRYPOINT单独使用效果一致，不单独列出了
+
+
+|   -   | 条件                                      | 进程树                                                       | log                                                          | 备注                                                         |
 | ---- | ----------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| 1    | 不使用dumb-init                           | / # pstree && ps -eo pid,ppid,args<br/> start.sh-+-app_30s---6*[{app_30s}]<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\|-app_600s---6*[{app_600s}]<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-app_60s---6*[{app_60s}]<br/> PID   PPID  COMMAND<br/> 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 {start.sh} /bin/sh /start.sh<br/> 6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 /app/app_30s<br/> 7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 /app/app_600s<br/> 8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 /app/app_60s<br/> 27&nbsp;&nbsp;&nbsp;&nbsp;0 sh<br/> 33&nbsp;&nbsp;&nbsp;&nbsp;27 ps -eo pid,ppid,args<br/> | $ docker logs -f  dumb<br/>600 ticker<br/>60 ticker<br/>30 ticker<br/># 执行 docker stop dumb<br/>600 ticker<br/>30 ticker<br/>60 ticker<br/>... | 执行`docker stop dumb`后容器并没有停止<br />且log中也没有信号接收的输出，<br />直到docker默认的等待时间（10s）被强杀 |
-| 2    | ENTRYPOINT + DUMB_INIT_SETSID=            | / # pstree && ps -eo pid,ppid,args<br/> dumb-init---start.sh-+-app_30s---6*[{app_30s}]<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\|-app_600s---6*[{app_600s}]<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-app_60s---6*[{app_60s}]<br/> PID   PPID  COMMAND<br/> 1&nbsp;&nbsp;&nbsp;&nbsp;0 /usr/bin/dumb-init -- /start.sh<br/> 6&nbsp;&nbsp;&nbsp;&nbsp;1 {start.sh} /bin/sh /start.sh<br/> 7&nbsp;&nbsp;&nbsp;&nbsp;6 /app/app_30s<br/> 8&nbsp;&nbsp;&nbsp;&nbsp;6 /app/app_600s<br/> 9&nbsp;&nbsp;&nbsp;&nbsp;6 /app/app_60s<br/> 28&nbsp;&nbsp;0 sh<br/> 34&nbsp;&nbsp;28 ps -eo pid,ppid,args<br/> | $ docker logs -f dumb<br/>60 ticker<br/>30 ticker<br/>600 ticker<br/>600 ticker<br/>60 ticker<br/>30 ticker<br/># 执行 docker stop dumb<br/>600 signal<br/>60 signal | 执行`docker stop dumb`后，<br />log中出现了两个程序接收到信号的日志输出<br />多次运行后，信号输出未1-3个不等，<br />start.sh是dumb-int的直接子进程<br />但start.sh并未等待它所有子进程推出后再退出 |
+| 1    | 不使用dumb-init                           | 见上方 | $ docker logs -f  dumb<br/>600 ticker<br/>60 ticker<br/>30 ticker<br/># 执行 docker stop dumb<br/>600 ticker<br/>30 ticker<br/>60 ticker<br/>... | 执行`docker stop dumb`后容器并没有停止<br />且log中也没有信号接收的输出，<br />直到docker默认的等待时间（10s）被强杀 |
+| 2    | ENTRYPOINT + DUMB_INIT_SETSID=            | 见上方 | $ docker logs -f dumb<br/>60 ticker<br/>30 ticker<br/>600 ticker<br/>600 ticker<br/>60 ticker<br/>30 ticker<br/># 执行 docker stop dumb<br/>600 signal<br/>60 signal | 执行`docker stop dumb`后，<br />log中出现了两个程序接收到信号的日志输出<br />多次运行后，信号输出未1-3个不等，<br />start.sh是dumb-int的直接子进程<br />但start.sh并未等待它所有子进程推出后再退出 |
 | 3    | ENTRYPOINT + DUMB_INIT_SETSID=0           | 同2                                                          | 同1                                                          | 执行`docker stop dumb`后容器立即退出<br />原因同2            |
-| 4    | ENTRYPOINT + shebang + DUMB_INIT_SETSID=0 | / # pstree && ps -eo pid,ppid,args<br/> dumb-init---start.sh---sh-+-app_30s---5*[{app_30s}]<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\|-app_600s---6*[{app_600s}]<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`-app_60s---6*[{app_60s}]<br/> PID   PPID  COMMAND<br/> 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0 /usr/bin/dumb-init -- /start.sh<br/> 6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 {start.sh} /usr/bin/dumb-init /bin/sh /start.sh<br/> 7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6 /bin/sh /start.sh<br/> 8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;7 /app/app_30s<br/> 9&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;7 /app/app_600s<br/> 10&nbsp;&nbsp;&nbsp;7 /app/app_60s<br/> 28&nbsp;&nbsp;&nbsp;0 sh<br/> 34&nbsp;&nbsp;&nbsp;28 ps -eo pid,ppid,args<br/> | 同1                                                          | 执行`docker stop dumb`后容器立即退出<br />原因同2<br />直接子进程分别是start.sh 以及 shebang中的 sh |
+| 4    | ENTRYPOINT + shebang + DUMB_INIT_SETSID=0 | 见上方 | 同1                                                          | 执行`docker stop dumb`后容器立即退出<br />原因同2<br />直接子进程分别是start.sh 以及 shebang中的 sh |
 | 5    | ENTRYPOINT + shebang + DUMB_INIT_SETSID=  | 同4                                                          | $ docker logs -f dumb<br/>60 ticker<br/>30 ticker<br/>600 ticker<br/>60 ticker<br/>30 ticker<br/>600 ticker<br/># 执行 docker stop dumb<br/>60 signal<br/>600 signal<br/>30 signal | 执行`docker stop dumb`后<br />容器等待所有子进程退出后才退出。<br />实现预期目标<br />原因是脚本shebang中设置`/usr/bin/dumb-init`，<br />其pid为6，ppid为1，接收到pid1传递的信号后再传递<br />同时等待所有子进程退出后才退出 |
 
 
