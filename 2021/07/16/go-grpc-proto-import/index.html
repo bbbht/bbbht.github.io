@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="docker,">
+  <meta name="keywords" content="go,grpc,">
 
 
 
@@ -86,18 +86,18 @@
 
 
 
-<meta name="description" content="在公司项目的某个容器内，想要查看某个中文名的文件内容，结果连文件名都不能输入于是只能先解决屡次出现的中文问题了">
-<meta name="keywords" content="docker">
+<meta name="description" content="需求是多个后端服务提供grpc接口及proto文件，之前上层服务各自调用，分散且难以管理所以选择重构，后端服务据说没有人手，不会做任何改动，但目标是实现故障转移、服务注册发现、负载均衡、任务泄露检测等其中就涉及要复用proto的要求，本来简单的事由于掉进前人坑中，也只好记录下，增加点教训">
+<meta name="keywords" content="go,grpc">
 <meta property="og:type" content="article">
-<meta property="og:title" content="docker中不能显示或输入中文">
-<meta property="og:url" content="http://yoursite.com/2018/03/15/docker-chinese-error/index.html">
+<meta property="og:title" content="通过import的方式复用proto来使用grpc">
+<meta property="og:url" content="http://yoursite.com/2021/07/16/go-grpc-proto-import/index.html">
 <meta property="og:site_name" content="Don&#39;t Panic">
-<meta property="og:description" content="在公司项目的某个容器内，想要查看某个中文名的文件内容，结果连文件名都不能输入于是只能先解决屡次出现的中文问题了">
+<meta property="og:description" content="需求是多个后端服务提供grpc接口及proto文件，之前上层服务各自调用，分散且难以管理所以选择重构，后端服务据说没有人手，不会做任何改动，但目标是实现故障转移、服务注册发现、负载均衡、任务泄露检测等其中就涉及要复用proto的要求，本来简单的事由于掉进前人坑中，也只好记录下，增加点教训">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2021-07-16T10:08:59.145Z">
+<meta property="og:updated_time" content="2021-07-16T10:08:59.163Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="docker中不能显示或输入中文">
-<meta name="twitter:description" content="在公司项目的某个容器内，想要查看某个中文名的文件内容，结果连文件名都不能输入于是只能先解决屡次出现的中文问题了">
+<meta name="twitter:title" content="通过import的方式复用proto来使用grpc">
+<meta name="twitter:description" content="需求是多个后端服务提供grpc接口及proto文件，之前上层服务各自调用，分散且难以管理所以选择重构，后端服务据说没有人手，不会做任何改动，但目标是实现故障转移、服务注册发现、负载均衡、任务泄露检测等其中就涉及要复用proto的要求，本来简单的事由于掉进前人坑中，也只好记录下，增加点教训">
 
 
 
@@ -127,14 +127,14 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/03/15/docker-chinese-error/">
+  <link rel="canonical" href="http://yoursite.com/2021/07/16/go-grpc-proto-import/">
 
 
 
 
 
   <meta name="google-site-verification" content="aVUEVKghcpKmqD1MgxttjI8n8mrd1iSrStqvpDlEAdg">
-  <title>docker中不能显示或输入中文 | Don't Panic</title>
+  <title>通过import的方式复用proto来使用grpc | Don't Panic</title>
   
 
 
@@ -300,7 +300,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/15/docker-chinese-error/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/07/16/go-grpc-proto-import/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="bbbht">
@@ -317,7 +317,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">docker中不能显示或输入中文</h2>
+          <h2 class="post-title" itemprop="name headline">通过import的方式复用proto来使用grpc</h2>
         
 
         <div class="post-meta">
@@ -329,8 +329,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-15T01:32:18+00:00">
-                2018-03-15
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-07-16T09:30:11+00:00">
+                2021-07-16
               </time>
             
 
@@ -352,8 +352,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/docker/" itemprop="url" rel="index">
-                    <span itemprop="name">docker</span>
+                  <a href="/categories/go/" itemprop="url" rel="index">
+                    <span itemprop="name">go</span>
                   </a>
                 </span>
 
@@ -370,8 +370,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/03/15/docker-chinese-error/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/03/15/docker-chinese-error/" itemprop="commentCount"></span>
+                <a href="/2021/07/16/go-grpc-proto-import/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/07/16/go-grpc-proto-import/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -404,14 +404,17 @@
       
 
       
-        <p>在公司项目的某个容器内，想要查看某个中文名的文件内容，结果连文件名都不能输入<br>于是只能先解决屡次出现的中文问题了<br><a id="more"></a></p>
-<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>ssh进入docker容器内，命令行中不能显示，也不能输入中文</p>
-<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>系统语言设置导致<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">root@298b22751598:/<span class="comment"># locale</span></span><br><span class="line">LANG=</span><br><span class="line">LANGUAGE=</span><br><span class="line">LC_CTYPE=<span class="string">"POSIX"</span></span><br><span class="line">LC_NUMERIC=<span class="string">"POSIX"</span></span><br><span class="line">LC_TIME=<span class="string">"POSIX"</span></span><br><span class="line">LC_COLLATE=<span class="string">"POSIX"</span></span><br><span class="line">LC_MONETARY=<span class="string">"POSIX"</span></span><br><span class="line">LC_MESSAGES=<span class="string">"POSIX"</span></span><br><span class="line">LC_PAPER=<span class="string">"POSIX"</span></span><br><span class="line">LC_NAME=<span class="string">"POSIX"</span></span><br><span class="line">LC_ADDRESS=<span class="string">"POSIX"</span></span><br><span class="line">LC_TELEPHONE=<span class="string">"POSIX"</span></span><br><span class="line">LC_MEASUREMENT=<span class="string">"POSIX"</span></span><br><span class="line">LC_IDENTIFICATION=<span class="string">"POSIX"</span></span><br><span class="line">LC_ALL=</span><br><span class="line"></span><br><span class="line">root@298b22751598:/<span class="comment"># locale -a</span></span><br><span class="line">C</span><br><span class="line">C.UTF-8</span><br><span class="line">POSIX</span><br></pre></td></tr></table></figure></p>
-<p>所以需要修改配置</p>
-<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>两种方案：</p>
-<h3 id="1-临时"><a href="#1-临时" class="headerlink" title="1. 临时"></a>1. 临时</h3><p>重启或注销后问题依旧<br><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">"export LANG=C.UTF-8"</span> &gt;&gt; /etc/profile</span><br><span class="line"><span class="built_in">source</span> /etc/profile</span><br></pre></td></tr></table></figure></p>
-<h3 id="2-修改Dockerfile，一劳永逸"><a href="#2-修改Dockerfile，一劳永逸" class="headerlink" title="2. 修改Dockerfile，一劳永逸"></a>2. 修改Dockerfile，一劳永逸</h3><p>在Dockerfile中添加一行，设置环境变量<br><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ENV</span> LANG C.UTF-<span class="number">8</span></span><br></pre></td></tr></table></figure></p>
-<p>重新制作docker镜像，然后重新运行容器</p>
+        <p>需求是多个后端服务提供grpc接口及proto文件，之前上层服务各自调用，分散且难以管理<br>所以选择重构，后端服务据说没有人手，不会做任何改动，但目标是实现故障转移、服务注册发现、负载均衡、任务泄露检测等<br>其中就涉及要复用proto的要求，本来简单的事由于掉进前人坑中，也只好记录下，增加点教训<br><a id="more"></a><br>整体方案简述：以slidecar模式给后端服务提供一个容器，主要负责服务注册，增加一个中间层，负责服务发现，然后通过rpc接口进行实际访问，并记录任务在哪台机器<br>上层服务直接调用中间层，中间层记录、处理，确认有足够资源后，转发上层服务的请求到后端服务，上层不需要关心任务被分配到了哪台机器<br>问题出在上层访问中间层的方式，要尽量保持请求方接口、参数、方式的不变以减少开发量。故提出一个方案，即复用proto，上层请求中间层时就使用后端服务的消息定义<br>方案很简单，但使用起来是出了点问题  </p>
+<ol>
+<li>proto文件定义老旧，没有任何option，当前protobuf版本1.27必须设置<code>option go_package</code>才能使用import功能</li>
+<li>package命名空间冲突，之前全部都是定义<code>package proto</code>完全没有区分度，导致消息定义冲突，直接panic，导致无法使用，必须修改package定义</li>
+</ol>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><p>由于有多个后端服务，故有多个proto文件，所以使用循环方式来生成，结构如下<br>其中 mix就是混合复用的proto了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">├── go.mod</span><br><span class="line">├── go.sum</span><br><span class="line">├── main.go</span><br><span class="line">├── ........</span><br><span class="line">└── proto</span><br><span class="line">    ├── mix</span><br><span class="line">    │   └── mix.pb.go</span><br><span class="line">    ├── mix.proto</span><br><span class="line">    ├── a</span><br><span class="line">    │   └── a.pb.go</span><br><span class="line">    ├── a.proto</span><br><span class="line">    ├── ........</span><br><span class="line">    ├── c</span><br><span class="line">    │   └── c.pb.go</span><br><span class="line">    └── c.proto</span><br></pre></td></tr></table></figure></p>
+<p>mix.proto格式<br>增加A、B前缀是为了增加区分度，将所有的方法定义整合到一个service中<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">syntax = &quot;proto3&quot;;</span><br><span class="line"></span><br><span class="line">package mix;</span><br><span class="line">option go_package = &quot;xxx/xxx/proto/mix&quot;;</span><br><span class="line"></span><br><span class="line">import &quot;a.proto&quot;;</span><br><span class="line">import &quot;b.proto&quot;;</span><br><span class="line">import &quot;c.proto&quot;;</span><br><span class="line">import ....</span><br><span class="line"></span><br><span class="line">service Dispatch &#123;</span><br><span class="line">    rpc Arpc_1 (a.In_1) returns (a.Out_1) &#123;&#125;</span><br><span class="line">    rpc Arpc_2 (a.In_2) returns (a.Out_2) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    rpc Brpc_1 (b.In_1) returns (b.Out_1) &#123;&#125;</span><br><span class="line">    rpc Brpc_2 (b.In_2) returns (b.Out_2) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>举例a.proto格式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">syntax = &quot;proto3&quot;;</span><br><span class="line"></span><br><span class="line">package a;</span><br><span class="line">option go_package = &quot;xxx/xxx/proto/a&quot;;</span><br><span class="line"></span><br><span class="line">service A &#123;</span><br><span class="line">    rpc rpc_1 (In_1) returns (Out_1) &#123;&#125;</span><br><span class="line">    rpc rpc_2 (In_2) returns (Out_2) &#123;&#125;</span><br><span class="line"></span><br><span class="line">    .......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样就只需要将之前直接调用方法加上前缀，再去掉一些由中间层处理的逻辑即可，做减法了，工作量大幅减少  </p>
+<p>使用的是makefile来生成，<code>@</code>是为了屏蔽命令回显，无视即可<br>其中由个重要配置项 <code>paths=source_relative</code>，配合 <code>go_package</code>才能实现proto复用的目标<br>实际上 paths 参数有两个可选项，<code>import</code>（默认值）/<code>source_relative</code><br>import则代表按照生成的 go 代码的包的全路径去创建目录层级，会造成生成很深的层级目录；source_relative 则是按照 proto 源文件的目录层级去创建 pb.go 代码的目录层级，如果目录不存在需要手动创建。<br><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">PROTO_PATH=proto/</span><br><span class="line">PROTO_FILES=<span class="variable">$(<span class="built_in">shell</span> find $&#123;PROTO_PATH&#125; -maxdepth 1 -type f -name '*.proto')</span></span><br><span class="line"></span><br><span class="line"><span class="section">genprotos:</span></span><br><span class="line">	@for proto_file in $&#123;PROTO_FILES&#125;; do \</span><br><span class="line"> 		echo <span class="string">"Generating protobuf for"</span> $$proto_file; \</span><br><span class="line"> 		proto_name=`basename $$proto_file .proto`; \</span><br><span class="line"><span class="comment">#  		echo $$proto_name; \</span></span><br><span class="line"> 		mkdir -p $&#123;PROTO_PATH&#125;$$proto_name; \</span><br><span class="line">		protoc -I$&#123;PROTO_PATH&#125; --go_out=plugins=grpc,paths=source_relative:$&#123;PROTO_PATH&#125;$$proto_name $$proto_file; \</span><br><span class="line">	done;</span><br></pre></td></tr></table></figure></p>
+<h2 id="题外话"><a href="#题外话" class="headerlink" title="题外话"></a>题外话</h2><p>IDE是goland，本来已经安装了插件<code>Protocol Buffer Editor</code>，本来好好的，但加入import语句后，就一致报错 <code>Cannot resolve import &#39;xxx.proto&#39;</code><br>实际上是IDE默认的配置导致的无法找到proto路径，需要改为手动配置proto文件目录<br>具体路径为 <code>进入settings -&gt; Languages &amp; Frameworks -&gt; Protocol Buffers</code>，取消勾选 <code>Configure automatically</code> ，然后手动添加proto文件所在的目录即可</p>
 
       
     </div>
@@ -429,7 +432,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/docker/" rel="tag"># docker</a>
+            <a href="/tags/go/" rel="tag"># go</a>
+          
+            <a href="/tags/grpc/" rel="tag"># grpc</a>
           
         </div>
       
@@ -442,8 +447,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/03/08/provisional-headers-are-shown/" rel="next" title="Chrome请求provisional headers are shown的解决">
-                <i class="fa fa-chevron-left"></i> Chrome请求provisional headers are shown的解决
+              <a href="/2021/07/09/docker-multi-process-dumb-init/" rel="next" title="使用dumb-init来实现docker中运行多个进程并处理SIGTERM信号">
+                <i class="fa fa-chevron-left"></i> 使用dumb-init来实现docker中运行多个进程并处理SIGTERM信号
               </a>
             
           </div>
@@ -451,10 +456,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/03/16/hexo-docker-github-pages/" rel="prev" title="在docker中部署hexo">
-                在docker中部署hexo <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -614,7 +615,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题描述"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原因"><span class="nav-number">2.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方法"><span class="nav-number">3.</span> <span class="nav-text">解决方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-临时"><span class="nav-number">3.1.</span> <span class="nav-text">1. 临时</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-修改Dockerfile，一劳永逸"><span class="nav-number">3.2.</span> <span class="nav-text">2. 修改Dockerfile，一劳永逸</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方法"><span class="nav-number">1.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#题外话"><span class="nav-number">2.</span> <span class="nav-text">题外话</span></a></li></ol></div>
             
 
           </div>
@@ -797,9 +798,9 @@
     
       <script type="text/javascript">
         var disqus_config = function () {
-          this.page.url = 'http://yoursite.com/2018/03/15/docker-chinese-error/';
-          this.page.identifier = '2018/03/15/docker-chinese-error/';
-          this.page.title = 'docker中不能显示或输入中文';
+          this.page.url = 'http://yoursite.com/2021/07/16/go-grpc-proto-import/';
+          this.page.identifier = '2021/07/16/go-grpc-proto-import/';
+          this.page.title = '通过import的方式复用proto来使用grpc';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://loessplateau.disqus.com/embed.js';
