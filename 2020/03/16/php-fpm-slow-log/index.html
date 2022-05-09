@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="网站并发上升后，页面响应变慢，甚至出现504由于网站主入口还是php处理，本地压测也无法复现，所以排查一番后决定通过php-fpm的slowlog来快速定位问题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="php-fpm slow log">
+<meta property="og:url" content="http://example.com/2020/03/16/php-fpm-slow-log/index.html">
+<meta property="og:site_name" content="Don&#39;t Panic">
+<meta property="og:description" content="网站并发上升后，页面响应变慢，甚至出现504由于网站主入口还是php处理，本地压测也无法复现，所以排查一番后决定通过php-fpm的slowlog来快速定位问题">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-03-16T05:14:45.000Z">
+<meta property="article:modified_time" content="2022-05-09T03:07:52.903Z">
+<meta property="article:author" content="bbbht">
+<meta property="article:tag" content="php">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2020/03/16/php-fpm-slow-log/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>php-fpm slow log | Don't Panic</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116292975-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-116292975-1');
+      }
+    </script>
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?a42c6bb7f27c4efdbc6c2deba01acaba";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Don't Panic</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Try Again</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/03/16/php-fpm-slow-log/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="bbbht">
+      <meta itemprop="description" content="尝试，记录，分享">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Don't Panic">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          php-fpm slow log
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-03-16 13:14:45" itemprop="dateCreated datePublished" datetime="2020-03-16T13:14:45+08:00">2020-03-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-09 11:07:52" itemprop="dateModified" datetime="2022-05-09T11:07:52+08:00">2022-05-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/php/" itemprop="url" rel="index"><span itemprop="name">php</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020/03/16/php-fpm-slow-log/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020/03/16/php-fpm-slow-log/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>网站并发上升后，页面响应变慢，甚至出现504<br>由于网站主入口还是php处理，本地压测也无法复现，所以排查一番后决定通过php-fpm的slowlog来快速定位问题</p>
+<span id="more"></span>
+
+<p>响应慢，大量502,504</p>
+<h2 id="检测服务器配置"><a href="#检测服务器配置" class="headerlink" title="检测服务器配置"></a>检测服务器配置</h2><p>8核16G配置，带宽峰值无限制</p>
+<h3 id="CPU"><a href="#CPU" class="headerlink" title="CPU"></a>CPU</h3><p>高并发时均值50%，nginx占比很高<br>平时10%左右</p>
+<h3 id="内存"><a href="#内存" class="headerlink" title="内存"></a>内存</h3><p>始终较低，20%左右</p>
+<h3 id="TCP连接数"><a href="#TCP连接数" class="headerlink" title="TCP连接数"></a>TCP连接数</h3><p>出问题阶段，服务器监控显示tcp连接数达到了65000左右，然后在65000阶段小幅波动<br>怀疑是负载均衡转过来的QPS达到上限(后确认确实占大头)<br>网关与真实服务器之间TCP连接由（源IP，目的IP，源端口，目的端口）四元组组成，由此，只有源端口可变<br>但实际情况网关后有多台服务器，所以应该非此限制<br>但是在真实的业务服务器中，nginx转发到php-fpm的过程中，同样会有这个限制  </p>
+<h3 id="文件句柄数"><a href="#文件句柄数" class="headerlink" title="文件句柄数"></a>文件句柄数</h3><p>正常范围</p>
+<h2 id="检查PHP相关配置"><a href="#检查PHP相关配置" class="headerlink" title="检查PHP相关配置"></a>检查PHP相关配置</h2><h3 id="php-ini配置"><a href="#php-ini配置" class="headerlink" title="php.ini配置"></a>php.ini配置</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">root@b616d73bd037:/# cat /etc/php/7.0/fpm/php.ini  | grep -v &#x27;^;&#x27; | grep -v &#x27;^$&#x27;</span><br><span class="line">[PHP]</span><br><span class="line">engine = On</span><br><span class="line">short_open_tag = Off</span><br><span class="line">precision = 14</span><br><span class="line">output_buffering = 4096</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h3 id="php-fpm配置"><a href="#php-fpm配置" class="headerlink" title="php-fpm配置"></a>php-fpm配置</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">root@b616d73bd037:/# cat /etc/php/7.0/fpm/pool.d/www.conf | grep -v &#x27;^;&#x27; | grep -v &#x27;^$&#x27;</span><br><span class="line">[www]</span><br><span class="line">user = www-data</span><br><span class="line">group = www-data</span><br><span class="line">listen = /run/php/php7.0-fpm.sock</span><br><span class="line">listen.owner = www-data</span><br><span class="line">listen.group = www-data</span><br><span class="line">listen.allowed_clients = 127.0.0.1</span><br><span class="line">;主要是static（静态）或者dynamic（动态）</span><br><span class="line">pm = static</span><br><span class="line">;静态方式下开启的php-fpm进程数量</span><br><span class="line">;在动态方式下，限定php-fpm的最大进程数</span><br><span class="line">;要注意pm.max_spare_servers的值只能小于等于pm.max_children</span><br><span class="line">pm.max_children = 40</span><br><span class="line">;动态方式下的起始php-fpm进程数量</span><br><span class="line">pm.start_servers = 2</span><br><span class="line">;动态方式空闲状态下的最小php-fpm进程数量</span><br><span class="line">pm.min_spare_servers = 1</span><br><span class="line">;动态方式空闲状态下的最大php-fpm进程数量</span><br><span class="line">pm.max_spare_servers = 3</span><br><span class="line">;children 处理多少个请求后被关闭，关闭时会有notice日志产生</span><br><span class="line">;[12-Feb-2020 15:45:24] NOTICE: [pool www] child 30032 exited with code 0 after 2590.928501 seconds from start</span><br><span class="line">pm.max_requests = 20000</span><br><span class="line">pm.status_path = /status</span><br><span class="line">slowlog = /var/log/$pool.log.slow</span><br><span class="line">catch_workers_output = yes</span><br><span class="line">php_admin_value[error_log] = /var/log/fpm-php.www.log</span><br><span class="line">php_admin_flag[log_errors] = on</span><br><span class="line">php_value[session.save_handler] = memcached</span><br><span class="line">php_value[session.save_path]    = cdd400d84eec4b3c.m.cnhzalicm10pub001.ocs.aliyuncs.com:11211</span><br><span class="line">php_value[soap.wsdl_cache_dir]  = /var/lib/php/wsdlcache</span><br></pre></td></tr></table></figure>
+<h2 id="关键配置排查"><a href="#关键配置排查" class="headerlink" title="关键配置排查"></a>关键配置排查</h2><h3 id="php-ini"><a href="#php-ini" class="headerlink" title="php.ini"></a>php.ini</h3><h4 id="max-execution-time"><a href="#max-execution-time" class="headerlink" title="max_execution_time"></a>max_execution_time</h4><p>当前设置30s，触发会返回500<br>这个字面意思，即脚本执行时间，所以sleep、curl等待响应一类耗时是不计入的  </p>
+<h3 id="php-fpm"><a href="#php-fpm" class="headerlink" title="php-fpm"></a>php-fpm</h3><h4 id="max-children"><a href="#max-children" class="headerlink" title="max_children"></a>max_children</h4><p>达到上限返回502？<br>每个按20M内存使用来计算，但静态由于长时间运行可按照每个30M来计算<br>当前40，参考配置来说，太低</p>
+<h4 id="request-terminate-timeout"><a href="#request-terminate-timeout" class="headerlink" title="request_terminate_timeout"></a>request_terminate_timeout</h4><p>执行超时触发502？<br>当前未设置</p>
+<h2 id="开启php-fpm慢日志"><a href="#开启php-fpm慢日志" class="headerlink" title="开启php-fpm慢日志"></a>开启php-fpm慢日志</h2><h3 id="慢日志相关内容"><a href="#慢日志相关内容" class="headerlink" title="慢日志相关内容"></a>慢日志相关内容</h3><p>; The log file for slow requests<br>; Default Value: not set<br>; Note: slowlog is mandatory if request_slowlog_timeout is set<br>;slowlog &#x3D; log&#x2F;$pool.log.slow</p>
+<p>; The timeout for serving a single request after which a PHP backtrace will be<br>; dumped to the ‘slowlog’ file. A value of ‘0s’ means ‘off’.<br>; Available units: s(econds)(default), m(inutes), h(ours), or d(ays)<br>; Default Value: 0<br>;request_slowlog_timeout &#x3D; 0</p>
+<h3 id="配置文件地址"><a href="#配置文件地址" class="headerlink" title="配置文件地址"></a>配置文件地址</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@ubuntu:/home/tb# ps -ef |grep php-fpm | grep master</span><br><span class="line">root      3484     1  0 10:17 ?        00:00:01 php-fpm: master process (/etc/php/7.0/fpm/php-fpm.conf)</span><br><span class="line"></span><br><span class="line">最终配置文件路径</span><br><span class="line">include=/etc/php/7.0/fpm/pool.d/*.conf</span><br></pre></td></tr></table></figure>
+
+<h3 id="修改配置，开启PHP慢日志"><a href="#修改配置，开启PHP慢日志" class="headerlink" title="修改配置，开启PHP慢日志"></a>修改配置，开启PHP慢日志</h3><h4 id="docker支持"><a href="#docker支持" class="headerlink" title="docker支持"></a>docker支持</h4><ol>
+<li><p>docker run 添加参数</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--cap-add=SYS_PTRACE</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>改运行中容器的docker配置文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 停止docker服务 </span></span><br><span class="line">systemctl stop docker</span><br><span class="line"><span class="comment"># 修改docker配置，先找到容器id</span></span><br><span class="line">sudo vim /var/lib/docker/containers/container_id/hostconfig.json</span><br><span class="line"><span class="comment"># 手动添加修改CapAdd内容</span></span><br><span class="line"><span class="string">&quot;CapAdd&quot;</span>:[<span class="string">&quot;SYS_PTRACE&quot;</span>],<span class="string">&quot;CapDrop&quot;</span>:null,</span><br><span class="line"><span class="comment"># 启动docker服务</span></span><br><span class="line">systemctl start docker</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h4 id="php-fpm支持"><a href="#php-fpm支持" class="headerlink" title="php-fpm支持"></a>php-fpm支持</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 修改php-fpm配置，不一定相同路径</span></span><br><span class="line">vim /etc/php/7.0/fpm/pool.d/www.conf</span><br><span class="line">slowlog = /var/log/<span class="variable">$pool</span>.log.slow 修改为 slowlog = /var/log/php.slow.log</span><br><span class="line">;request_slowlog_timeout = 0 修改为 request_slowlog_timeout = 2s</span><br><span class="line"><span class="comment"># 重启php-fpm</span></span><br><span class="line"><span class="built_in">kill</span> -USR2 pid</span><br></pre></td></tr></table></figure>
+
+<h4 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h4><p>报错处理<br><strong>ERROR: Unable to set php_value ‘soap.wsdl_cache_dir’.</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 注释掉，因为未使用</span></span><br><span class="line">;php_value[soap.wsdl_cache_dir]  = /var/lib/php/wsdlcache</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 修改php-fpm的日志记录等级，默认notice</span></span><br><span class="line">vim /etc/php/7.0/fpm/php-fpm.conf</span><br><span class="line">;log_level = notice 修改为 log_level = warning</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="noopener" href="https://serverfault.com/questions/704007/php-slowlog-causing-ptrace-error-in-docker-container/706982#706982">链接1</a><br><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/967b2f37d8af">链接2</a><br><a target="_blank" rel="noopener" href="https://loesspie.com/">原文链接</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/php/" rel="tag"># php</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/12/15/go-bitwise-operators%20/" rel="prev" title="go位操作">
+      <i class="fa fa-chevron-left"></i> go位操作
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/10/docker-ce-ubuntu18-install-uninstall/" rel="next" title="Ubuntu18.04中安装及彻底卸载Docker-CE">
+      Ubuntu18.04中安装及彻底卸载Docker-CE <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E6%B5%8B%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">检测服务器配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CPU"><span class="nav-number">1.1.</span> <span class="nav-text">CPU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E5%AD%98"><span class="nav-number">1.2.</span> <span class="nav-text">内存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TCP%E8%BF%9E%E6%8E%A5%E6%95%B0"><span class="nav-number">1.3.</span> <span class="nav-text">TCP连接数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%8F%A5%E6%9F%84%E6%95%B0"><span class="nav-number">1.4.</span> <span class="nav-text">文件句柄数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5PHP%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">检查PHP相关配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#php-ini%E9%85%8D%E7%BD%AE"><span class="nav-number">2.1.</span> <span class="nav-text">php.ini配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#php-fpm%E9%85%8D%E7%BD%AE"><span class="nav-number">2.2.</span> <span class="nav-text">php-fpm配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E9%85%8D%E7%BD%AE%E6%8E%92%E6%9F%A5"><span class="nav-number">3.</span> <span class="nav-text">关键配置排查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#php-ini"><span class="nav-number">3.1.</span> <span class="nav-text">php.ini</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#max-execution-time"><span class="nav-number">3.1.1.</span> <span class="nav-text">max_execution_time</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#php-fpm"><span class="nav-number">3.2.</span> <span class="nav-text">php-fpm</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#max-children"><span class="nav-number">3.2.1.</span> <span class="nav-text">max_children</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#request-terminate-timeout"><span class="nav-number">3.2.2.</span> <span class="nav-text">request_terminate_timeout</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%90%AFphp-fpm%E6%85%A2%E6%97%A5%E5%BF%97"><span class="nav-number">4.</span> <span class="nav-text">开启php-fpm慢日志</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%85%A2%E6%97%A5%E5%BF%97%E7%9B%B8%E5%85%B3%E5%86%85%E5%AE%B9"><span class="nav-number">4.1.</span> <span class="nav-text">慢日志相关内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%9C%B0%E5%9D%80"><span class="nav-number">4.2.</span> <span class="nav-text">配置文件地址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E9%85%8D%E7%BD%AE%EF%BC%8C%E5%BC%80%E5%90%AFPHP%E6%85%A2%E6%97%A5%E5%BF%97"><span class="nav-number">4.3.</span> <span class="nav-text">修改配置，开启PHP慢日志</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#docker%E6%94%AF%E6%8C%81"><span class="nav-number">4.3.1.</span> <span class="nav-text">docker支持</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#php-fpm%E6%94%AF%E6%8C%81"><span class="nav-number">4.3.2.</span> <span class="nav-text">php-fpm支持</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B6%E5%AE%83"><span class="nav-number">4.3.3.</span> <span class="nav-text">其它</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">5.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">bbbht</p>
+  <div class="site-description" itemprop="description">尝试，记录，分享</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/bbbht" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;bbbht" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:plateau.loess@gmail.com" title="E-Mail → mailto:plateau.loess@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bbbht</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://loessplateau.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://example.com/2020/03/16/php-fpm-slow-log/";
+    this.page.identifier = "2020/03/16/php-fpm-slow-log/";
+    this.page.title = "php-fpm slow log";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://loessplateau.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

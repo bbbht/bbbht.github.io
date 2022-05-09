@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="最近刷到一篇Netflix的技术博客，提到用 FieldMask 在grpc中实现类似 GraphQL 中的 field selectors 或 Json Api 标准中的 Sparse Fieldsets">
+<meta property="og:type" content="article">
+<meta property="og:title" content="grpc中使用fieldmask以提升接口的灵活性">
+<meta property="og:url" content="http://example.com/2021/12/24/protobuf-fieldmask/index.html">
+<meta property="og:site_name" content="Don&#39;t Panic">
+<meta property="og:description" content="最近刷到一篇Netflix的技术博客，提到用 FieldMask 在grpc中实现类似 GraphQL 中的 field selectors 或 Json Api 标准中的 Sparse Fieldsets">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-12-24T06:26:43.000Z">
+<meta property="article:modified_time" content="2022-05-09T03:07:52.907Z">
+<meta property="article:author" content="bbbht">
+<meta property="article:tag" content="go">
+<meta property="article:tag" content="grpc">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2021/12/24/protobuf-fieldmask/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>grpc中使用fieldmask以提升接口的灵活性 | Don't Panic</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116292975-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-116292975-1');
+      }
+    </script>
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?a42c6bb7f27c4efdbc6c2deba01acaba";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Don't Panic</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Try Again</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/12/24/protobuf-fieldmask/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="bbbht">
+      <meta itemprop="description" content="尝试，记录，分享">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Don't Panic">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          grpc中使用fieldmask以提升接口的灵活性
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-24 14:26:43" itemprop="dateCreated datePublished" datetime="2021-12-24T14:26:43+08:00">2021-12-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-09 11:07:52" itemprop="dateModified" datetime="2022-05-09T11:07:52+08:00">2022-05-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/grpc/" itemprop="url" rel="index"><span itemprop="name">grpc</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2021/12/24/protobuf-fieldmask/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/12/24/protobuf-fieldmask/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>最近刷到一篇Netflix的技术博客，提到用 FieldMask 在grpc中实现类似 GraphQL 中的 field selectors 或 Json Api 标准中的 Sparse Fieldsets</p>
+<span id="more"></span>
+<p>文章中提到的痛点目前公司系统中也是存在的，但是没有那么明显，通过很不优雅的添加一个额外标记字段解决了99%的问题。如今遇到好的解决方案记录，学习以增加姿势储备</p>
+<h2 id="痛点"><a href="#痛点" class="headerlink" title="痛点"></a>痛点</h2><ol>
+<li>文章中提到，Netflix后端通信使用grpc。在处理请求时，如果能知道哪些响应字段是可忽略不返回的，是很有用的，毕竟某些字段可能需要经过复杂的下游请求或密集计算的结果<br>对于此痛点，在GraphQ &#x2F; Json Api 标准中，分别有对应的解决方案 field selectors &#x2F; Sparse Fieldsets，而在grpc场景下，他们选择了 FieldMask  </li>
+<li>对于一个拥有众多属性的对象要进行更新操作时，本着职责单一的原则，一个需求会定义一个接口，会导致接口数量随着操作需求的增加而不断增加<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// separate RPC for every field, not recommended</span><br><span class="line">service ProductionService &#123;</span><br><span class="line">  rpc UpdateProductionFormat (UpdateProductionFormatRequest) &#123;...&#125;</span><br><span class="line"></span><br><span class="line">  rpc UpdateProductionTitle (UpdateProductionTitleRequest) &#123;...&#125;</span><br><span class="line"></span><br><span class="line">  rpc UpdateProductionSchedule (UpdateProductionScheduleRequest) &#123;...&#125;</span><br><span class="line"></span><br><span class="line">  rpc UpdateProductionScripts (UpdateProductionScriptsRequest) &#123;...&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">message UpdateProductionFormatRequest &#123;...&#125;</span><br><span class="line"></span><br><span class="line">message UpdateProductionTitleRequest &#123;...&#125;</span><br><span class="line"></span><br><span class="line">message UpdateProductionScheduleRequest &#123;...&#125;</span><br><span class="line"></span><br><span class="line">message UpdateProductionScriptsRequest &#123;...&#125;</span><br></pre></td></tr></table></figure>
+但这显然看起来是很凌乱的，实际上维护起来也是很困难的，如果要穷尽组合，那么接口数量将十分可观<br>当然，也有只提供一个接口，然后update所有字段的操作，太骚了，把握不住不推荐</li>
+</ol>
+<h2 id="FieldMask"><a href="#FieldMask" class="headerlink" title="FieldMask"></a>FieldMask</h2><p>grpc使用protobuf作为 IDL (interface definition language， 接口定义语言)及接口序列化协议<br>FieldMask是field_mask.proto中定义的一个message，如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// ## Field Mask Verification</span><br><span class="line">//</span><br><span class="line">// The implementation of any API method which has a FieldMask type field in the</span><br><span class="line">// request should verify the included field paths, and return an</span><br><span class="line">// `INVALID_ARGUMENT` error if any path is unmappable.</span><br><span class="line">message FieldMask &#123;</span><br><span class="line">  // The set of field mask paths.</span><br><span class="line">  repeated string paths = 1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Get-场景应用"><a href="#Get-场景应用" class="headerlink" title="Get 场景应用"></a>Get 场景应用</h3><p>博客中通过一个根据 production_id 获取 production 详情的例子来说明FieldMask在<code>Get</code>场景下的作用，如下的proto定义</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">// Contains Production-related information  </span><br><span class="line">message Production &#123;</span><br><span class="line">  string id = 1;</span><br><span class="line">  string title = 2;</span><br><span class="line">  ProductionFormat format = 3;</span><br><span class="line">  repeated ProductionScript scripts = 4;</span><br><span class="line">  ProductionSchedule schedule = 5;</span><br><span class="line">  // ... more fields</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">service ProductionService &#123;</span><br><span class="line">  // returns Production by ID</span><br><span class="line">  rpc GetProduction (GetProductionRequest) returns (GetProductionResponse);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">message GetProductionRequest &#123;</span><br><span class="line">  string production_id = 1;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">message GetProductionResponse &#123;</span><br><span class="line">  Production production = 1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中 ProductionScript&#x2F;ProductionSchedule两个字段都是需要通过额外的grpc请求才能获取到数据<br>所以如果请求方并不需要这两个字段，那么这些额外的rpc请求就是被浪费的，不仅耗费更多的时间，也增加网络传输的成本，属于费力不讨好<br>然后也举例可以通过增加额外标记字段（我们仍在用，惭愧）的方式来判断是否需要返回这些字段</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// Request with one-off &quot;include&quot; fields, not recommended</span><br><span class="line">message GetProductionRequest &#123;</span><br><span class="line">  string production_id = 1;</span><br><span class="line">  bool include_format = 2;</span><br><span class="line">  bool include_schedule = 3;</span><br><span class="line">  bool include_scripts = 4;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>This approach requires adding a custom includeXXX field for every expensive response field and doesn’t work well for nested fields.<br>It also increases the complexity of the request, ultimately making maintenance and support more challenging.</p>
+</blockquote>
+<p>但它显而易见的一堆劣势，额外的字段、嵌套结构不适用、提高复杂性、使用&#x2F;维护困难。。然后进入正题，使用FieldMask解决问题</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 记得确保本地已有或通过`-I`指定搜寻路径</span><br><span class="line">import &quot;google/protobuf/field_mask.proto&quot;;</span><br><span class="line"></span><br><span class="line">message GetProductionRequest &#123;</span><br><span class="line">  string production_id = 1;</span><br><span class="line">  google.protobuf.FieldMask field_mask = 2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// FieldMask的定义在 google.golang.org/protobuf/types/known/fieldmaskpb/field_mask.pb.go</span></span><br><span class="line"><span class="keyword">type</span>  <span class="keyword">struct</span> &#123;</span><br><span class="line">  state         protoimpl.MessageState</span><br><span class="line">	sizeCache     protoimpl.SizeCache</span><br><span class="line">	unknownFields protoimpl.UnknownFields</span><br><span class="line"></span><br><span class="line">	<span class="comment">// The set of field mask paths.</span></span><br><span class="line">	Paths []<span class="type">string</span> <span class="string">`protobuf:&quot;bytes,1,rep,name=paths,proto3&quot; json:&quot;paths,omitempty&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>具体使用可参考下方示例代码</p>
+<h3 id="Update-场景"><a href="#Update-场景" class="headerlink" title="Update 场景"></a>Update 场景</h3><p>为了解决Update场景下的痛点，需要客户端设置fieldmask，然后由服务端通过判断来决定如何操作<br>对于单个或多个字段的更新操作，可由一个接口来代替<br>服务端通过 fieldmask 信息，来判断需要处理哪些字段，不再是无脑全量更新或一个操作一个接口的模式，极大的提升接口的灵活性<br>对于 fieldmask，java中由 <a target="_blank" rel="noopener" href="https://developers.google.com/protocol-buffers/docs/reference/java/com/google/protobuf/util/FieldMaskUtil">FieldMaskUtil</a> 提供的工具十分方便，目前go的工具还比较少<br>可以考虑下 <a target="_blank" rel="noopener" href="https://github.com/mennanov/fieldmask-utils">fieldmask-utils</a>，或自行按需求封装轮子  </p>
+<blockquote>
+<p>API designers should aim for simplicity, but make their APIs open for extension and evolution.<br>It’s often not easy to keep APIs simple and future-proof.<br>Utilizing FieldMask in APIs helps us achieve both simplicity and flexibility.</p>
+</blockquote>
+<p>具体使用可参考下方示例代码</p>
+<h3 id="示例代码，包含了Get及Update场景"><a href="#示例代码，包含了Get及Update场景" class="headerlink" title="示例代码，包含了Get及Update场景"></a>示例代码，包含了Get及Update场景</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;log&quot;</span></span><br><span class="line">	<span class="string">&quot;net&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line"></span><br><span class="line">	blog <span class="string">&quot;gotest/grpc/blog/proto&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;google.golang.org/grpc&quot;</span></span><br><span class="line">	<span class="string">&quot;google.golang.org/protobuf/types/known/fieldmaskpb&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> client blog.BlogServiceClient</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> startServer()</span><br><span class="line">	time.Sleep(time.Second)</span><br><span class="line">	setClient()</span><br><span class="line"></span><br><span class="line">	get()</span><br><span class="line">	update()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 只获取 count、title字段</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">get</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*<span class="number">3</span>)</span><br><span class="line">	<span class="keyword">defer</span> cancel()</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> err <span class="type">error</span></span><br><span class="line">	<span class="keyword">var</span> m *blog.Article</span><br><span class="line">	<span class="keyword">var</span> fm *fieldmaskpb.FieldMask</span><br><span class="line"></span><br><span class="line">	<span class="comment">// blog.GetRequest 如果没有xx字段，将报错 proto: invalid path &quot;xx&quot; for message &quot;blog.GetRequest&quot;</span></span><br><span class="line">	<span class="comment">// 即此处fieldmask是要跟对象绑定的，</span></span><br><span class="line">	fm, err = fieldmaskpb.New(m, <span class="string">&quot;title&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;new fiedmask err %+v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 继续添加</span></span><br><span class="line">	err = fm.Append(m, <span class="string">&quot;count&quot;</span>, <span class="string">&quot;title&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;append fiedmask err %+v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="string">&quot;after append&quot;</span>, fm) <span class="comment">// after append paths:&quot;title&quot; paths:&quot;count&quot; paths:&quot;title&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 排序及移除多余的</span></span><br><span class="line">	fm.Normalize()</span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="string">&quot;after normalize&quot;</span>, fm) <span class="comment">// after normalize paths:&quot;count&quot; paths:&quot;title&quot;</span></span><br><span class="line"></span><br><span class="line">	r, err := client.Get(ctx, &amp;blog.GetRequest&#123;</span><br><span class="line">		Id:        <span class="number">1</span>,</span><br><span class="line">		FieldMask: fm,</span><br><span class="line">	&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;failed to get: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 服务端判断了paths，只返回指定的字段</span></span><br><span class="line">	fmt.Printf(<span class="string">&quot;get response %+v \n&quot;</span>, r) <span class="comment">// get response title:&quot;do not panic&quot; count:42</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 只更新title、author字段</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">update</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*<span class="number">3</span>)</span><br><span class="line">	<span class="keyword">defer</span> cancel()</span><br><span class="line"></span><br><span class="line">	m := &amp;blog.Article&#123;</span><br><span class="line">		Id:     <span class="number">1</span>,</span><br><span class="line">		Title:  <span class="string">&quot;don&#x27;t panic&quot;</span>,</span><br><span class="line">		Author: <span class="string">&quot;update-author&quot;</span>,</span><br><span class="line">		Count:  <span class="number">20</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fm := &amp;fieldmaskpb.FieldMask&#123;Paths: []<span class="type">string</span>&#123;<span class="string">&quot;author&quot;</span>, <span class="string">&quot;title&quot;</span>&#125;&#125;</span><br><span class="line">	<span class="keyword">if</span> !fm.IsValid(m) &#123;</span><br><span class="line">		log.Fatalln(<span class="string">&quot;invalid fieldmask&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	r, err := client.Update(ctx, &amp;blog.UpdateRequest&#123;</span><br><span class="line">		Book:      m,</span><br><span class="line">		FieldMask: fm,</span><br><span class="line">	&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;failed to update: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;update response %+v \n&quot;</span>, r) <span class="comment">// update response id:1  title:&quot;don&#x27;t panic&quot;  author:&quot;update-author&quot;  count:42</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">setClient</span><span class="params">()</span></span> &#123;</span><br><span class="line">	conn, err := grpc.Dial(</span><br><span class="line">		<span class="string">&quot;localhost:8001&quot;</span>,</span><br><span class="line">		grpc.WithInsecure(),</span><br><span class="line">	)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;failed to dial: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	client = blog.NewBlogServiceClient(conn)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">startServer</span><span class="params">()</span></span> &#123;</span><br><span class="line">	lis, err := net.Listen(<span class="string">&quot;tcp&quot;</span>, <span class="string">&quot;:8001&quot;</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;failed to listen: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	s := grpc.NewServer()</span><br><span class="line">	blog.RegisterBlogServiceServer(s, &amp;server&#123;&#125;)</span><br><span class="line">	<span class="keyword">if</span> err = s.Serve(lis); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Fatalf(<span class="string">&quot;failed to serve: %v&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> server <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s server)</span></span> Get(ctx context.Context, request *blog.GetRequest) (*blog.Article, <span class="type">error</span>) &#123;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;server get %d, %+v \n&quot;</span>, request.GetId(), request.GetFieldMask()) <span class="comment">// server get 1, paths:&quot;count&quot; paths:&quot;title&quot;</span></span><br><span class="line"></span><br><span class="line">	r := &amp;blog.Article&#123;&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// balabla 。。。逻辑</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 只使用顶级名称，不考虑层级</span></span><br><span class="line">	<span class="comment">// 实际使用可以考虑 https://github.com/mennanov/fieldmask-utils</span></span><br><span class="line">	<span class="keyword">for</span> _, s := <span class="keyword">range</span> request.GetFieldMask().GetPaths() &#123;</span><br><span class="line">		<span class="comment">// request.GetFieldMask().ProtoReflect().Descriptor().Fields().ByNumber()</span></span><br><span class="line">		<span class="keyword">switch</span> s &#123;</span><br><span class="line">		<span class="keyword">case</span> <span class="string">&quot;id&quot;</span>:</span><br><span class="line">			r.Id = <span class="number">10</span></span><br><span class="line">		<span class="keyword">case</span> <span class="string">&quot;title&quot;</span>:</span><br><span class="line">			r.Title = <span class="string">&quot;do not panic&quot;</span></span><br><span class="line">		<span class="keyword">case</span> <span class="string">&quot;author&quot;</span>:</span><br><span class="line">			r.Author = <span class="string">&quot;Douglas&quot;</span></span><br><span class="line">		<span class="keyword">case</span> <span class="string">&quot;count&quot;</span>:</span><br><span class="line">			r.Count = <span class="number">42</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> r, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s server)</span></span> Update(ctx context.Context, request *blog.UpdateRequest) (*blog.Article, <span class="type">error</span>) &#123;</span><br><span class="line">	fmt.Printf(<span class="string">&quot;server update %+v, %+v \n&quot;</span>, request.GetBook(), request.GetFieldMask()) <span class="comment">// server update id:1  title:&quot;don&#x27;t panic&quot;  author:&quot;update-author&quot;  count:20, paths:&quot;author&quot;  paths:&quot;title&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// select * from x where id=&#123;request.GetId()&#125;</span></span><br><span class="line">	raw := &amp;blog.Article&#123;</span><br><span class="line">		Id:     request.GetBook().GetId(),</span><br><span class="line">		Title:  <span class="string">&quot;title-raw&quot;</span>,</span><br><span class="line">		Author: <span class="string">&quot;author-raw&quot;</span>,</span><br><span class="line">		Count:  <span class="number">42</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 需要判断哪些字段是要处理的</span></span><br><span class="line">	<span class="keyword">for</span> _, s := <span class="keyword">range</span> request.GetFieldMask().GetPaths() &#123;</span><br><span class="line">		<span class="keyword">switch</span> s &#123;</span><br><span class="line">		<span class="keyword">case</span> <span class="string">&quot;title&quot;</span>:</span><br><span class="line">			raw.Title = request.GetBook().GetTitle()</span><br><span class="line">		<span class="keyword">case</span> <span class="string">&quot;author&quot;</span>:</span><br><span class="line">			raw.Author = request.GetBook().GetAuthor()</span><br><span class="line">		<span class="keyword">case</span> <span class="string">&quot;count&quot;</span>:</span><br><span class="line">			raw.Count = request.GetBook().GetCount()</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Printf(<span class="string">&quot;server update raw %+v \n&quot;</span>, raw)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 按什么什么的逻辑处理指定的那些字段就行了</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> raw, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>proto定义</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">syntax = &quot;proto3&quot;;</span><br><span class="line"></span><br><span class="line">import &quot;google/protobuf/field_mask.proto&quot;;</span><br><span class="line">import &quot;google/protobuf/descriptor.proto&quot;;</span><br><span class="line"></span><br><span class="line">package blog;</span><br><span class="line"></span><br><span class="line">option go_package = &quot;./;blog&quot;;</span><br><span class="line"></span><br><span class="line">service BlogService &#123;</span><br><span class="line">  rpc Get (GetRequest) returns (Article) &#123;&#125;</span><br><span class="line">  rpc Update (UpdateRequest) returns (Article) &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">message Article &#123;</span><br><span class="line">  int64 id = 1;</span><br><span class="line">  string title = 2;</span><br><span class="line">  string author = 3;</span><br><span class="line">  int64 count = 4;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">message GetRequest &#123;</span><br><span class="line">  int64 id = 1;</span><br><span class="line">  google.protobuf.FieldMask field_mask = 2;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">message UpdateRequest &#123;</span><br><span class="line">  Article book = 1;</span><br><span class="line">  google.protobuf.FieldMask field_mask = 2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><h4 id="缺省场景"><a href="#缺省场景" class="headerlink" title="缺省场景"></a>缺省场景</h4><p>没有设置fieldmask或为空时，应当处理所有的信息（如返回<em>，update</em>）</p>
+<h4 id="重命名"><a href="#重命名" class="headerlink" title="重命名"></a>重命名</h4><p>fieldmask 是利用字符串形式的字段名来匹配的，而protobuf传递过程中是忽略字段名而是传递序号，接收方通过需要解析出字段名<br>所以，如果服务端修改了字段名，而客户端未同步，那么不用fieldmask的情况下是没有问题的，但如果在fieldmask中使用了该字段，将导致无法解析<br>文中提到三个方案：</p>
+<ol>
+<li>不运行重命名字段，但这似乎是不可能的</li>
+<li>要求服务端支持所有旧字段名，向后兼容，这意味着额外的代码</li>
+<li>废弃字段，然后创建一个新的字段（最优）</li>
+</ol>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="noopener" href="https://netflixtechblog.com/practical-api-design-at-netflix-part-1-using-protobuf-fieldmask-35cfdc606518">Netflix 技术博客 1</a><br><a target="_blank" rel="noopener" href="https://netflixtechblog.com/practical-api-design-at-netflix-part-2-protobuf-fieldmask-for-mutation-operations-2e75e1d230e4">Netflix 技术博客 2</a><br><a target="_blank" rel="noopener" href="https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/field_mask.proto">field_mask.proto</a><br><a target="_blank" rel="noopener" href="https://github.com/mennanov/fieldmask-utils">fieldmask-utils</a><br><a target="_blank" rel="noopener" href="https://loesspie.com/">原文链接</a>  </p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/go/" rel="tag"># go</a>
+              <a href="/tags/grpc/" rel="tag"># grpc</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/12/17/http-content-length/" rel="prev" title="http请求响应头缺失Content-Length头信息的问题">
+      <i class="fa fa-chevron-left"></i> http请求响应头缺失Content-Length头信息的问题
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/01/06/go-protobuf-custom-json-tag/" rel="next" title="在go的protobuf中进行自定义json tag标记及使用">
+      在go的protobuf中进行自定义json tag标记及使用 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%97%9B%E7%82%B9"><span class="nav-number">1.</span> <span class="nav-text">痛点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FieldMask"><span class="nav-number">2.</span> <span class="nav-text">FieldMask</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Get-%E5%9C%BA%E6%99%AF%E5%BA%94%E7%94%A8"><span class="nav-number">2.1.</span> <span class="nav-text">Get 场景应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Update-%E5%9C%BA%E6%99%AF"><span class="nav-number">2.2.</span> <span class="nav-text">Update 场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BB%A3%E7%A0%81%EF%BC%8C%E5%8C%85%E5%90%AB%E4%BA%86Get%E5%8F%8AUpdate%E5%9C%BA%E6%99%AF"><span class="nav-number">2.3.</span> <span class="nav-text">示例代码，包含了Get及Update场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F"><span class="nav-number">2.4.</span> <span class="nav-text">注意</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%BA%E7%9C%81%E5%9C%BA%E6%99%AF"><span class="nav-number">2.4.1.</span> <span class="nav-text">缺省场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%8D%E5%91%BD%E5%90%8D"><span class="nav-number">2.4.2.</span> <span class="nav-text">重命名</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">3.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">bbbht</p>
+  <div class="site-description" itemprop="description">尝试，记录，分享</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/bbbht" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;bbbht" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:plateau.loess@gmail.com" title="E-Mail → mailto:plateau.loess@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bbbht</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://loessplateau.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://example.com/2021/12/24/protobuf-fieldmask/";
+    this.page.identifier = "2021/12/24/protobuf-fieldmask/";
+    this.page.title = "grpc中使用fieldmask以提升接口的灵活性";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://loessplateau.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

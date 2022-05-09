@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="在使用grpc-gateway的时候，测试时发现HTTP接口返回给前端的json数据的字段格式很不统一，所以需要标准化protobuf-&gt;json的映射关系">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在go的protobuf中进行自定义json tag标记及使用">
+<meta property="og:url" content="http://example.com/2022/01/06/go-protobuf-custom-json-tag/index.html">
+<meta property="og:site_name" content="Don&#39;t Panic">
+<meta property="og:description" content="在使用grpc-gateway的时候，测试时发现HTTP接口返回给前端的json数据的字段格式很不统一，所以需要标准化protobuf-&gt;json的映射关系">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-01-06T07:17:38.000Z">
+<meta property="article:modified_time" content="2022-05-09T07:09:19.212Z">
+<meta property="article:author" content="bbbht">
+<meta property="article:tag" content="go">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2022/01/06/go-protobuf-custom-json-tag/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>在go的protobuf中进行自定义json tag标记及使用 | Don't Panic</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116292975-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-116292975-1');
+      }
+    </script>
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?a42c6bb7f27c4efdbc6c2deba01acaba";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Don't Panic</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Try Again</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/01/06/go-protobuf-custom-json-tag/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="bbbht">
+      <meta itemprop="description" content="尝试，记录，分享">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Don't Panic">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          在go的protobuf中进行自定义json tag标记及使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-01-06 15:17:38" itemprop="dateCreated datePublished" datetime="2022-01-06T15:17:38+08:00">2022-01-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-09 15:09:19" itemprop="dateModified" datetime="2022-05-09T15:09:19+08:00">2022-05-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/go/" itemprop="url" rel="index"><span itemprop="name">go</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2022/01/06/go-protobuf-custom-json-tag/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2022/01/06/go-protobuf-custom-json-tag/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>在使用grpc-gateway的时候，测试时发现HTTP接口返回给前端的json数据的字段格式很不统一，所以需要标准化protobuf-&gt;json的映射关系</p>
+<span id="more"></span>
+
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><ol>
+<li>proro的字段命名很不规范，有全小写的，有大驼峰&#x2F;小驼峰&#x2F;下划线等等  </li>
+<li>使用了默认的 protoc-gen-go 插件，生成的json tag会尝试小驼峰以及omitempty，但如果是纯小写或大驼峰，则不会改变</li>
+</ol>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><h3 id="不使用-protoc-gen-go"><a href="#不使用-protoc-gen-go" class="headerlink" title="不使用 protoc-gen-go"></a>不使用 protoc-gen-go</h3><p>比如使用 <a target="_blank" rel="noopener" href="https://github.com/gogo/protobuf">gogo</a>，就可以完全自定义json tag的命名<br>参考如下例子</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">import &quot;github.com/gogo/protobuf/gogoproto/gogo.proto&quot;;</span><br><span class="line"></span><br><span class="line">// Result example:</span><br><span class="line">// type Post struct &#123;</span><br><span class="line">//    Number int64 `protobuf:&quot;bytes,1,opt,name=number,json=no1,proto3&quot; json:&quot;no2&quot;`</span><br><span class="line">// &#125;</span><br><span class="line">message Post &#123;</span><br><span class="line">    int64 number = 1 [json_name=&quot;no1&quot;, (gogoproto.jsontag) = &quot;no2&quot;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="json-name-jsonpb"><a href="#json-name-jsonpb" class="headerlink" title="json_name + jsonpb"></a>json_name + jsonpb</h3><p>上个方案中已经出现了json_name，官方的说明如下，具体见参考链接</p>
+<blockquote>
+<p>Generates JSON objects. Message field names are mapped to lowerCamelCase and become JSON object keys.<br>If the json_name field option is specified, the specified value will be used as the key instead.<br>Parsers accept both the lowerCamelCase name (or the one specified by the json_name option) and the original proto field name.<br>null is an accepted value for all field types and treated as the default value of the corresponding field type.</p>
+</blockquote>
+<p>json_name并不会影响 protoc-gen-go 生成的go结构体中的json tag，而是会在 protobuf tag 中生成指定的json name<br>它的用途是在protobuf-&gt;json时被应用，而要让它起作用，<code>encoding/json</code>包是不行的，它只认json tag。要使用 <code>github.com/golang/protobuf/jsonpb</code><br>看如下例子理解<br>定义proto文件，强行在Blog中塞进了不同的字段命名格式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">syntax = &quot;proto3&quot;;</span><br><span class="line"></span><br><span class="line">package blog;</span><br><span class="line"></span><br><span class="line">option go_package = &quot;./;blog&quot;;</span><br><span class="line"></span><br><span class="line">service BlogService &#123;</span><br><span class="line">  rpc Get (GetRequest) returns (GetResponse) &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">message Blog &#123;</span><br><span class="line">  int64 id = 1 [json_name = &quot;myid&quot;];</span><br><span class="line">  string titleName = 2;</span><br><span class="line">  string author_name = 3;</span><br><span class="line">  string img = 4;</span><br><span class="line">  int64 CountNum = 5;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">message GetRequest &#123;</span><br><span class="line">  int64 id = 1;</span><br><span class="line">&#125;</span><br><span class="line">message GetResponse &#123;</span><br><span class="line">  Blog data = 1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>执行命令 <code>protoc --go_out=paths=source_relative:. jsontag.proto</code>，生成pb文件中的 message Blog 对应的 Blog 结构体如下  </p>
+<ul>
+<li>json tag是和message定义完全一致的</li>
+<li>如果字段原本就是驼峰格式，那么默认情况下，protobuf中是不会额外出现<code>json=xxx</code>内容的<ul>
+<li>见字段 img &#x2F; titleName &#x2F; CountNum</li>
+</ul>
+</li>
+<li>如果字段不是驼峰格式，或者指定了 json_name，那么protobuf中会出现<code>json=xxx</code>内容<ul>
+<li>见字段 id &#x2F; author_name</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Blog <span class="keyword">struct</span> &#123;</span><br><span class="line">	state         protoimpl.MessageState</span><br><span class="line">	sizeCache     protoimpl.SizeCache</span><br><span class="line">	unknownFields protoimpl.UnknownFields</span><br><span class="line"></span><br><span class="line">	Id         <span class="type">int64</span>  <span class="string">`protobuf:&quot;varint,1,opt,name=id,json=myid,proto3&quot; json:&quot;id,omitempty&quot;`</span></span><br><span class="line">	TitleName  <span class="type">string</span> <span class="string">`protobuf:&quot;bytes,2,opt,name=titleName,proto3&quot; json:&quot;titleName,omitempty&quot;`</span></span><br><span class="line">	AuthorName <span class="type">string</span> <span class="string">`protobuf:&quot;bytes,3,opt,name=author_name,json=authorName,proto3&quot; json:&quot;author_name,omitempty&quot;`</span></span><br><span class="line">	Img        <span class="type">string</span> <span class="string">`protobuf:&quot;bytes,4,opt,name=img,proto3&quot; json:&quot;img,omitempty&quot;`</span></span><br><span class="line">	CountNum   <span class="type">int64</span>  <span class="string">`protobuf:&quot;varint,5,opt,name=CountNum,proto3&quot; json:&quot;CountNum,omitempty&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>json序列化</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">&quot;github.com/golang/protobuf/jsonpb&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	b := blog.Blog&#123;Id: <span class="number">42</span>, TitleName: <span class="string">&quot;nothing&quot;</span>, AuthorName: <span class="string">&quot;who&quot;</span>&#125;</span><br><span class="line"></span><br><span class="line">	m := jsonpb.Marshaler&#123;</span><br><span class="line">		OrigName:     <span class="literal">false</span>,</span><br><span class="line">		EnumsAsInts:  <span class="literal">false</span>,</span><br><span class="line">		EmitDefaults: <span class="literal">false</span>,</span><br><span class="line">		Indent:       <span class="string">&quot;&quot;</span>,</span><br><span class="line">		AnyResolver:  <span class="literal">nil</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Println(m.MarshalToString(&amp;b))</span><br><span class="line">	<span class="comment">// &#123;&quot;myid&quot;:&quot;42&quot;,&quot;titleName&quot;:&quot;nothing&quot;,&quot;authorName&quot;:&quot;who&quot;&#125; &lt;nil&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 使用原始的 protobuf 字段名</span></span><br><span class="line">	m.OrigName = <span class="literal">true</span></span><br><span class="line">	fmt.Println(m.MarshalToString(&amp;b))</span><br><span class="line">	<span class="comment">// &#123;&quot;id&quot;:&quot;42&quot;,&quot;titleName&quot;:&quot;nothing&quot;,&quot;author_name&quot;:&quot;who&quot;&#125; &lt;nil&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 零值字段输出</span></span><br><span class="line">	m.EmitDefaults = <span class="literal">true</span></span><br><span class="line">	fmt.Println(m.MarshalToString(&amp;b))</span><br><span class="line">	<span class="comment">// &#123;&quot;id&quot;:&quot;42&quot;,&quot;titleName&quot;:&quot;nothing&quot;,&quot;author_name&quot;:&quot;who&quot;,&quot;img&quot;:&quot;&quot;,&quot;CountNum&quot;:&quot;0&quot;&#125; &lt;nil&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 零值字段输出，但使用 protobuf 的 json tag</span></span><br><span class="line">	m.OrigName = <span class="literal">false</span></span><br><span class="line">	fmt.Println(m.MarshalToString(&amp;b))</span><br><span class="line">	<span class="comment">// &#123;&quot;myid&quot;:&quot;42&quot;,&quot;titleName&quot;:&quot;nothing&quot;,&quot;authorName&quot;:&quot;who&quot;,&quot;img&quot;:&quot;&quot;,&quot;CountNum&quot;:&quot;0&quot;&#125; &lt;nil&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 自定义缩进字符</span></span><br><span class="line">	m.Indent = <span class="string">&quot;|——&quot;</span></span><br><span class="line">	fmt.Println(m.MarshalToString(&amp;b))</span><br><span class="line">	<span class="comment">// &#123;</span></span><br><span class="line">	<span class="comment">// |——&quot;id&quot;: &quot;42&quot;,</span></span><br><span class="line">	<span class="comment">// |——&quot;titleName&quot;: &quot;nothing&quot;,</span></span><br><span class="line">	<span class="comment">// |——&quot;author_name&quot;: &quot;who&quot;,</span></span><br><span class="line">	<span class="comment">// |——&quot;img&quot;: &quot;&quot;,</span></span><br><span class="line">	<span class="comment">// |——&quot;CountNum&quot;: &quot;0&quot;</span></span><br><span class="line">	<span class="comment">// &#125; &lt;nil&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// 直接输出字符串</span></span><br><span class="line">	fmt.Println(b.String())</span><br><span class="line">	<span class="comment">// id:42  titleName:&quot;nothing&quot;  author_name:&quot;who&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>具体怎么用，就可以选择了</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="noopener" href="https://loesspie.com/">原文链接</a><br><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/51828804/defining-custom-go-struct-tags-for-protobuf-message-fields">Defining custom go struct tags for protobuf message fields</a><br><a target="_blank" rel="noopener" href="https://developers.google.com/protocol-buffers/docs/proto3">Language Guide (proto3)</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/go/" rel="tag"># go</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/12/24/protobuf-fieldmask/" rel="prev" title="grpc中使用fieldmask以提升接口的灵活性">
+      <i class="fa fa-chevron-left"></i> grpc中使用fieldmask以提升接口的灵活性
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/01/07/go-grpc-gateway/" rel="next" title="go通过grpc-gateway同时提供grpc/http服务的示例">
+      go通过grpc-gateway同时提供grpc/http服务的示例 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0"><span class="nav-number">1.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">解决方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E4%BD%BF%E7%94%A8-protoc-gen-go"><span class="nav-number">2.1.</span> <span class="nav-text">不使用 protoc-gen-go</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#json-name-jsonpb"><span class="nav-number">2.2.</span> <span class="nav-text">json_name + jsonpb</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">3.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">bbbht</p>
+  <div class="site-description" itemprop="description">尝试，记录，分享</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/bbbht" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;bbbht" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:plateau.loess@gmail.com" title="E-Mail → mailto:plateau.loess@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bbbht</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://loessplateau.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://example.com/2022/01/06/go-protobuf-custom-json-tag/";
+    this.page.identifier = "2022/01/06/go-protobuf-custom-json-tag/";
+    this.page.title = "在go的protobuf中进行自定义json tag标记及使用";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://loessplateau.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

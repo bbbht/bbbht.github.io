@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="对接第三方对象存储的服务最近总是有warning日志，远程上传的对象get请求返回的响应头中缺失content-length信息go程序中获取到的content-length值为-1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="http请求响应头缺失Content-Length头信息的问题">
+<meta property="og:url" content="http://example.com/2021/12/17/http-content-length/index.html">
+<meta property="og:site_name" content="Don&#39;t Panic">
+<meta property="og:description" content="对接第三方对象存储的服务最近总是有warning日志，远程上传的对象get请求返回的响应头中缺失content-length信息go程序中获取到的content-length值为-1">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-12-17T07:45:11.000Z">
+<meta property="article:modified_time" content="2022-05-09T03:07:52.891Z">
+<meta property="article:author" content="bbbht">
+<meta property="article:tag" content="go">
+<meta property="article:tag" content="http">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2021/12/17/http-content-length/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>http请求响应头缺失Content-Length头信息的问题 | Don't Panic</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116292975-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-116292975-1');
+      }
+    </script>
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?a42c6bb7f27c4efdbc6c2deba01acaba";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Don't Panic</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Try Again</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/12/17/http-content-length/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="bbbht">
+      <meta itemprop="description" content="尝试，记录，分享">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Don't Panic">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          http请求响应头缺失Content-Length头信息的问题
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-17 15:45:11" itemprop="dateCreated datePublished" datetime="2021-12-17T15:45:11+08:00">2021-12-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-09 11:07:52" itemprop="dateModified" datetime="2022-05-09T11:07:52+08:00">2022-05-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/http/" itemprop="url" rel="index"><span itemprop="name">http</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2021/12/17/http-content-length/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/12/17/http-content-length/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>对接第三方对象存储的服务最近总是有warning日志，远程上传的对象get请求返回的响应头中缺失content-length信息<br>go程序中获取到的content-length值为-1</p>
+<span id="more"></span>
+<p>之前被content-length值为-1坑过，具体场景为程序中使用 <a target="_blank" rel="noopener" href="https://github.com/minio/minio-go">minio</a> 作为sdk对接第三方对象存储<br>使用<code>PutObject</code>方法完成远程上传，即通过http get获取源对象，直接上传，不进行本地转存，原本运行挺稳定，直到出现大量响应头信息缺失content-length的资源出现<br>当时使用的minio版本为<em>github.com&#x2F;minio&#x2F;minio-go v6.0.8+incompatible</em>，此版本中当不显式传入大于0的size（对应http请求返回的content-length）时，将采用分块上传的逻辑<br>但是每块的体积是500M，计算方式是最大对象体积&#x2F;最大分块数<br>最开始是串行上传，所以并没有暴露问题，直到为了优化性能利用带宽，改成了并行上传时，OOM了，因为需要同时上传的对象数n*500M的内存，这啥配置顶得住<br>这个问题的解决方案是升级了minio版本到v7，可以配置默认的chunk大小，不再是500M，然后将有问题的源都改为支持返回content-length，同时对获取不到content-length的请求添加告警，包括chunked<br>所以再看到这个告警还是要重视的<br>结果大跌眼镜，是个内部服务提供的远程上传链接，有着不少诡异的清空，初期很是抓头</p>
+<h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><h3 id="Content-Length"><a href="#Content-Length" class="headerlink" title="Content-Length"></a>Content-Length</h3><p>Content-Length 表示请求&#x2F;响应实体内容的长度（字节）<br>一般是自动生成的，并不需要手动指定修改，手动操作反而会引发错误，比如在chrome浏览器中发送ajax时进行操作，可以试试  </p>
+<ul>
+<li>当内容的实际字节数大于 Content-Length 时<ul>
+<li>当服务端接收的请求实体长度超过 Content-Length ，服务端会直接关闭连接，从而导致请求失败</li>
+<li>当服务端返回的响应实体长度超过 Content-Length，超出 Content-Length 长度的内容将被丢弃</li>
+</ul>
+</li>
+<li>当内容的实际字节数小于 Content-Length 时<ul>
+<li>当服务端接收的请求实体长度小于 Content-Length，服务端会继续等待后面的数据，从而导致超时</li>
+<li>当服务端返回的响应实体长度小于 Content-Length，浏览器会报错，如Chrome 浏览器会报 net::ERR_CONTENT_LENGTH_MISMATCH</li>
+</ul>
+</li>
+</ul>
+<p>可见Content-Length适用于消息体长度明确的情况，Content-Length 无法提前计算出来的情况则使用分段传输</p>
+<h3 id="Transfer-Encoding"><a href="#Transfer-Encoding" class="headerlink" title="Transfer-Encoding"></a>Transfer-Encoding</h3><p>分块传输编码（Chunked transfer encoding）是超文本传输协议（HTTP）中的一种数据传输机制，允许HTTP由网页服务器发送给客户端应用（ 通常是网页浏览器）的数据可以分成多个部分。分块传输编码只在HTTP协议1.1版本（HTTP&#x2F;1.1）中提供<br>Transfer-Encoding 和 Content-Length 是互斥的，如果同时出现，浏览器以 Transfer-Encoding 为准，在Go中，会从header中删除两个信息，然后设置TransferEncoding和ContentLength属性<br>具体可以参考<code>net/http</code>源码</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// srs/net/http/transfer.go</span></span><br><span class="line"><span class="comment">// parseTransferEncoding sets t.Chunked based on the Transfer-Encoding header.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t *transferReader)</span></span> parseTransferEncoding() <span class="type">error</span> &#123;</span><br><span class="line">	raw, present := t.Header[<span class="string">&quot;Transfer-Encoding&quot;</span>]</span><br><span class="line">	<span class="keyword">if</span> !present &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">delete</span>(t.Header, <span class="string">&quot;Transfer-Encoding&quot;</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Issue 12785; ignore Transfer-Encoding on HTTP/1.0 requests.</span></span><br><span class="line">	<span class="keyword">if</span> !t.protoAtLeast(<span class="number">1</span>, <span class="number">1</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Like nginx, we only support a single Transfer-Encoding header field, and</span></span><br><span class="line">	<span class="comment">// only if set to &quot;chunked&quot;. This is one of the most security sensitive</span></span><br><span class="line">	<span class="comment">// surfaces in HTTP/1.1 due to the risk of request smuggling, so we keep it</span></span><br><span class="line">	<span class="comment">// strict and simple.</span></span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(raw) != <span class="number">1</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> &amp;unsupportedTEError&#123;fmt.Sprintf(<span class="string">&quot;too many transfer encodings: %q&quot;</span>, raw)&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> !ascii.EqualFold(textproto.TrimString(raw[<span class="number">0</span>]), <span class="string">&quot;chunked&quot;</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> &amp;unsupportedTEError&#123;fmt.Sprintf(<span class="string">&quot;unsupported transfer encoding: %q&quot;</span>, raw[<span class="number">0</span>])&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// RFC 7230 3.3.2 says &quot;A sender MUST NOT send a Content-Length header field</span></span><br><span class="line">	<span class="comment">// in any message that contains a Transfer-Encoding header field.&quot;</span></span><br><span class="line">	<span class="comment">//</span></span><br><span class="line">	<span class="comment">// but also: &quot;If a message is received with both a Transfer-Encoding and a</span></span><br><span class="line">	<span class="comment">// Content-Length header field, the Transfer-Encoding overrides the</span></span><br><span class="line">	<span class="comment">// Content-Length. Such a message might indicate an attempt to perform</span></span><br><span class="line">	<span class="comment">// request smuggling (Section 9.5) or response splitting (Section 9.4) and</span></span><br><span class="line">	<span class="comment">// ought to be handled as an error. A sender MUST remove the received</span></span><br><span class="line">	<span class="comment">// Content-Length field prior to forwarding such a message downstream.&quot;</span></span><br><span class="line">	<span class="comment">//</span></span><br><span class="line">	<span class="comment">// Reportedly, these appear in the wild.</span></span><br><span class="line">	<span class="built_in">delete</span>(t.Header, <span class="string">&quot;Content-Length&quot;</span>)</span><br><span class="line"></span><br><span class="line">	t.Chunked = <span class="literal">true</span></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">    <span class="comment">// Unify output</span></span><br><span class="line">    <span class="keyword">switch</span> rr := msg.(<span class="keyword">type</span>) &#123;</span><br><span class="line">    <span class="keyword">case</span> *Request:</span><br><span class="line">        rr.Body = t.Body</span><br><span class="line">        rr.ContentLength = t.ContentLength</span><br><span class="line">        <span class="keyword">if</span> t.Chunked &#123;</span><br><span class="line">            rr.TransferEncoding = []<span class="type">string</span>&#123;<span class="string">&quot;chunked&quot;</span>&#125;</span><br><span class="line">        &#125;</span><br><span class="line">        rr.Close = t.Close</span><br><span class="line">        rr.Trailer = t.Trailer</span><br><span class="line">    <span class="keyword">case</span> *Response:</span><br><span class="line">        rr.Body = t.Body</span><br><span class="line">        rr.ContentLength = t.ContentLength</span><br><span class="line">        <span class="keyword">if</span> t.Chunked &#123;</span><br><span class="line">            rr.TransferEncoding = []<span class="type">string</span>&#123;<span class="string">&quot;chunked&quot;</span>&#125;</span><br><span class="line">        &#125;</span><br><span class="line">        rr.Close = t.Close</span><br><span class="line">        rr.Trailer = t.Trailer</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><ol>
+<li>不是100%出现</li>
+<li>同样的接口，Go请求不返回content-length，但curl访问则返回</li>
+<li>同样的代码，其它服务中的文件访问均会返回content-length</li>
+</ol>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><h3 id="1-并不是每个请求都能复现"><a href="#1-并不是每个请求都能复现" class="headerlink" title="1. 并不是每个请求都能复现"></a>1. 并不是每个请求都能复现</h3><p>通过观察日志，正常返回content-length的请求，其content-length值均不大于255<br>通过创建特殊文件请求验证，确认只有大于等于256字节的文件被访问时才会出现不返回content-length的情况  </p>
+<h3 id="1-curl表现不一致的问题"><a href="#1-curl表现不一致的问题" class="headerlink" title="1. curl表现不一致的问题"></a>1. curl表现不一致的问题</h3><p>通过排查，定位到 <code>compressed</code> 这个配置上，如果显示的添加配置 <code>curl --compressed</code>，则表现与Go请求一致，即获取到了chunked 响应<br>而<code>compressed</code>是指定请求要压缩的，对接收到的响应也会自动进行解压缩。即默认请求是不进行压缩的，所以会返回content-length头<br>同理，如果Go请求时指定 Accept-Encoding 为 identity，可以达到同样的效果</p>
+<h3 id="2-同代码不同表现的原因"><a href="#2-同代码不同表现的原因" class="headerlink" title="2. 同代码不同表现的原因"></a>2. 同代码不同表现的原因</h3><p>由于有参照，通过控制变量发的对比发现唯一的不同是其他服务是内网访问，而出问题的服务配置了公网地址访问<br>那么问题就只能是出在了多余的公网访问这一步。而服务是k8s集群内的，那么就是使用的ingress-nginx配置上有文章了<br>先找到ingress的pod，然后查看pod的nginx配置</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ kubectl get po -n ingress-nginx</span><br><span class="line">NAME                                   READY   STATUS    RESTARTS   AGE</span><br><span class="line">default-http-backend-7c6b4d97f-xx6qx   1/1     Running   36         1y</span><br><span class="line">nginx-ingress-controller-48h52         1/1     Running   1          178d</span><br><span class="line">nginx-ingress-controller-7nwrq         1/1     Running   0          178d</span><br><span class="line">nginx-ingress-controller-fbf8c         1/1     Running   1          178d</span><br><span class="line">nginx-ingress-controller-gtbg2         1/1     Running   1          178d</span><br><span class="line">nginx-ingress-controller-hz8l7         1/1     Running   1          178d</span><br><span class="line">nginx-ingress-controller-kxh2b         1/1     Running   1          178d</span><br><span class="line"></span><br><span class="line"><span class="comment"># 随便一个pod</span></span><br><span class="line">$ kubectl <span class="built_in">exec</span> -it nginx-ingress-controller-48h52 -n ingress-nginx -- <span class="built_in">cat</span> /etc/nginx/nginx.conf &gt; nginx.conf</span><br><span class="line"><span class="comment"># 搜索nginx.conf文件</span></span><br></pre></td></tr></table></figure>
+<p>果然，发现了这些配置</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">gzip on;</span><br><span class="line">gzip_comp_level 5;</span><br><span class="line">gzip_http_version 1.1;</span><br><span class="line">gzip_min_length 256;</span><br><span class="line">gzip_types application/atom+xml application/javascript application/x-javascript application/json application/rss+xml application/vnd.ms-fontobject application/x-font-ttf application/x-web-app-manifest+json application/xhtml+xml application/xml font/opentype image/svg+xml image/x-icon text/css text/plain text/x-component;</span><br><span class="line">gzip_proxied any;</span><br><span class="line">gzip_vary on;</span><br></pre></td></tr></table></figure>
+<p>其中<code>gzip_min_length 256;</code>对应了问题1，响应达到256字节的请求才会出现状况的原因<br>而nginx中<code>chunked_transfer_encoding</code>又是默认开启（on）的，所以导致文件被压缩后通过分块传输的方式对外响应，从而表现出content-length响应头信息丢失的现象  </p>
+<h3 id="为什么gzip会导致分块传输-Transfer-Encoding-chunked"><a href="#为什么gzip会导致分块传输-Transfer-Encoding-chunked" class="headerlink" title="为什么gzip会导致分块传输 Transfer-Encoding: chunked ?"></a>为什么gzip会导致分块传输 Transfer-Encoding: chunked ?</h3><p>虽然原始的服务提供者的http响应是未分块且响应了正确的头信息 Content-Length 的<br>由于请求经过了ingress-nginx（或者其它形式的），根据其配置，超过 gzip_min_length 大小的响应body需要被压缩<br>header 是先于 body 被发送的，但应用 gzip 压缩的过程会导致 body 的体积变化，且压缩完成前是不知道其明确的体积的，所以此场景下只能选择分块传输<br>这都是因为nginx的gzip默认是动态压缩的，如果又要压缩，又要返回content-length，则需要额外的 gzip_static 模块 <em>ngx_http_gzip_static_module</em> 支持，添加模块后加入配置 <code>gzip_static on;</code> 即可实现   </p>
+<blockquote>
+<p>gzip_static 开启需要额外的存储空间，自行权衡</p>
+</blockquote>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><ol>
+<li>指定不压缩<br>有一定的风险，毕竟不压缩会造成带宽的额外开销，如果确定影响不大，那么就可以放心设置<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">req, err := http.NewRequest(<span class="string">&quot;GET&quot;</span>, url, <span class="literal">nil</span>)</span><br><span class="line">req.Header.Set(<span class="string">&quot;Accept-Encoding&quot;</span>, <span class="string">&quot;identity&quot;</span>)</span><br></pre></td></tr></table></figure></li>
+<li>绕过nginx<br>已经分析到原始的服务返回是没有分块传输的，是ingress造成的这个现象，而又有直接内网访问的方案来解决，所以绕过它就好了</li>
+</ol>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a target="_blank" rel="noopener" href="https://loesspie.com/">原文链接</a><br><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%88%86%E5%9D%97%E4%BC%A0%E8%BE%93%E7%BC%96%E7%A0%81">分块传输编码</a><br><a target="_blank" rel="noopener" href="http://nginx.org/en/docs/http/ngx_http_gzip_static_module.html#gzip_static">ngx_http_gzip_static_module</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/go/" rel="tag"># go</a>
+              <a href="/tags/http/" rel="tag"># http</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/11/09/go-assert-type-implement-interface/" rel="prev" title="go判断实现接口的方法 var _ Interface = (*Type)(nil)">
+      <i class="fa fa-chevron-left"></i> go判断实现接口的方法 var _ Interface = (*Type)(nil)
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/12/24/protobuf-fieldmask/" rel="next" title="grpc中使用fieldmask以提升接口的灵活性">
+      grpc中使用fieldmask以提升接口的灵活性 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E6%8F%90"><span class="nav-number">1.</span> <span class="nav-text">前提</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Content-Length"><span class="nav-number">1.1.</span> <span class="nav-text">Content-Length</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Transfer-Encoding"><span class="nav-number">1.2.</span> <span class="nav-text">Transfer-Encoding</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0"><span class="nav-number">3.</span> <span class="nav-text">原因</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%B9%B6%E4%B8%8D%E6%98%AF%E6%AF%8F%E4%B8%AA%E8%AF%B7%E6%B1%82%E9%83%BD%E8%83%BD%E5%A4%8D%E7%8E%B0"><span class="nav-number">3.1.</span> <span class="nav-text">1. 并不是每个请求都能复现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-curl%E8%A1%A8%E7%8E%B0%E4%B8%8D%E4%B8%80%E8%87%B4%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">3.2.</span> <span class="nav-text">1. curl表现不一致的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%90%8C%E4%BB%A3%E7%A0%81%E4%B8%8D%E5%90%8C%E8%A1%A8%E7%8E%B0%E7%9A%84%E5%8E%9F%E5%9B%A0"><span class="nav-number">3.3.</span> <span class="nav-text">2. 同代码不同表现的原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88gzip%E4%BC%9A%E5%AF%BC%E8%87%B4%E5%88%86%E5%9D%97%E4%BC%A0%E8%BE%93-Transfer-Encoding-chunked"><span class="nav-number">3.4.</span> <span class="nav-text">为什么gzip会导致分块传输 Transfer-Encoding: chunked ?</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5"><span class="nav-number">5.</span> <span class="nav-text">参考链接</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">bbbht</p>
+  <div class="site-description" itemprop="description">尝试，记录，分享</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/bbbht" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;bbbht" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:plateau.loess@gmail.com" title="E-Mail → mailto:plateau.loess@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bbbht</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://loessplateau.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://example.com/2021/12/17/http-content-length/";
+    this.page.identifier = "2021/12/17/http-content-length/";
+    this.page.title = "http请求响应头缺失Content-Length头信息的问题";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://loessplateau.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

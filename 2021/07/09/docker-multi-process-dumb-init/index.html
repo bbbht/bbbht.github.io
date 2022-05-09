@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="最近重构一些老项目，为此实现了一个基于etcd的grpc服务注册、发现及负载均衡的中间件服务注册嘛，无论docker还是k8s部署，都需要服务在监听到系统信号 SIGTERM ，实现标准的优雅停机，摘除注册之前的服务启动命令是一个脚本，看似实现了，但没有完全实现">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用dumb-init来实现docker中运行多个进程并处理SIGTERM信号">
+<meta property="og:url" content="http://example.com/2021/07/09/docker-multi-process-dumb-init/index.html">
+<meta property="og:site_name" content="Don&#39;t Panic">
+<meta property="og:description" content="最近重构一些老项目，为此实现了一个基于etcd的grpc服务注册、发现及负载均衡的中间件服务注册嘛，无论docker还是k8s部署，都需要服务在监听到系统信号 SIGTERM ，实现标准的优雅停机，摘除注册之前的服务启动命令是一个脚本，看似实现了，但没有完全实现">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-07-09T02:17:18.000Z">
+<meta property="article:modified_time" content="2022-05-09T03:07:52.868Z">
+<meta property="article:author" content="bbbht">
+<meta property="article:tag" content="docker">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2021/07/09/docker-multi-process-dumb-init/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>使用dumb-init来实现docker中运行多个进程并处理SIGTERM信号 | Don't Panic</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-116292975-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-116292975-1');
+      }
+    </script>
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?a42c6bb7f27c4efdbc6c2deba01acaba";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Don't Panic</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Try Again</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-sitemap">
+
+    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>站点地图</a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/07/09/docker-multi-process-dumb-init/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="bbbht">
+      <meta itemprop="description" content="尝试，记录，分享">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Don't Panic">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用dumb-init来实现docker中运行多个进程并处理SIGTERM信号
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-09 10:17:18" itemprop="dateCreated datePublished" datetime="2021-07-09T10:17:18+08:00">2021-07-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-09 11:07:52" itemprop="dateModified" datetime="2022-05-09T11:07:52+08:00">2022-05-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/docker/" itemprop="url" rel="index"><span itemprop="name">docker</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2021/07/09/docker-multi-process-dumb-init/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2021/07/09/docker-multi-process-dumb-init/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>最近重构一些老项目，为此实现了一个基于etcd的grpc服务注册、发现及负载均衡的中间件<br>服务注册嘛，无论docker还是k8s部署，都需要服务在监听到系统信号 <code>SIGTERM</code> ，实现标准的<code>优雅停机</code>，摘除注册<br>之前的服务启动命令是一个脚本，看似实现了，但没有完全实现</p>
+<span id="more"></span>
+<p>Linux中 ，pid 为 1 的进程，有着特殊的使命：</p>
+<ul>
+<li>传递信号，确保子进程完全退出</li>
+<li>等待子进程退出</li>
+</ul>
+<p>容器化环境中，往往直接运行应用程序，而缺少初始化系统（如 systemd、sysvinit 等）。这可能需要应用程序来处理系统信号，接管子进程，进而导致容器无法停止、产生僵尸进程等问题。Yelp 开发的 dumb-init ，旨在模拟初始化系统功能，向子进程代理发送信号和接管子进程。  </p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/dumb-init /bin/sh</span></span><br><span class="line">/init.sh</span><br><span class="line"><span class="comment"># 还有一大堆其它乱七八糟的，省略</span></span><br><span class="line">a=<span class="variable">$1</span></span><br><span class="line"><span class="built_in">nohup</span> fluentd&amp;</span><br><span class="line">/app/main <span class="variable">$&#123;a&#125;</span></span><br></pre></td></tr></table></figure>
+<p>其中基础镜像是alpine，&#x2F;init.sh 的脚本内容为 <code>nohup crond -f &amp; </code>，目的是运行crontab<br>fluentd是收集日志的，定时任务也是给它用的，定期清理日志文件。。<br>真正的服务则是要依赖 <code>/app/main</code> 这个二进制运行，真实的进程情况  </p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">/app <span class="comment"># ps -eo pid,ppid,args</span></span><br><span class="line">PID   PPID  COMMAND</span><br><span class="line">    1     0 &#123;start.sh&#125; /usr/bin/dumb-init /bin/sh /bin/start.sh</span><br><span class="line">    8     1 /bin/sh /bin/start.sh</span><br><span class="line">   10     1 crond -f</span><br><span class="line">   11     8 &#123;fluentd&#125; /usr/bin/ruby /usr/bin/fluentd</span><br><span class="line">   12     8 /app/main</span><br><span class="line">   27    11 /usr/bin/ruby -Eascii-8bit:ascii-8bit /usr/bin/fluentd --under-supervisor</span><br><span class="line">   32     0 sh</span><br><span class="line">   43    32 ps -eo pid,ppid,args</span><br><span class="line">/app <span class="comment"># pstree</span></span><br><span class="line">start.sh-+-crond</span><br><span class="line">         `-sh-+-fluentd---ruby</span><br><span class="line">              `-main</span><br></pre></td></tr></table></figure>
+<p>可见，shebang中添加 <code>/usr/bin/dumb-init</code> 起作用了但没有完全起作用。脚本中的第一行脚本执行后，其ppid确实为1<br>再之后运行的命令，则隶属于脚本之下的进程id了  </p>
+<h2 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h2><p>进程树可以清晰的看到，main的ppid并非1，所以无法接收到<code>dumb-init</code>传递的信号，所以无法真正实现优雅停机<br>dumb-init的原理就是其作为pid为1的进程，接收到的信号会向其子进程传递<br><strong>但其有个配置环境变量 <code>DUMB_INIT_SETSID</code>，如果设为0则只向直接子进程发送信号，即子进程的ppid必须为1才能接收到传递的信号</strong><br>问题则就是出现在这个配置上，基础镜像被添加了环境变量并且值为0  </p>
+<h2 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h2><p>使用go写一些demo来模拟程序并监听信号退出，通过修改timeout来控制程序自动退出时间</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> timeout = <span class="number">600</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	signals := <span class="built_in">make</span>(<span class="keyword">chan</span> os.Signal)</span><br><span class="line">	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)</span><br><span class="line">	ticker := time.NewTicker(time.Second * <span class="number">3</span>)</span><br><span class="line">	<span class="keyword">defer</span> ticker.Stop()</span><br><span class="line">	timer := time.NewTimer(time.Second * timeout)</span><br><span class="line">	<span class="keyword">defer</span> timer.Stop()</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		<span class="keyword">select</span> &#123;</span><br><span class="line">		<span class="keyword">case</span> &lt;-signals:</span><br><span class="line">			fmt.Println(timeout, <span class="string">&quot;signal&quot;</span>)</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		<span class="keyword">case</span> &lt;-timer.C:</span><br><span class="line">			fmt.Println(timeout, <span class="string">&quot;timeout&quot;</span>)</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		<span class="keyword">case</span> &lt;-ticker.C:</span><br><span class="line">			fmt.Println(timeout, <span class="string">&quot;ticker&quot;</span>)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 编译三个不同时间的二进制程序</span></span><br><span class="line">go build -o app_30s</span><br><span class="line">go build -o app_60s</span><br><span class="line">go build -o app_600s</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> alpine:latest</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> sed -i <span class="string">&quot;s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g&quot;</span> /etc/apk/repositories \</span></span><br><span class="line"><span class="language-bash">	&amp;&amp; apk update \</span></span><br><span class="line"><span class="language-bash">	&amp;&amp; apk add --no-cache dumb-init \</span></span><br><span class="line"><span class="language-bash">	&amp;&amp; <span class="built_in">rm</span> -rf /var/cache/apk/*</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> app* /app/</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> *.sh /</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 控制dumb-init信号传递</span></span><br><span class="line"><span class="keyword">ENV</span> DUMB_INIT_SETSID=<span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># dumb-init的另一种使用方式</span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="language-bash"> [ <span class="string">&quot;/usr/bin/dumb-init&quot;</span>, <span class="string">&quot;--&quot;</span> ]</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">CMD</span><span class="language-bash"> [ <span class="string">&quot;/start.sh&quot;</span> ]</span></span><br></pre></td></tr></table></figure>
+<p>启动脚本<br><code>#!/usr/bin/dumb-init /bin/sh</code></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#! /bin/sh</span></span><br><span class="line">/app/app_30s &amp;</span><br><span class="line">/app/app_600s &amp;</span><br><span class="line">/app/app_60s</span><br></pre></td></tr></table></figure>
+<h3 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h3><p>不适用dumb-init</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/ <span class="comment"># pstree &amp;&amp; ps -eo pid,ppid,args</span></span><br><span class="line">start.sh-+-app_30s---6*[&#123;app_30s&#125;]</span><br><span class="line">         |-app_600s---6*[&#123;app_600s&#125;]</span><br><span class="line">         `-app_60s---6*[&#123;app_60s&#125;]</span><br><span class="line">PID   PPID  COMMAND</span><br><span class="line">    1     0 &#123;start.sh&#125; /bin/sh /start.sh</span><br><span class="line">    6     1 /app/app_30s</span><br><span class="line">    7     1 /app/app_600s</span><br><span class="line">    8     1 /app/app_60s</span><br><span class="line">   27     0 sh</span><br><span class="line">   33    27 ps -eo pid,ppid,args</span><br></pre></td></tr></table></figure>
+<p>ENTRYPOINT</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">/ <span class="comment"># pstree &amp;&amp; ps -eo pid,ppid,args</span></span><br><span class="line">dumb-init---start.sh-+-app_30s---5*[&#123;app_30s&#125;]</span><br><span class="line">                     |-app_600s---6*[&#123;app_600s&#125;]</span><br><span class="line">                     `-app_60s---6*[&#123;app_60s&#125;]</span><br><span class="line">PID   PPID  COMMAND</span><br><span class="line">    1     0 /usr/bin/dumb-init -- /start.sh</span><br><span class="line">    6     1 &#123;start.sh&#125; /bin/sh /start.sh</span><br><span class="line">    7     6 /app/app_30s</span><br><span class="line">    8     6 /app/app_600s</span><br><span class="line">    9     6 /app/app_60s</span><br><span class="line">   27     0 sh</span><br><span class="line">   33    27 ps -eo pid,ppid,args</span><br></pre></td></tr></table></figure>
+<p>ENTRYPOINT + shebang</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">/ <span class="comment"># pstree &amp;&amp; ps -eo pid,ppid,args</span></span><br><span class="line">dumb-init---start.sh---sh-+-app_30s---7*[&#123;app_30s&#125;]</span><br><span class="line">                          |-app_600s---5*[&#123;app_600s&#125;]</span><br><span class="line">                          `-app_60s---6*[&#123;app_60s&#125;]</span><br><span class="line">PID   PPID  COMMAND</span><br><span class="line">    1     0 /usr/bin/dumb-init -- /start.sh</span><br><span class="line">    6     1 &#123;start.sh&#125; /usr/bin/dumb-init /bin/sh /start.sh</span><br><span class="line">    7     6 /bin/sh /start.sh</span><br><span class="line">    8     7 /app/app_30s</span><br><span class="line">    9     7 /app/app_600s</span><br><span class="line">   10     7 /app/app_60s</span><br><span class="line">   29     0 sh</span><br><span class="line">   35    29 ps -eo pid,ppid,args</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>shenbang、ENTRYPOINT单独使用效果一致，不单独列出了</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>-</th>
+<th>条件</th>
+<th>进程树</th>
+<th>log</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>不使用dumb-init</td>
+<td>见上方</td>
+<td>$ docker logs -f  dumb<br/>600 ticker<br/>60 ticker<br/>30 ticker<br/># 执行 docker stop dumb<br/>600 ticker<br/>30 ticker<br/>60 ticker<br/>…</td>
+<td>执行<code>docker stop dumb</code>后容器并没有停止<br />且log中也没有信号接收的输出，<br />直到docker默认的等待时间（10s）被强杀</td>
+</tr>
+<tr>
+<td>2</td>
+<td>ENTRYPOINT + DUMB_INIT_SETSID&#x3D;</td>
+<td>见上方</td>
+<td>$ docker logs -f dumb<br/>60 ticker<br/>30 ticker<br/>600 ticker<br/>600 ticker<br/>60 ticker<br/>30 ticker<br/># 执行 docker stop dumb<br/>600 signal<br/>60 signal</td>
+<td>执行<code>docker stop dumb</code>后，<br />log中出现了两个程序接收到信号的日志输出<br />多次运行后，信号输出未1-3个不等，<br />start.sh是dumb-int的直接子进程<br />但start.sh并未等待它所有子进程推出后再退出</td>
+</tr>
+<tr>
+<td>3</td>
+<td>ENTRYPOINT + DUMB_INIT_SETSID&#x3D;0</td>
+<td>同2</td>
+<td>同1</td>
+<td>执行<code>docker stop dumb</code>后容器立即退出<br />原因同2</td>
+</tr>
+<tr>
+<td>4</td>
+<td>ENTRYPOINT + shebang + DUMB_INIT_SETSID&#x3D;0</td>
+<td>见上方</td>
+<td>同1</td>
+<td>执行<code>docker stop dumb</code>后容器立即退出<br />原因同2<br />直接子进程分别是start.sh 以及 shebang中的 sh</td>
+</tr>
+<tr>
+<td>5</td>
+<td>ENTRYPOINT + shebang + DUMB_INIT_SETSID&#x3D;</td>
+<td>同4</td>
+<td>$ docker logs -f dumb<br/>60 ticker<br/>30 ticker<br/>600 ticker<br/>60 ticker<br/>30 ticker<br/>600 ticker<br/># 执行 docker stop dumb<br/>60 signal<br/>600 signal<br/>30 signal</td>
+<td>执行<code>docker stop dumb</code>后<br />容器等待所有子进程退出后才退出。<br />实现预期目标<br />原因是脚本shebang中设置<code>/usr/bin/dumb-init</code>，<br />其pid为6，ppid为1，接收到pid1传递的信号后再传递<br />同时等待所有子进程退出后才退出</td>
+</tr>
+</tbody></table>
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><h3 id="如果多程序中只有一个程序需要获取到信号，则通过exec提升子进程"><a href="#如果多程序中只有一个程序需要获取到信号，则通过exec提升子进程" class="headerlink" title="如果多程序中只有一个程序需要获取到信号，则通过exec提升子进程"></a>如果多程序中只有一个程序需要获取到信号，则通过exec提升子进程</h3><blockquote>
+<p>exec 命令用于调用并执行指定的命令。<br>通常用在 Shell 脚本程序中，可以调用其他的命令。如果在当前终端中使用命令，则当指定的命令执行完毕后会立即退出终端。</p>
+</blockquote>
+<h4 id="补充信息，使用exec后，DUMB-INIT-SETSID配置无影响"><a href="#补充信息，使用exec后，DUMB-INIT-SETSID配置无影响" class="headerlink" title="补充信息，使用exec后，DUMB_INIT_SETSID配置无影响"></a>补充信息，使用exec后，DUMB_INIT_SETSID配置无影响</h4><p>具体原因看进程树就明白了  </p>
+<h5 id="ENTRYPOINT"><a href="#ENTRYPOINT" class="headerlink" title="ENTRYPOINT"></a>ENTRYPOINT</h5><p>此时有且只有app_60s接收到了信号，具体看进程树<br>start.sh</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#! /bin/sh</span></span><br><span class="line">/app/app_30s &amp;</span><br><span class="line">/app/app_600s &amp;</span><br><span class="line"><span class="built_in">exec</span> /app/app_60s</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/ <span class="comment"># pstree &amp;&amp; ps -eo pid,ppid,args</span></span><br><span class="line">dumb-init---app_60s-+-app_30s---6*[&#123;app_30s&#125;]</span><br><span class="line">                    |-app_600s---7*[&#123;app_600s&#125;]</span><br><span class="line">                    `-6*[&#123;app_60s&#125;]</span><br><span class="line">PID   PPID  COMMAND</span><br><span class="line">    1     0 /usr/bin/dumb-init -- /start.sh</span><br><span class="line">    6     1 /app/app_60s</span><br><span class="line">    7     6 /app/app_30s</span><br><span class="line">    8     6 /app/app_600s</span><br><span class="line">   28     0 sh</span><br><span class="line">   34    28 ps -eo pid,ppid,args</span><br></pre></td></tr></table></figure>
+
+<h5 id="ENTRYPOINT-shebang"><a href="#ENTRYPOINT-shebang" class="headerlink" title="ENTRYPOINT + shebang"></a>ENTRYPOINT + shebang</h5><p>此时有且只有app_60s接收到了信号，具体看进程树<br>此处可发现，dumb-init多层是可以的，会一直向下传递</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">/ <span class="comment"># pstree &amp;&amp; ps -eo pid,ppid,args</span></span><br><span class="line">dumb-init---start.sh---app_60s-+-app_30s---6*[&#123;app_30s&#125;]</span><br><span class="line">                               |-app_600s---6*[&#123;app_600s&#125;]</span><br><span class="line">                               `-6*[&#123;app_60s&#125;]</span><br><span class="line">PID   PPID  COMMAND</span><br><span class="line">    1     0 /usr/bin/dumb-init -- /start.sh</span><br><span class="line">    6     1 &#123;start.sh&#125; /usr/bin/dumb-init /bin/sh /start.sh</span><br><span class="line">    7     6 /app/app_60s</span><br><span class="line">    8     7 /app/app_30s</span><br><span class="line">    9     7 /app/app_600s</span><br><span class="line">   28     0 sh</span><br><span class="line">   34    28 ps -eo pid,ppid,args</span><br></pre></td></tr></table></figure>
+<h3 id="如果多个程序都需要获取到信号，则-ENTRYPOINT-shebang-DUMB-INIT-SETSID-x3D"><a href="#如果多个程序都需要获取到信号，则-ENTRYPOINT-shebang-DUMB-INIT-SETSID-x3D" class="headerlink" title="如果多个程序都需要获取到信号，则 ENTRYPOINT + shebang + DUMB_INIT_SETSID&#x3D;"></a>如果多个程序都需要获取到信号，则 ENTRYPOINT + shebang + DUMB_INIT_SETSID&#x3D;</h3><p>子进程都能从dumb-init获取到信号，并等待其退出  </p>
+<h2 id="参考连接"><a href="#参考连接" class="headerlink" title="参考连接"></a>参考连接</h2><p><a target="_blank" rel="noopener" href="https://github.com/Yelp/dumb-init">dumb-init</a><br><a target="_blank" rel="noopener" href="https://www.google.com/search?q=Linux+exec&oq=Linux+exec+&aqs=edge.0.69i59l2j0i10i12l2j69i60l3.3164j0j9&sourceid=chrome&ie=UTF-8">exec</a><br><a target="_blank" rel="noopener" href="https://loesspie.com/">原文链接</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/docker/" rel="tag"># docker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/05/23/go-signal-buffer-channel/" rel="prev" title="golang使用有缓冲的channel来接收signal">
+      <i class="fa fa-chevron-left"></i> golang使用有缓冲的channel来接收signal
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/07/16/go-grpc-proto-import/" rel="next" title="通过import的方式复用proto来使用grpc">
+      通过import的方式复用proto来使用grpc <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%9B%A0"><span class="nav-number">1.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81"><span class="nav-number">2.</span> <span class="nav-text">验证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E6%9E%9C"><span class="nav-number">2.1.</span> <span class="nav-text">结果</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">解决方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E6%9E%9C%E5%A4%9A%E7%A8%8B%E5%BA%8F%E4%B8%AD%E5%8F%AA%E6%9C%89%E4%B8%80%E4%B8%AA%E7%A8%8B%E5%BA%8F%E9%9C%80%E8%A6%81%E8%8E%B7%E5%8F%96%E5%88%B0%E4%BF%A1%E5%8F%B7%EF%BC%8C%E5%88%99%E9%80%9A%E8%BF%87exec%E6%8F%90%E5%8D%87%E5%AD%90%E8%BF%9B%E7%A8%8B"><span class="nav-number">3.1.</span> <span class="nav-text">如果多程序中只有一个程序需要获取到信号，则通过exec提升子进程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A1%A5%E5%85%85%E4%BF%A1%E6%81%AF%EF%BC%8C%E4%BD%BF%E7%94%A8exec%E5%90%8E%EF%BC%8CDUMB-INIT-SETSID%E9%85%8D%E7%BD%AE%E6%97%A0%E5%BD%B1%E5%93%8D"><span class="nav-number">3.1.1.</span> <span class="nav-text">补充信息，使用exec后，DUMB_INIT_SETSID配置无影响</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#ENTRYPOINT"><span class="nav-number">3.1.1.1.</span> <span class="nav-text">ENTRYPOINT</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ENTRYPOINT-shebang"><span class="nav-number">3.1.1.2.</span> <span class="nav-text">ENTRYPOINT + shebang</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E6%9E%9C%E5%A4%9A%E4%B8%AA%E7%A8%8B%E5%BA%8F%E9%83%BD%E9%9C%80%E8%A6%81%E8%8E%B7%E5%8F%96%E5%88%B0%E4%BF%A1%E5%8F%B7%EF%BC%8C%E5%88%99-ENTRYPOINT-shebang-DUMB-INIT-SETSID-x3D"><span class="nav-number">3.2.</span> <span class="nav-text">如果多个程序都需要获取到信号，则 ENTRYPOINT + shebang + DUMB_INIT_SETSID&#x3D;</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%BF%9E%E6%8E%A5"><span class="nav-number">4.</span> <span class="nav-text">参考连接</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">bbbht</p>
+  <div class="site-description" itemprop="description">尝试，记录，分享</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">90</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/bbbht" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;bbbht" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:plateau.loess@gmail.com" title="E-Mail → mailto:plateau.loess@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">bbbht</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://loessplateau.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://example.com/2021/07/09/docker-multi-process-dumb-init/";
+    this.page.identifier = "2021/07/09/docker-multi-process-dumb-init/";
+    this.page.title = "使用dumb-init来实现docker中运行多个进程并处理SIGTERM信号";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://loessplateau.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>
