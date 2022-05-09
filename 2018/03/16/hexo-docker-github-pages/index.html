@@ -28,7 +28,7 @@
 <meta property="og:description" content="开发机软件环境比较复杂，为避免无谓的干扰，所以将hexo环境放入docker中于是写了个Dockfile只用来本地预览，发布还是由appveyor完成顺手够用就好">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2018-03-16T00:49:53.000Z">
-<meta property="article:modified_time" content="2022-05-09T09:15:11.237Z">
+<meta property="article:modified_time" content="2022-05-09T09:36:31.049Z">
 <meta property="article:author" content="bbbht">
 <meta property="article:tag" content="others">
 <meta property="article:tag" content="docker">
@@ -221,7 +221,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-09 17:15:11" itemprop="dateModified" datetime="2022-05-09T17:15:11+08:00">2022-05-09</time>
+                <time title="修改时间：2022-05-09 17:36:31" itemprop="dateModified" datetime="2022-05-09T17:36:31+08:00">2022-05-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -283,6 +283,7 @@
 </ul>
 </li>
 <li>文件名不能包含 <code>&amp;</code>，会导致 sitemap 出错 <code>xmlParseEntityRef: no name</code></li>
+<li>如果自定义域名了，<code>CNAME</code> 要放在 source 目录下，否则 generate 后 deploy 时会被删除</li>
 </ul>
 <p><a target="_blank" rel="noopener" href="https://loesspie.com/">原文链接</a></p>
 
